@@ -28,12 +28,14 @@ class FileProxy(collections.Iterator):
             return it()
         return self
 
-    def next(self):
+    def __next__(self):
         """Implementation of :class:`collections.Iterator` protocol."""
         line = self.readline()
         if not line:
             raise StopIteration('hit eof')
         return line
+
+    next = __next__
 
     def read(self, size=-1):
         """Reads at the most ``size`` bytes from the file.
