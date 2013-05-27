@@ -6,6 +6,7 @@ except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup, find_packages
+from setuptools.command.test import test
 
 
 def readme():
@@ -14,6 +15,19 @@ def readme():
             return f.read()
     except (IOError, OSError):
         return ''
+
+
+class pytest(test):
+
+    def finalize_options(self):
+        test.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        from pytest import main
+        errno = main(self.test_args)
+        raise SystemExit(errno)
 
 
 setup(
@@ -25,7 +39,7 @@ setup(
     author_email='minhee' '@' 'dahlia.kr',
     license='MIT License',
     packages=find_packages(exclude=['tests']),
-    install_requires=['SQLAlchemy >= 0.8.0', 'Wand >= 0.2.0'],
+    install_requires=['SQLAlchemy >= 0.8.0'],
     tests_require=['pytest >= 2.3.0'],
     classifiers=[
         'Development Status :: 3 - Alpha',
