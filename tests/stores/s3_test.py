@@ -1,7 +1,7 @@
 import functools
 import os.path
 import re
-import time
+import uuid
 
 from pytest import fixture, mark, raises, skip
 
@@ -66,7 +66,8 @@ def s3_sandbox_store_getter(request):
 @mark.parametrize('prefix', ['', 'prefixtest'])
 def test_s3_store(prefix, s3_store_getter):
     s3 = s3_store_getter(prefix=prefix)
-    image = TestingImage(thing_id=1234, width=405, height=640,
+    thing_id = uuid.uuid1().int
+    image = TestingImage(thing_id=thing_id, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     image_path = os.path.join(sample_images_dir, 'iu.jpg')
@@ -77,7 +78,7 @@ def test_s3_store(prefix, s3_store_getter):
     with s3.open(image) as actual:
         actual_data = actual.read()
     assert expected_data == actual_data
-    expected_key = s3.get_key('testing', 1234, 405, 640, 'image/jpeg')
+    expected_key = s3.get_key('testing', thing_id, 405, 640, 'image/jpeg')
     expected_url = s3.bucket.make_url(expected_key)
     actual_url = s3.locate(image)
     assert remove_query(expected_url) == remove_query(actual_url)
@@ -102,7 +103,7 @@ def test_s3_sandbox_store(underlying_prefix, overriding_prefix,
                                  overriding_prefix=overriding_prefix)
     under = s3.underlying
     over = s3.overriding
-    id_offset = int(time.time()) - 1325343600
+    id_offset = uuid.uuid1().int
     if id_offset % 2:  # id_offset is always even
         id_offset -= 1
     if not underlying_prefix:
