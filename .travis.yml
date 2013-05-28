@@ -13,7 +13,7 @@ before_script:
 - if [ "$DB" = "postgresql" ]; then createdb -U postgres -E utf8 -T postgres si_test; fi
 - if [ "$DB" = "mysql" ]; then mysql -e "CREATE DATABASE si_test;"; fi
 script:
-- py.test
+- py.test --durations=20
 notifications:
   irc:
     channels:
