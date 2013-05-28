@@ -154,6 +154,12 @@ class LocalProxyStore(Store, LocalProxy):
             object_type, object_id, width, height, mimetype
         )
 
+    def __repr__(self):
+        try:
+            return super(LocalProxyStore, self).__repr__()
+        except ContextError:
+            return '("unbound", {0}.current_store)[1]'.format(__name__)
+
 
 #: (:class:`LocalProxyStore`) The currently set context of the image store
 #: backend.  It can be set using :func:`store_context()`.

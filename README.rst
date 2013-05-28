@@ -8,6 +8,9 @@ entity objects.
 Links
 -----
 
+Docs
+   https://sqlalchemy-imageattach.readthedocs.org/
+
 GitHub
    https://github.com/crosspop/sqlalchemy-imageattach
 

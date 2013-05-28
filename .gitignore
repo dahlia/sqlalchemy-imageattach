@@ -1,3 +1,4 @@
+docs/_build/
 SQLAlchemy_ImageAttach.egg-info/
 .tox/
 .*.swp
