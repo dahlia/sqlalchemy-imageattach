@@ -180,7 +180,7 @@ class Image(object):
 
     #: (:class:`basestring`) The mimetype of the image
     #: e.g. ``'image/jpeg'``, ``'image/png'``.
-    mimetype = Column(String, nullable=False)
+    mimetype = Column(String(255), nullable=False)
 
     #: (:class:`bool`) Whether it is original or resized.
     original = Column(Boolean, nullable=False, default=False)
