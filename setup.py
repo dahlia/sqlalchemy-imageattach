@@ -39,7 +39,8 @@ setup(
     author_email='minhee' '@' 'dahlia.kr',
     license='MIT License',
     packages=find_packages(exclude=['tests']),
-    install_requires=['SQLAlchemy >= 0.8.0'],
+    install_requires=['SQLAlchemy >= 0.8.0', 'Wand >= 0.2.0', 'Werkzeug',
+                      'simples3'],
     tests_require=['pytest >= 2.3.0'],
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -48,7 +49,6 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Programming Language :: Python :: Implementation :: Stackless',
