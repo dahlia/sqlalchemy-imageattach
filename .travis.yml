@@ -6,7 +6,7 @@ python:
 env:
 - DB=sqlite IMAGEATTACH_TEST_DATABASE_URL='sqlite://'
 - DB=postgresql DRIVER=psycopg2 IMAGEATTACH_TEST_DATABASE_URL='postgresql:///si_test?user=postgres'
-- DB=mysql DRIVER=oursql IMAGEATTACH_TEST_DATABASE_URL='mysql://root@localhost/si_test'
+- DB=mysql DRIVER=oursql IMAGEATTACH_TEST_DATABASE_URL='mysql+oursql://root@localhost/si_test'
 install:
 - pip install "pytest>=2.3.0" $DRIVER -e .
 before_script:
