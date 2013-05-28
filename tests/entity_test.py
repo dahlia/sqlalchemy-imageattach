@@ -29,7 +29,7 @@ def tmp_store(request, tmpdir):
 class Something(Base):
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String(100), nullable=False)
     cover = image_attachment('SomethingCover')
 
     __tablename__ = 'something'
@@ -276,7 +276,7 @@ class Samething(Base):
     """Not S'o'mething, but s'a'mething."""
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String(100), nullable=False)
     cover = image_attachment('SamethingCover')
 
     __tablename__ = 'samething'
