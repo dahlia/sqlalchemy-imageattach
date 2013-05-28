@@ -8,6 +8,8 @@ except ImportError:
     from setuptools import setup, find_packages
 from setuptools.command.test import test
 
+from sqlalchemy_imageattach.version import VERSION
+
 
 def readme():
     try:
@@ -32,7 +34,7 @@ class pytest(test):
 
 setup(
     name='SQLAlchemy-ImageAttach',
-    version='0.8.0a1',
+    version=VERSION,
     description='SQLAlchemy extension for attaching images to entity objects',
     long_description=readme(),
     author='Hong Minhee',
