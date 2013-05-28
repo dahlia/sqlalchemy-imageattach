@@ -3,8 +3,15 @@ python:
 - 2.6
 - 2.7
 - pypy
+env:
+- DB=sqlite IMAGEATTACH_TEST_DATABASE_URL='sqlite://'
+- DB=postgresql DRIVER=psycopg2 IMAGEATTACH_TEST_DATABASE_URL='postgresql:///si_test?user=postgres'
+- DB=mysql DRIVER=oursql IMAGEATTACH_TEST_DATABASE_URL='mysql://root@localhost/si_test'
 install:
-- pip install "pytest>=2.3.0" -e .
+- pip install "pytest>=2.3.0" $DRIVER -e .
+before_script:
+- if [ "$DB" = "postgresql" ]; then createdb -U postgres -E utf8 -T postgres si_test; fi
+- if [ "$DB" = "mysql" ]; then mysql -e "CREATE DATABASE si_test;"; fi
 script:
 - py.test
 notifications:
