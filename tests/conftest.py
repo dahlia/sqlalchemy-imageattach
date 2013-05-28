@@ -7,6 +7,13 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool, StaticPool
 
+try:
+    from psycopg2cffi.compat import register
+except ImportError:
+    pass
+else:
+    register()
+
 
 DEFAULT_DATABASE_URL = 'sqlite://'
 
