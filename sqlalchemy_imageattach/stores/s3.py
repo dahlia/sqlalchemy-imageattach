@@ -28,7 +28,7 @@ In here we depend on :mod:`simples3` to deal with S3 buckets and objects.
 import mimetypes
 import re
 
-from simples3.bucket import S3Bucket
+from simples3.bucket import S3Bucket, S3Error
 
 from ..store import Store
 
@@ -106,7 +106,7 @@ class S3Store(Store):
         key = self.get_key(*args, **kwargs)
         try:
             return self.bucket.get(key)
-        except KeyError as e:
+        except (KeyError, S3Error) as e:
             raise IOError(str(e))
 
     def get_url(self, *args, **kwargs):
@@ -191,7 +191,7 @@ class S3SandboxStore(Store):
         key = self.overriding.get_key(*args, **kwargs)
         try:
             file_ = self.overriding.bucket.get(key)
-        except KeyError:
+        except (KeyError, S3Error):
             return self.underlying.get_file(*args, **kwargs)
         if file_.s3_info.get('mimetype') == self.DELETED_MARK_MIMETYPE:
             raise IOError('deleted')
@@ -201,7 +201,7 @@ class S3SandboxStore(Store):
         key = self.overriding.get_key(*args, **kwargs)
         try:
             self.overriding.bucket.info(key)
-        except KeyError:
+        except (KeyError, S3Error):
             store = self.underlying
         else:
             store = self.overriding
