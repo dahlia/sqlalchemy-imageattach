@@ -5,12 +5,17 @@ import uuid
 
 from pytest import fixture, mark, raises, skip
 
+from sqlalchemy_imageattach.stores import s3
 from sqlalchemy_imageattach.stores.s3 import S3SandboxStore, S3Store
 from ..conftest import sample_images_dir
 from .conftest import TestingImage, utcnow
 
 
 remove_query = functools.partial(re.compile(r'\?.*$').sub, '')
+
+
+# Don't use HTTPS for unit testing (to utilize fakes3)
+s3.BASE_URL_FORMAT = 'http://{0}.s3.amazonaws.com'
 
 
 @fixture

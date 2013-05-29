@@ -32,13 +32,19 @@ from simples3.bucket import S3Bucket, S3Error
 
 from ..store import Store
 
-__all__ = 'S3SandboxStore', 'S3Store'
+__all__ = 'BASE_URL_FORMAT', 'DEFAULT_MAX_AGE', 'S3SandboxStore', 'S3Store'
 
 
 #: (:class:`numbers.Integral`) The default ``max-age`` seconds of
 #: :mailheader:`Cache-Control`.  It's the default value of
 #: :attr:`S3Store.max_age` attribute.
 DEFAULT_MAX_AGE = 60 * 60 * 24 * 365
+
+#: (:class:`str`) The format string of base url of AWS S3.
+#: Contains no trailing slash.
+#: Default is ``'https://{0}.s3.amazonaws.com'``.
+BASE_URL_FORMAT = 'https://{0}.s3.amazonaws.com'
+
 
 
 class S3Store(Store):
@@ -81,7 +87,7 @@ class S3Store(Store):
                                 'with simples3.bucket.S3Bucket argument')
             self.bucket = name
         else:
-            base_url = 'https://{0}.s3.amazonaws.com'.format(name)
+            base_url = BASE_URL_FORMAT.format(name)
             self.bucket = S3Bucket(
                 name,
                 access_key=access_key,
