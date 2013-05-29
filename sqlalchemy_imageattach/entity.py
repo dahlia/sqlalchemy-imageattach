@@ -131,18 +131,21 @@ class Image(object):
 
     Note that it implements :meth:`__html__()` method, a de facto
     standard special method for HTML templating.  So you can simply use
-    it in Jinja2 like:
+    it in HTML templates like:
 
     .. sourcecode:: jinja
 
        {{ user.profile.find_thumbnail(120) }}
 
-    instead of:
+    The above template is equivalent to:
 
     .. sourcecode:: html+jinja
 
-       <img src="{{ user.profile.find_thumbnail(120)|permalink }}"
-            width="120" height="{{ user.profile.find_thumbnail(120).height }}">
+       {% with thumbnail = user.profile.find_thumbnail(120) %}
+           <img src="{{ thumbnail.locate() }}"
+                width="{{ thumbnail.width }}"
+                height="{{ thumbnail.height }}">
+       {% endwith %}
 
     """
 
