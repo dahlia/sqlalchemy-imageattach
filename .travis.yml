@@ -7,13 +7,23 @@ env:
 - DB=sqlite IMAGEATTACH_TEST_DATABASE_URL='sqlite://'
 - DB=postgresql DRIVER=psycopg2ct IMAGEATTACH_TEST_DATABASE_URL='postgresql:///si_test?user=postgres'
 - DB=mysql DRIVER=PyMySQL IMAGEATTACH_TEST_DATABASE_URL='mysql+pymysql://root@localhost/si_test'
+before_install:
+- sudo apt-get update -qq
+- sudo apt-get install -qq s3cmd
 install:
 - pip install "pytest>=2.3.0" "pytest-cov>=1.6" coveralls $DRIVER -e .
+- gem install --user-install --no-ri --no-rdoc fakes3
 before_script:
 - if [ "$DB" = "postgresql" ]; then createdb -U postgres -E utf8 -T postgres si_test; fi
 - if [ "$DB" = "mysql" ]; then mysql -e "CREATE DATABASE si_test;"; fi
+- sudo -b nohup ~/.gem/ruby/bin/*/fakes3 -r /tmp/fakes3 -p 80
+- echo 127.0.0.1 s3.amazonaws.com | sudo tee -a /etc/hosts
+- echo 127.0.0.1 si-test.s3.amazonaws.com | sudo tee -a /etc/hosts
+- echo 127.0.0.1 si-test-sandbox.s3.amazonaws.com | sudo tee -a /etc/hosts
+- s3cmd mb s3://si-test
+- s3cmd mb s3://si-test-sandbox
 script:
-- py.test --cov sqlalchemy_imageattach --durations=20
+- py.test --cov sqlalchemy_imageattach --durations=20 --s3-access-key=foo --s3-secret-key=bar --s3-name=si-test --s3-sandbox-name=si-test-sandbox
 after_success:
 - coveralls
 notifications:
