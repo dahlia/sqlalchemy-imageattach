@@ -20,8 +20,8 @@ before_script:
 - echo 127.0.0.1 s3.amazonaws.com | sudo tee -a /etc/hosts
 - echo 127.0.0.1 si-test.s3.amazonaws.com | sudo tee -a /etc/hosts
 - echo 127.0.0.1 si-test-sandbox.s3.amazonaws.com | sudo tee -a /etc/hosts
-- s3cmd mb s3://si-test
-- s3cmd mb s3://si-test-sandbox
+- s3cmd -c .travis-s3cfg mb s3://si-test
+- s3cmd -c .travis-s3cfg mb s3://si-test-sandbox
 script:
 - py.test --cov sqlalchemy_imageattach --durations=20 --s3-access-key=foo --s3-secret-key=bar --s3-name=si-test --s3-sandbox-name=si-test-sandbox
 after_success:
