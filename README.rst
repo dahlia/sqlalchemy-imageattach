@@ -21,5 +21,12 @@ Continuous Integration (Travis CI)
       :alt: Build Status
       :target: http://travis-ci.org/crosspop/sqlalchemy-imageattach
 
+Code Coverage
+   https://coveralls.io/r/crosspop/sqlalchemy-imageattach
+
+   .. image:: https://coveralls.io/repos/crosspop/sqlalchemy-imageattach/badge.png
+      :alt: Coverage Status
+      :target: https://coveralls.io/r/crosspop/sqlalchemy-imageattach
+
 Author Website
    http://dahlia.kr/

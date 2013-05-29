@@ -43,6 +43,10 @@
       :alt: Build Status
       :target: http://travis-ci.org/crosspop/sqlalchemy-imageattach
 
+   .. image:: https://coveralls.io/repos/crosspop/sqlalchemy-imageattach/badge.png
+      :alt: Coverage Status
+      :target: https://coveralls.io/r/crosspop/sqlalchemy-imageattach
+
 
 .. _Hong Minhee: http://dahlia.kr/
 .. _Crosspop: http://crosspop.in/

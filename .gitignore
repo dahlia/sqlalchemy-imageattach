@@ -1,5 +1,6 @@
 docs/_build/
 SQLAlchemy_ImageAttach.egg-info/
+.coverage
 .tox/
 .*.swp
 *.pyc
