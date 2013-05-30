@@ -8,7 +8,8 @@ from werkzeug.test import Client
 from werkzeug.wrappers import Response
 
 from sqlalchemy_imageattach.stores.fs import (FileSystemStore,
-                                              HttpExposedFileSystemStore)
+                                              HttpExposedFileSystemStore,
+                                              StaticServerMiddleware)
 from ..conftest import sample_images_dir
 from .conftest import TestingImage, utcnow
 
@@ -68,3 +69,33 @@ def test_http_fs_store(tmpdir):
     with raises(IOError):
         http_fs_store.open(image)
     tmpdir.remove()
+
+
+def test_static_server():
+    def fallback_app(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/plain')])
+        yield 'fallback: '
+        yield environ['PATH_INFO']
+    test_dir = os.path.join(os.path.dirname(__file__), '..')
+    app = StaticServerMiddleware(fallback_app, '/static/', test_dir)
+    client = Client(app, Response)
+    # 200 OK
+    response = client.get('/static/context_test.py')
+    assert response.status_code == 200
+    assert response.mimetype == 'text/x-python'
+    with open(os.path.join(test_dir, 'context_test.py'), 'rb') as f:
+        assert response.data == f.read()
+        assert response.content_length == f.tell()
+    # 200 OK: subdirectory
+    response = client.get('/static/stores/fs_test.py')
+    assert response.status_code == 200
+    assert response.mimetype == 'text/x-python'
+    with open(os.path.join(test_dir, 'stores', 'fs_test.py'), 'rb') as f:
+        assert response.data == f.read()
+        assert response.content_length == f.tell()
+    # 404 Not Found
+    response = client.get('/static/not-exist')
+    assert response.status_code == 404
+    # fallback app
+    response = client.get('/static-not/')
+    assert response.data == 'fallback: /static-not/'

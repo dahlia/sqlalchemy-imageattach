@@ -21,12 +21,10 @@ import os
 import os.path
 import shutil
 
-from werkzeug.wsgi import SharedDataMiddleware  # FIXME: remove this dependency
-
 from ..store import Store
 
 __all__ = ('BaseFileSystemStore', 'FileSystemStore',
-           'HttpExposedFileSystemStore')
+           'HttpExposedFileSystemStore', 'StaticServerMiddleware')
 
 
 class BaseFileSystemStore(Store):
@@ -126,13 +124,75 @@ class HttpExposedFileSystemStore(BaseFileSystemStore):
         :param app: the wsgi app to wrap
         :type app: :class:`collections.Callable`
         :returns: the another wsgi app that wraps ``app``
-        :rtype: :class:`werkzeug.wsgi.SharedDataMiddleware`
+        :rtype: :class:`StaticServerMiddleware`
 
         """
-        _app = SharedDataMiddleware(app, {'/' + self.prefix: self.path})
+        _app = StaticServerMiddleware(app, '/' + self.prefix, self.path)
         def app(environ, start_response):
             if not hasattr(self, 'host_url'):
                 self.host_url = environ['wsgi.url_scheme'] + '://' + \
                                 environ['HTTP_HOST'] + '/'
             return _app(environ, start_response)
         return app
+
+
+class StaticServerMiddleware(object):
+    """Simple static server WSGI middleware.
+
+    :param app: the fallback app when the path is not scoped in
+                ``url_path``
+    :type app: :class:`collections.Callable`
+    :param url_path: the exposed path to url
+    :type url_path: :class:`basestring`
+    :param dir_path: the filesystem directory path to serve
+    :type dir_path: :class:`basestring`
+
+    .. todo::
+
+       - Security considerations (especially about paths)
+       - :mailheader:`ETag`
+       - :mailheader:`Last-Modified` and :mailheader:`If-Modified-Since`
+       - :mailheader:`Cache-Control` and :mailheader:`Expires`
+
+    """
+
+    def __init__(self, app, url_path, dir_path):
+        if not url_path.startswith('/'):
+            url_path = '/' + url_path
+        if not url_path.endswith('/'):
+            url_path += '/'
+        if not dir_path:
+            dir_path = '.'
+        elif not dir_path.endswith('/'):
+            dir_path += '/'
+        self.app = app
+        self.url_path = url_path
+        self.dir_path = dir_path
+
+    @staticmethod
+    def file_stream(path):
+        with open(path, 'rb') as f:
+            while 1:
+                buf = f.read(4096)
+                if buf:
+                    yield buf
+                else:
+                    break
+
+    def __call__(self, environ, start_response):
+        path = environ.get('PATH_INFO', '/')
+        if not path.startswith(self.url_path):
+            return self.app(environ, start_response)
+        file_path = os.path.join(self.dir_path, path[len(self.url_path):])
+        try:
+            stat = os.stat(file_path)
+        except (IOError, OSError):
+            start_response('404 Not Found', [('Content-Type', 'text/plain')])
+            return '404 Not Found',
+        mimetype, _ = mimetypes.guess_type(file_path)
+        mimetype = mimetype or 'application/octet-stream'
+        start_response('200 OK', [
+            ('Content-Type', mimetype),
+            ('Content-Length', str(stat.st_size))
+        ])
+        return self.file_stream(file_path)

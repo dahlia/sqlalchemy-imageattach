@@ -41,8 +41,8 @@ setup(
     author_email='minhee' '@' 'dahlia.kr',
     license='MIT License',
     packages=find_packages(exclude=['tests']),
-    install_requires=['SQLAlchemy >= 0.8.0', 'Wand >= 0.2.0', 'Werkzeug'],
-    tests_require=['pytest >= 2.3.0'],
+    install_requires=['SQLAlchemy >= 0.8.0', 'Wand >= 0.2.0'],
+    tests_require=['pytest >= 2.3.0', 'Werkzeug >= 0.8'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
@@ -55,5 +55,6 @@ setup(
         'Programming Language :: Python :: Implementation :: Stackless',
         'Topic :: Database :: Front-Ends',
         'Topic :: Multimedia :: Graphics'
-    ]
+    ],
+    cmdclass={'test': pytest}
 )
