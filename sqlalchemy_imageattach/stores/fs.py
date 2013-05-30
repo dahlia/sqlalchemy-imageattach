@@ -104,7 +104,7 @@ class HttpExposedFileSystemStore(BaseFileSystemStore):
 
     """
 
-    def __init__(self, path, prefix='x.images'):
+    def __init__(self, path, prefix='__images__'):
         super(HttpExposedFileSystemStore, self).__init__(path)
         if prefix.startswith('/'):
             prefix = prefix[1:]

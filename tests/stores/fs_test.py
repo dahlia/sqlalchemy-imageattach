@@ -52,7 +52,7 @@ def test_http_fs_store(tmpdir):
     with http_fs_store.open(image) as actual:
         actual_data = actual.read()
     assert expected_data == actual_data
-    expected_url = 'http://localhost/x.images/testing/234/1/1234.405x640.jpe'
+    expected_url = 'http://localhost/__images__/testing/234/1/1234.405x640.jpe'
     def app(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/plain')])
         yield http_fs_store.locate(image)
@@ -60,7 +60,7 @@ def test_http_fs_store(tmpdir):
     client = Client(app, Response)
     actual_url = client.get('/').data
     assert expected_url == remove_query(actual_url)
-    response = client.get('/x.images/testing/234/1/1234.405x640.jpe')
+    response = client.get('/__images__/testing/234/1/1234.405x640.jpe')
     assert response.status_code == 200
     assert response.data == expected_data
     assert response.mimetype == 'image/jpeg'
