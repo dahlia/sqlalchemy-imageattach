@@ -88,9 +88,10 @@ def get_current_context_id():
             return greenlet.getcurrent()
         return greenlet.getcurrent(), stackless.getcurrent()
     elif stackless is not None:
-        get_current_context_id = stackless.getcurrent()
+        get_current_context_id = stackless.getcurrent
         return stackless.getcurrent()
-    return thread.getident()
+    get_current_context_id = thread.get_ident
+    return thread.get_ident()
 
 
 #: (:class:`dict`) The dictionary of concurrent contexts to their stacks.
