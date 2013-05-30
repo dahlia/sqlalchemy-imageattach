@@ -32,6 +32,7 @@ if os.environ.get('READTHEDOCS', 0):
             return Mock(self.name + '.' + name)
         def __repr__(self):
             return self.name
+    sys.modules['wand'] = Mock('wand')
     mockapi = Mock('wand.api')
     sys.modules['wand'].api = sys.modules['wand.api'] = mockapi
     mockapi.library = Mock('wand.api.library')
