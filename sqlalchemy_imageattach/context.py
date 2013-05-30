@@ -3,10 +3,9 @@
 
 Scoped context makes other modules able to vertically take an image
 store object without explicit parameter for it.  It's similar to
-:pypi:`Flask`'s design decision and actually implemented using
-:pypi:`Werkzeug`'s context locals.  Context locals are poor man's
-way to use dynamic scoping in programming languages that doesn't
-provide it (like Python).
+Flask_'s design decision and Werkzeug_'s context locals.
+Context locals are workaround to use dynamic scoping in
+programming languages that doesn't provide it (like Python).
 
 For example, a function can take an image store to use as its parameter::
 
@@ -51,20 +50,51 @@ The above code can be rewritten using scoped context::
     with store_context(fs_store):
         func()
 
+.. _Flask: http://flask.pocoo.org/
+.. _Werkzeug: http://werkzeug.pocoo.org/
+
 """
 import contextlib
+try:
+    import thread
+except ImportError:
+    import dummy_thread as thread
 
-from werkzeug.local import LocalProxy, LocalStack
+try:
+    import greenlet
+except ImportError:
+    greenlet = None
+try:
+    import stackless
+except ImportError:
+    stackless = None
 
 from .store import Store
 
-__all__ = ('current_store', 'current_store_stack', 'get_current_store',
-           'store_context')
+__all__ = ('current_store', 'current_store_stack', 'get_current_context_id',
+           'get_current_store', 'store_context')
 
 
-#: (:class:`werkzeug.local.LocalStack`) The context local stack to maintain
-#: internal state of nested contexts.
-current_store_stack = LocalStack()
+def get_current_context_id():
+    """Identifis which context it is (greenlet, stackless, or thread).
+
+    :returns: the identifier of the current context.
+
+    """
+    global get_current_context_id
+    if greenlet is not None:
+        if stackless is None:
+            get_current_context_id = greenlet.getcurrent
+            return greenlet.getcurrent()
+        return greenlet.getcurrent(), stackless.getcurrent()
+    elif stackless is not None:
+        get_current_context_id = stackless.getcurrent()
+        return stackless.getcurrent()
+    return thread.getident()
+
+
+#: (:class:`dict`) The dictionary of concurrent contexts to their stacks.
+context_stacks = {}
 
 
 @contextlib.contextmanager
@@ -89,9 +119,9 @@ def store_context(store):
     if not isinstance(store, Store):
         raise TypeError('store must be an instance of sqlalchemy_imageattach.'
                         'store.Store, not ' + repr(store))
-    current_store_stack.push(store)
+    context_stacks.setdefault(get_current_context_id(), []).append(store)
     yield store
-    current_store_stack.pop()
+    context_stacks.setdefault(get_current_context_id(), []).pop()
 
 
 def get_current_store():
@@ -103,67 +133,76 @@ def get_current_store():
     :rtype: :class:`~sqlalchemy_imageattach.store.Store`
 
     """
-    store = current_store_stack.top
-    if store is None:
+    try:
+        store = context_stacks.setdefault(get_current_context_id(), [])[-1]
+    except IndexError:
         raise ContextError('not in store_context; use sqlalchemy_imageattach.'
                            'entity.store_context()')
     return store
 
 
-class LocalProxyStore(Store, LocalProxy):
-    """The subtype of :class:`~sqlalchemy_imageattach.store.Store` and
-    :class:`werkzeug.local.LocalProxy`.  It's a proxy of another
-    image storage which doesn't fail on instance type checking
-    for :class:`~sqlalchemy_imageattach.store.Store` interface::
+class LocalProxyStore(Store):
+    """Proxy of another image storage.
 
-        from sqlalchemy_imageattach.store import Store
-        from werkzeug.local import LocalProxy
-
-        local_proxy_store = LocalProxyStore(get_current_storage)
-        local_proxy = LocalProxy(get_current_storage)
-
-        assert isinstance(local_proxy_store, Store), \
-               'LocalProxyStore instance passes on instance type checking'
-        assert not isinstance(local_proxy, Store), \
-               'while LocalProxy fails'
-
-    The constructor takes the same parameters to
-    :class:`~werkzeug.local.LocalProxy`'s one.
+    :param get_current_object: a function that returns "current" store
+    :type get_current_object: :class:`collections.Callable`
+    :param repr_string: an optional string for :func:`repr()`
+    :type repr_string: :class:`str`
 
     """
 
+    def __init__(self, get_current_object, repr_string=None):
+        if not callable(get_current_object):
+            raise TypeError('expected callable')
+        self.get_current_object = get_current_object
+        self.repr_string = repr_string
+
     def put_file(self, file, object_type, object_id, width, height,
                  mimetype, reproducible):
-        self._get_current_object().put_file(
+        self.get_current_object().put_file(
             file, object_type, object_id, width, height,
             mimetype, reproducible
         )
 
     def delete_file(self, object_type, object_id, width, height, mimetype):
-        self._get_current_object().delete_file(
+        self.get_current_object().delete_file(
             object_type, object_id, width, height, mimetype
         )
 
     def get_file(self, object_type, object_id, width, height, mimetype):
-        return self._get_current_object().get_file(
+        return self.get_current_object().get_file(
             object_type, object_id, width, height, mimetype
         )
 
     def get_url(self, object_type, object_id, width, height, mimetype):
-        return self._get_current_object().get_url(
+        return self.get_current_object().get_url(
             object_type, object_id, width, height, mimetype
         )
 
+    def __eq__(self, other):
+        return self.get_current_object() == other
+
+    def __ne__(self, other):
+        return self.get_current_object() != other
+
+    def __hash__(self):
+        return hash(self.get_current_object())
+
     def __repr__(self):
-        try:
-            return super(LocalProxyStore, self).__repr__()
-        except ContextError:
-            return '("unbound", {0}.current_store)[1]'.format(__name__)
+        if self.repr_string is None:
+            try:
+                current_store = self.get_current_object()
+            except ContextError:
+                return '<Unbound {0}.{1}>'.format(self.__module__,
+                                                  self.__name__)
+            return repr(current_store)
+        return self.repr_string
 
 
 #: (:class:`LocalProxyStore`) The currently set context of the image store
 #: backend.  It can be set using :func:`store_context()`.
-current_store = LocalProxyStore(get_current_store, 'current_store')
+current_store = LocalProxyStore(get_current_store,
+                                __name__ + '.current_store')
 
 
 class ContextError(Exception):
