@@ -41,8 +41,7 @@ setup(
     author_email='minhee' '@' 'dahlia.kr',
     license='MIT License',
     packages=find_packages(exclude=['tests']),
-    install_requires=['SQLAlchemy >= 0.8.0', 'Wand >= 0.2.0', 'Werkzeug',
-                      'simples3'],
+    install_requires=['SQLAlchemy >= 0.8.0', 'Wand >= 0.2.0', 'Werkzeug'],
     tests_require=['pytest >= 2.3.0'],
     classifiers=[
         'Development Status :: 3 - Alpha',
