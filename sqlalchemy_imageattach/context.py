@@ -71,8 +71,9 @@ except ImportError:
 
 from .store import Store
 
-__all__ = ('current_store', 'current_store_stack', 'get_current_context_id',
-           'get_current_store', 'store_context')
+__all__ = ('ContextError', 'LocalProxyStore', 'context_stacks',
+           'current_store', 'get_current_context_id', 'get_current_store',
+           'store_context')
 
 
 def get_current_context_id():
