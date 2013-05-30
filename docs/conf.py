@@ -38,6 +38,7 @@ if os.environ.get('READTHEDOCS', 0):
     mockapi.library = Mock('wand.api.library')
     mockapi.libmagick = Mock('wand.api.libmagick')
     mockapi.libc = Mock('wand.api.libc')
+    sys.modules['wand'].image = sys.modules['wand.image'] = Mock('wand.image')
 
 
 # -- General configuration -----------------------------------------------------
