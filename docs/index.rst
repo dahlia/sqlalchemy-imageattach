@@ -11,7 +11,9 @@
 
       api/context
       api/entity
+      api/file
       api/store
+      api/util
       api/version
 
 
