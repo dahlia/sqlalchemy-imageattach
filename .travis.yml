@@ -35,6 +35,6 @@ after_success:
 notifications:
   irc:
     channels:
-    - "irc://ocarina.irc.ozinger.org:8080#hongminhee"
+    - "ircs://ssl.irc.ozinger.org:16667#hongminhee"
     on_success: change
     on_failure: always
