@@ -22,6 +22,27 @@ sys.path.insert(0, os.path.abspath('..'))
 from sqlalchemy_imageattach.version import VERSION
 
 
+# Mocking C libraries to fake wand.api module which is unavailable
+# on ReadTheDocs builder.
+if os.environ.get('READTHEDOCS', 0):
+    try:
+        import wand.api
+    except ImportError:
+        pass
+    class Mock(object):
+        def __init__(self, name):
+            self.name = name
+        def __getattr__(self, name):
+            return Mock(self.name + '.' + name)
+        def __repr__(self):
+            return self.name
+    mockapi = sys.modules['wand._api']
+    mockapi.library = Mock('wand.api.library')
+    mockapi.libmagick = Mock('wand.api.libmagick')
+    mockapi.libc = Mock('wand.api.libc')
+    sys.modules['wand'].api = sys.modules['wand.api'] = mockapi
+
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
