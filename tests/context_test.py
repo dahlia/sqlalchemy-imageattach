@@ -13,7 +13,9 @@ except ImportError:
 from pytest import mark, raises
 
 from sqlalchemy_imageattach.context import (ContextError, current_store,
-                                            get_current_store, store_context)
+                                            get_current_store,
+                                            pop_store_context,
+                                            push_store_context, store_context)
 from sqlalchemy_imageattach.store import Store
 from sqlalchemy_imageattach.stores.fs import FileSystemStore
 
@@ -49,6 +51,22 @@ def test_store_context():
     with raises(ContextError):
         current_store.get_current_object()
     shutil.rmtree(path)
+
+
+def test_push_pop():
+    store_1 = Store()
+    store_2 = Store()
+    with raises(ContextError):
+        get_current_store()
+    push_store_context(store_1)
+    assert get_current_store() is store_1
+    push_store_context(store_2)
+    assert get_current_store() is store_2
+    pop_store_context()
+    assert get_current_store() is store_1
+    pop_store_context()
+    with raises(ContextError):
+        get_current_store()
 
 
 def test_thread_context():

@@ -73,7 +73,7 @@ from .store import Store
 
 __all__ = ('ContextError', 'LocalProxyStore', 'context_stacks',
            'current_store', 'get_current_context_id', 'get_current_store',
-           'store_context')
+           'pop_store_context', 'push_store_context', 'store_context')
 
 
 def get_current_context_id():
@@ -99,6 +99,34 @@ def get_current_context_id():
 context_stacks = {}
 
 
+def push_store_context(store):
+    """Manually pushes a store to the current stack.
+
+    Although :func:`store_context()` and :keyword:`with` keyword are
+    preferred than using it, it's useful when you have to push and pop
+    the current stack on different hook functions like setup/teardown.
+
+    :param store: the image store to set to the :data:`current_store`
+    :type store: :class:`~sqlalchemy_imageattach.store.Store`
+
+    """
+    context_stacks.setdefault(get_current_context_id(), []).append(store)
+
+
+def pop_store_context():
+    """Manually pops the current store from the stack.
+
+    Although :func:`store_context()` and :keyword:`with` keyword are
+    preferred than using it, it's useful when you have to push and pop
+    the current stack on different hook functions like setup/teardown.
+
+    :returns: the current image store
+    :rtype: :class:`~sqlalchemy_imageattach.store.Store`
+
+    """
+    return context_stacks.setdefault(get_current_context_id(), []).pop()
+
+
 @contextlib.contextmanager
 def store_context(store):
     """Sets the new (nested) context of the current image storage::
@@ -121,9 +149,9 @@ def store_context(store):
     if not isinstance(store, Store):
         raise TypeError('store must be an instance of sqlalchemy_imageattach.'
                         'store.Store, not ' + repr(store))
-    context_stacks.setdefault(get_current_context_id(), []).append(store)
+    push_store_context(store)
     yield store
-    context_stacks.setdefault(get_current_context_id(), []).pop()
+    pop_store_context()
 
 
 def get_current_store():
