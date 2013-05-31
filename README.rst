@@ -36,6 +36,9 @@ Links
 Docs
    https://sqlalchemy-imageattach.readthedocs.org/
 
+Package Index (Cheeseshop)
+   https://pypi.python.org/pypi/SQLAlchemy-ImageAttach
+
 GitHub
    https://github.com/crosspop/sqlalchemy-imageattach
 
