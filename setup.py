@@ -37,6 +37,7 @@ setup(
     version=VERSION,
     description='SQLAlchemy extension for attaching images to entity objects',
     long_description=readme(),
+    url='https://github.com/crosspop/sqlalchemy-imageattach',
     author='Hong Minhee',
     author_email='minhee' '@' 'dahlia.kr',
     license='MIT License',
