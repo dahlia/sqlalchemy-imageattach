@@ -32,6 +32,10 @@ enities.  It's easy to use with :mod:`sqlalchemy.ext.declarative`::
         def object_id(self):
             return self.user_id
 
+.. toctree::
+
+   changes
+
 
 .. module:: sqlalchemy_imageattach
 
@@ -72,6 +76,8 @@ SQLAlchemy-ImageAttach is an open source software written by `Hong Minhee`_
 
 If you find any bug, please create an issue to the `issue tracker`_.
 Pull requests are also always welcome!
+
+Check out :doc:`changes` as well.
 
 .. image:: https://secure.travis-ci.org/crosspop/sqlalchemy-imageattach.png
    :alt: Build Status
