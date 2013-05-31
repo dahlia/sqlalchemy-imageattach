@@ -21,6 +21,10 @@ Every image has its URL
 SQLAlchemy transaction aware
    Saved file are removed when the ongoing transaction has been rolled back.
 
+Tested on various environments
+   - Python versions: Python 2.6, 2.7, PyPy.
+   - DBMS: PostgreSQL, MySQL, SQLite
+
 .. _SQLAlchemy: http://www.sqlalchemy.org/
 .. _S3: http://aws.amazon.com/s3/
 .. _RRS: http://aws.amazon.com/s3/#rss
