@@ -172,6 +172,11 @@ class Image(object):
            This is an abstract property which has to be implemented
            by subclass.
 
+        .. todo::
+
+           We can automatically fill the implementation
+           when there's only one primary key and its type is integral.
+
         """
         raise NotImplementedError('object_id property has to be implemented')
 

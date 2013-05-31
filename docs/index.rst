@@ -28,6 +28,10 @@ enities.  It's easy to use with :mod:`sqlalchemy.ext.declarative`::
         user = relationship('User')
         __tablename__ = 'user_picture'
 
+        @property
+        def object_id(self):
+            return self.user_id
+
 
 .. module:: sqlalchemy_imageattach
 
