@@ -269,7 +269,7 @@ class Store(object):
         url = self.get_url(image.object_type, image.object_id,
                            image.width, image.height, image.mimetype)
         if '?' in url:
-            fmt = '{0}&_xpop_t={1}'
+            fmt = '{0}&_ts={1}'
         else:
-            fmt = '{0}?_xpop_t={1}'
+            fmt = '{0}?_ts={1}'
         return fmt.format(url, image.created_at.strftime('%Y%m%d%H%M%S%f'))
