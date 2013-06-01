@@ -1,39 +1,37 @@
 SQLAlchemy-ImageAttach
 ======================
 
-SQLAlchemy-ImageAttach is a SQLAlchemy extension for attaching images to
-enities.  It's easy to use with :mod:`sqlalchemy.ext.declarative`::
+SQLAlchemy-ImageAttach is a SQLAlchemy_ extension for attaching images to
+entity objects.  It provides the following features:
 
-    from sqlalchemy import Column, ForeignKey, Integer, Unicode, relationship
-    from sqlalchemy.ext.declarative import declarative_base
-    from sqlalchemy_imageattach.entity import Image, image_attachment
+Storage backend interface
+   You can use file system backend on your local development box,
+   and switch it to AWS S3_ when it's deployed to the production box.
+   Or you can add a new backend implementation by yourself.
 
+Maintaining multple image sizes
+   Any size of thumbnails can be generated from the original size
+   without assuming the fixed set of sizes.  You can generate a thumbnail
+   of a particular size if it doesn't exist yet when the size is requested.
+   Use RRS_ (Reduced Redundancy Storage) for reproducible thumbnails on S3.
 
-    Base = declarative_base()
+Every image has its URL
+   Attached images can be exposed as a URL.
 
+SQLAlchemy transaction aware
+   Saved file are removed when the ongoing transaction has been rolled back.
 
-    class User(Base):
-        """User model."""
+Tested on various environments
+   - Python versions: Python 2.6, 2.7, PyPy
+   - DBMS: PostgreSQL, MySQL, SQLite
 
-        id = Column(Integer, primary_key=True)
-        name = Column(Unicode, nullable=False)
-        picture = image_attachment('UserPicture')
-        __tablename__ = 'user'
-
-
-    class UserPicture(Base, Image):
-        """User picture model."""
-
-        user_id = Column(Integer, ForeignKey('User.id'), primary_key=True)
-        user = relationship('User')
-        __tablename__ = 'user_picture'
-
-        @property
-        def object_id(self):
-            return self.user_id
+.. _SQLAlchemy: http://www.sqlalchemy.org/
+.. _S3: http://aws.amazon.com/s3/
+.. _RRS: http://aws.amazon.com/s3/#rss
 
 .. toctree::
 
+   guide/declare
    changes
 
 
