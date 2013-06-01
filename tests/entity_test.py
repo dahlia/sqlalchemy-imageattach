@@ -42,10 +42,6 @@ class SomethingCover(Base, Image):
 
     __tablename__ = 'something_cover'
 
-    @property
-    def object_id(self):
-        return self.something_id
-
 
 def from_raw_file(fx_session, tmp_store):
     something = Something(name='some name')
@@ -105,6 +101,64 @@ def from_raw_file(fx_session, tmp_store):
     with something.cover.find_thumbnail(width=20).open_file(tmp_store) as f:
         with WandImage(file=f) as wand:
             assert wand.width == 20
+
+
+class ObjectIdOverriddenImage(Base, Image):
+
+    id = Column(Integer, primary_key=True)
+
+    __tablename__ = 'object_id_overridden_image'
+
+    @property
+    def object_id(self):
+        return self.id * 2
+
+
+class StringKeyImage(Base, Image):
+
+    id = Column(String, primary_key=True)
+
+    __tablename__ = 'string_key_image'
+
+
+class CompositeKeyImage(Base, Image):
+
+    id_a = Column(Integer, primary_key=True)
+    id_b = Column(Integer, primary_key=True)
+
+    __tablename__ = 'composite_key_image'
+
+
+def test_default_object_id():
+    """If the primary key is integer, object_id is automatically filled."""
+    o = SomethingCover(something_id=12345)
+    assert o.object_id == o.something_id
+
+
+def test_overridden_object_id():
+    """object_id can be overridden."""
+    o = ObjectIdOverriddenImage(id=12345)
+    assert o.object_id == 12345 * 2
+
+
+def test_string_key_object_id():
+    """If the primary key is not integer, object_id cannot be
+    automatically implemented.
+
+    """
+    o = StringKeyImage(id='string_key')
+    with raises(NotImplementedError):
+        o.object_id
+
+
+def test_composite_key_object_id():
+    """If the primary key is composite key, object_id cannot be
+    automatically implemented.
+
+    """
+    o = CompositeKeyImage(id_a=123, id_b=456)
+    with raises(NotImplementedError):
+        o.object_id
 
 
 def test_from_raw_file_implicitly(fx_session, tmp_store):
@@ -288,10 +342,6 @@ class SamethingCover(Base, Image):
     samething = relationship(Samething)
 
     __tablename__ = 'samething_cover'
-
-    @property
-    def object_id(self):
-        return self.samething_id
 
 
 def test_delete_from_persistence(fx_session, tmp_store):

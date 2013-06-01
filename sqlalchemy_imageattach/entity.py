@@ -17,18 +17,21 @@ image entities that subclass :class:`Image` mixin::
 
         __tablename__ = 'user_picture'
 
-        @property
-        def object_id(self):
-            return self.user_id
-
 You have to also inherit your own :func:`declarative_base()
 <sqlalchemy.ext.declarative.declarative_base>` class (``Base`` in the example).
 
 Assume there's also :class:`UserFrontCover` in the same way.
 
-Note that the class implements :attr:`~Image.object_id` property.
-It must be implemented to identify each image.  Backend storages utilize
-this to identify images e.g. filename, S3 key.
+Note that the class can override :attr:`~Image.object_id` property.
+Backend storages utilize this to identify images e.g. filename, S3 key.
+If the primary key of the image entity is integer, :attr:`~Image.object_id`
+automatically uses the primary key value by default, but it can be
+overridden if needed, and must be implemented if the primary key is not
+integer or composite key.
+
+There's also :attr:`~Image.object_type` property.  :class:`Image` provides
+the default value for it as well.  It uses the class name (underscores
+will be replaced by hyphens) by default, but you can override it.
 
 These :class:`Image` subclasses can be related to the their
 'parent' entity using :func:`image_attachment()` function.
@@ -78,6 +81,7 @@ from sqlalchemy import Column
 from sqlalchemy.event import listen
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.instrumentation import instance_state
@@ -166,18 +170,17 @@ class Image(object):
     @property
     def object_id(self):
         """(:class:`numbers.Integral`) The identifier number of the image.
-
-        .. note::
-
-           This is an abstract property which has to be implemented
-           by subclass.
-
-        .. todo::
-
-           We can automatically fill the implementation
-           when there's only one primary key and its type is integral.
+        It uses the primary key if it's integer, but can be overridden,
+        and must be implemented when the primary key is not integer or
+        composite key.
 
         """
+        key_columns = inspect(type(self)).primary_key
+        pk = [c.name for c in key_columns if c.name not in ('width', 'height')]
+        if len(pk) == 1:
+            pk_value = getattr(self, pk[0])
+            if isinstance(pk_value, numbers.Integral):
+                return pk_value
         raise NotImplementedError('object_id property has to be implemented')
 
     #: (:class:`numbers.Integral`) The image's width.

@@ -26,7 +26,3 @@ It's easy to use with :mod:`sqlalchemy.ext.declarative`::
         user_id = Column(Integer, ForeignKey('User.id'), primary_key=True)
         user = relationship('User')
         __tablename__ = 'user_picture'
-
-        @property
-        def object_id(self):
-            return self.user_id
