@@ -26,3 +26,9 @@ It's easy to use with :mod:`sqlalchemy.ext.declarative`::
         user_id = Column(Integer, ForeignKey('User.id'), primary_key=True)
         user = relationship('User')
         __tablename__ = 'user_picture'
+
+In the above example, we declare two entity classes.  ``UserPicture`` which
+inherits :class:`~sqlalchemy_imageattach.entity.Image` is an image entity,
+and ``User`` owns it.  :func:`~sqlalchemy_imageattach.entity.image_attachment()`
+function is a specialized :func:`~sqlalchemy.orm.relationship()` for image
+entities.  You can understand it as many-to-many relationship.

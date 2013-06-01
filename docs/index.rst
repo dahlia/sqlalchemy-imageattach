@@ -29,6 +29,10 @@ Tested on various environments
 .. _S3: http://aws.amazon.com/s3/
 .. _RRS: http://aws.amazon.com/s3/#rss
 
+
+User's guide
+------------
+
 .. toctree::
 
    guide/declare
