@@ -116,7 +116,7 @@ class ObjectIdOverriddenImage(Base, Image):
 
 class StringKeyImage(Base, Image):
 
-    id = Column(String, primary_key=True)
+    id = Column(String(255), primary_key=True)
 
     __tablename__ = 'string_key_image'
 
