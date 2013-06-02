@@ -36,6 +36,7 @@ User's guide
 .. toctree::
 
    guide/declare
+   guide/store
    changes
 
 
