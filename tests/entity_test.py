@@ -524,3 +524,13 @@ def test_imageset_should_be_cleared(fx_session, tmp_store):
     assert shinji_500 != asuka_500
     assert shinji_100 != asuka_100
     assert shinji_50 != asuka_50
+
+
+def test_compile_image_columns(fx_session):
+    """These queries should be able to be compiled."""
+    query = fx_session.query(SomethingCover)
+    query.order_by(Image.width).all()
+    query.order_by(Image.height).all()
+    query.order_by(Image.mimetype).all()
+    query.order_by(Image.original).all()
+    query.order_by(Image.created_at).all()

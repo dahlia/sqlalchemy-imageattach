@@ -184,20 +184,21 @@ class Image(object):
         raise NotImplementedError('object_id property has to be implemented')
 
     #: (:class:`numbers.Integral`) The image's width.
-    width = Column(Integer, primary_key=True)
+    width = Column('width', Integer, primary_key=True)
 
     #: (:class:`numbers.Integral`) The image's height."""
-    height = Column(Integer, primary_key=True)
+    height = Column('height', Integer, primary_key=True)
 
     #: (:class:`basestring`) The mimetype of the image
     #: e.g. ``'image/jpeg'``, ``'image/png'``.
-    mimetype = Column(String(255), nullable=False)
+    mimetype = Column('mimetype', String(255), nullable=False)
 
     #: (:class:`bool`) Whether it is original or resized.
-    original = Column(Boolean, nullable=False, default=False)
+    original = Column('original', Boolean, nullable=False, default=False)
 
     #: (:class:`datetime.datetime`) The created time.
-    created_at = Column(DateTime(timezone=True), nullable=False, default=now())
+    created_at = Column('created_at',
+                        DateTime(timezone=True), nullable=False, default=now())
 
     @hybrid_property
     def size(self):
