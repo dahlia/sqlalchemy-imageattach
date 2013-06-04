@@ -15,6 +15,11 @@ To be released.
   able to be used as SQL expressions.
 - Added ``block_size`` option to :class:`StaticServerMiddleware
   <sqlalchemy_imageattach.stores.fs.StaticServerMiddleware>`.
+- :class:`~sqlalchemy_imageattach.stores.fs.StaticServerMiddleware` now
+  supports ``'wsgi.file_wrapper'``.  See also `optional platform-specific
+  file handling`__.
+
+__ http://www.python.org/dev/peps/pep-0333/#optional-platform-specific-file-handling
 
 
 Version 0.8.0.dev-20130531

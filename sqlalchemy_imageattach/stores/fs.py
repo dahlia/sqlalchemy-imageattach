@@ -197,4 +197,11 @@ class StaticServerMiddleware(object):
             ('Content-Type', mimetype),
             ('Content-Length', str(stat.st_size))
         ])
+        try:
+            file_wrapper = environ['wsgi.file_wrapper']
+        except KeyError:
+            pass
+        else:
+            if callable(file_wrapper):
+                return file_wrapper(open(file_path, 'rb'), self.block_size)
         return self.file_stream(file_path)
