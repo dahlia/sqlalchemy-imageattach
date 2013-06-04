@@ -13,6 +13,8 @@ To be released.
   property now has the default value when the primary key is an integer.
 - Columns of :class:`~sqlalchemy_imageattach.entity.Image` class become
   able to be used as SQL expressions.
+- Added ``block_size`` option to :class:`StaticServerMiddleware
+  <sqlalchemy_imageattach.stores.fs.StaticServerMiddleware>`.
 
 
 Version 0.8.0.dev-20130531

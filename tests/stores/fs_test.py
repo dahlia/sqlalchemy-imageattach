@@ -3,7 +3,7 @@ import os
 import os.path
 import re
 
-from pytest import raises
+from pytest import mark, raises
 from werkzeug.test import Client
 from werkzeug.wrappers import Response
 
@@ -71,13 +71,18 @@ def test_http_fs_store(tmpdir):
     tmpdir.remove()
 
 
-def test_static_server():
+@mark.parametrize('block_size', [None, 8192, 1024, 1024 * 1024])
+def test_static_server(block_size):
     def fallback_app(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/plain')])
         yield 'fallback: '
         yield environ['PATH_INFO']
     test_dir = os.path.join(os.path.dirname(__file__), '..')
-    app = StaticServerMiddleware(fallback_app, '/static/', test_dir)
+    if block_size:
+        app = StaticServerMiddleware(fallback_app, '/static/', test_dir,
+                                     block_size)
+    else:
+        app = StaticServerMiddleware(fallback_app, '/static/', test_dir)
     client = Client(app, Response)
     # 200 OK
     response = client.get('/static/context_test.py')

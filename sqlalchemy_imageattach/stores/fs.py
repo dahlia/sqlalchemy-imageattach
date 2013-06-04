@@ -146,6 +146,8 @@ class StaticServerMiddleware(object):
     :type url_path: :class:`basestring`
     :param dir_path: the filesystem directory path to serve
     :type dir_path: :class:`basestring`
+    :param block_size: the block size in bytes
+    :type block_size: :class:`numbers.Integral`
 
     .. todo::
 
@@ -156,7 +158,7 @@ class StaticServerMiddleware(object):
 
     """
 
-    def __init__(self, app, url_path, dir_path):
+    def __init__(self, app, url_path, dir_path, block_size=8192):
         if not url_path.startswith('/'):
             url_path = '/' + url_path
         if not url_path.endswith('/'):
@@ -168,12 +170,12 @@ class StaticServerMiddleware(object):
         self.app = app
         self.url_path = url_path
         self.dir_path = dir_path
+        self.block_size = int(block_size)
 
-    @staticmethod
-    def file_stream(path):
+    def file_stream(self, path):
         with open(path, 'rb') as f:
             while 1:
-                buf = f.read(4096)
+                buf = f.read(self.block_size)
                 if buf:
                     yield buf
                 else:
