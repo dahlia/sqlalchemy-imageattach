@@ -155,6 +155,40 @@ The above template codes are equivalent to:
 .. _Mako: http://makotemplates.org/
 
 
+Getting image files
+-------------------
+
+:class:`~sqlalchemy_imageattach.entity.ImageSet` provides :meth:`open_file()
+<sqlalchemy_imageattach.entity.ImageSet.open_file>` method.  It returns
+a file-like object::
+
+    from shutil import copyfileobj
+
+    with store_context(store):
+        with user.picture.open_file() as f:
+            copyfileobj(f, dst)
+
+Note that the responsibility to close an opened file is yours.  Recommend to
+open it in :keyword:`with` block.
+
+
+Getting image binary
+--------------------
+
+There's a shortcut to read byte string from an opened file.
+Use :meth:`~sqlalchemy_imageattach.entity.ImageSet.make_blob()` method.
+The following two ways are equivalent::
+
+    # make_blob()
+    with store_context(store):
+        blob = user.picture.make_blob()
+
+    # open().read()
+    with store_context(store):
+        with user.picture.open_file() as f:
+            blob = f.read()
+
+
 .. _thumbnail:
 
 Thumbnails
@@ -174,9 +208,17 @@ It takes one of three arguments: ``width``, ``height``, or ``ratio``::
         height_300_url = width_300.locate()
         half = half.locate()
 
+It returns a made :class:`~sqlalchemy_imageattach.entity.Image` object,
+and it shares the most of the same methods to
+:class:`~sqlalchemy_imageattach.entity.ImageSet` like
+:meth:`~sqlalchemy_imageattach.entity.Image.locate()`,
+:meth:`~sqlalchemy_imageattach.entity.Image.open_file()`,
+:meth:`~sqlalchemy_imageattach.entity.Image.make_blob()`.
+
 Once made thumbnails can be found using :meth:`find_thumbnail()
 <sqlalchemy_imageattach.entity.ImageSet.find_thumbnail>`.  It takes one of
-two arguments: ``width`` or ``height``::
+two arguments: ``width`` or ``height`` and returns a found
+:class:`~sqlalchemy_imageattach.entity.Image` object::
 
     with store_context(store):
         # Find thumbnails
