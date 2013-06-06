@@ -53,14 +53,17 @@ def test_http_fs_store(tmpdir):
     with http_fs_store.open(image) as actual:
         actual_data = actual.read()
     assert expected_data == actual_data
-    expected_url = 'http://localhost/__images__/testing/234/1/1234.405x640.jpe'
+    expected_urls = (
+        'http://localhost/__images__/testing/234/1/1234.405x640.jpe',
+        'http://localhost/__images__/testing/234/1/1234.405x640.jpg'
+    )
     def app(environ, start_response):
         start_response('200 OK', [('Content-Type', 'text/plain')])
         yield http_fs_store.locate(image)
     app = http_fs_store.wsgi_middleware(app)
     client = Client(app, Response)
     actual_url = client.get('/').data
-    assert expected_url == remove_query(actual_url)
+    assert remove_query(actual_url.decode()) in expected_urls
     response = client.get('/__images__/testing/234/1/1234.405x640.jpe')
     assert response.status_code == 200
     assert response.data == expected_data
@@ -103,4 +106,4 @@ def test_static_server(block_size):
     assert response.status_code == 404
     # fallback app
     response = client.get('/static-not/')
-    assert response.data == 'fallback: /static-not/'
+    assert response.data == b'fallback: /static-not/'

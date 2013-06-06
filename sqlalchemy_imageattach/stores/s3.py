@@ -16,7 +16,10 @@ import hashlib
 import hmac
 import logging
 import mimetypes
-import urllib2
+try:
+    from urllib import request as urllib2
+except ImportError:
+    import urllib2
 
 from ..store import Store
 
@@ -95,7 +98,7 @@ class S3Request(urllib2.Request):
         pairs = [(k.lower(), v)
                  for k, v in self.header_items()
                  if k.lower().startswith('x-amz-')]
-        pairs.sort(key=lambda (k, v): k)
+        pairs.sort(key=lambda pair: pair[0])
         line = '{0}:{1}\n'.format
         return ''.join(line(k, v) for k, v in pairs)
 

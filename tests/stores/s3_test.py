@@ -1,7 +1,10 @@
 import functools
 import os.path
 import re
-import urllib2
+try:
+    from urllib import request as urllib2
+except ImportError:
+    import urllib2
 import uuid
 
 from pytest import fixture, mark, raises, skip

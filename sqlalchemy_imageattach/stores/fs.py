@@ -46,7 +46,7 @@ class BaseFileSystemStore(Store):
     def put_file(self, file, object_type, object_id, width, height, mimetype,
                  reproducible):
         path = self.get_path(object_type, object_id, width, height, mimetype)
-        for i in xrange(len(path)):
+        for i in range(len(path)):
             d = os.path.join(self.path, *path[:i])
             if not os.path.isdir(d):
                 os.mkdir(d)

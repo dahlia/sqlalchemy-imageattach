@@ -55,10 +55,17 @@ The above code can be rewritten using scoped context::
 
 """
 import contextlib
-try:
-    import thread
-except ImportError:
-    import dummy_thread as thread
+import sys
+if sys.version_info >= (3,):
+    try:
+        import _thread
+    except ImportError:
+        import _dummy_thread as _thread
+else:
+    try:
+        import thread as _thread
+    except ImportError:
+        import dummy_thread as _thread
 
 try:
     import greenlet
@@ -91,8 +98,8 @@ def get_current_context_id():
     elif stackless is not None:
         get_current_context_id = stackless.getcurrent
         return stackless.getcurrent()
-    get_current_context_id = thread.get_ident
-    return thread.get_ident()
+    get_current_context_id = _thread.get_ident
+    return _thread.get_ident()
 
 
 #: (:class:`dict`) The dictionary of concurrent contexts to their stacks.

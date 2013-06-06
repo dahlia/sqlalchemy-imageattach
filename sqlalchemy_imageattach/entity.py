@@ -213,9 +213,8 @@ class Image(object):
         return tuple_(cls.width, cls.height)
 
     @size.setter
-    def size(self, (width, height)):
-        self.width = width
-        self.height = height
+    def size(self, size):
+        self.width, self.height = size
 
     def make_blob(self, store=current_store):
         """Gets the byte string of the image from the ``store``.
@@ -280,7 +279,7 @@ class Image(object):
 
     __doc__ = append_docstring_attributes(
         __doc__,
-        dict((k, v) for k, v in locals().iteritems()
+        dict((k, v) for k, v in locals().items()
                     if isinstance(v, declared_attr))
     )
 

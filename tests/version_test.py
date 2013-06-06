@@ -15,13 +15,13 @@ def test_version_info():
 
 
 def test_sqlalchemy_version():
-    assert map(int, __version__.split('.')[:2]) == list(VERSION_INFO[:2])
+    assert list(map(int, __version__.split('.')[:2])) == list(VERSION_INFO[:2])
     assert __version__.split('.')[:2] == VERSION.split('.')[:2]
 
 
 def test_version():
     assert isinstance(VERSION, str)
-    assert map(int, VERSION.split('.')) == list(VERSION_INFO)
+    assert list(map(int, VERSION.split('.'))) == list(VERSION_INFO)
 
 
 def test_print():
