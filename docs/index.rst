@@ -24,10 +24,23 @@ SQLAlchemy transaction aware
 Tested on various environments
    - Python versions: Python 2.6, 2.7, PyPy
    - DBMS: PostgreSQL, MySQL, SQLite
+   - SQLAlchemy: 0.8 or higher
 
 .. _SQLAlchemy: http://www.sqlalchemy.org/
 .. _S3: http://aws.amazon.com/s3/
 .. _RRS: http://aws.amazon.com/s3/#rss
+
+
+Installation
+------------
+
+It's already available on PyPI_, so just use :program:`pip`:
+
+.. code-block:: console
+
+   $ pip install SQLAlchemy-ImageAttach
+
+.. _PyPI: https://pypi.python.org/pypi/SQLAlchemy-ImageAttach
 
 
 User's guide
