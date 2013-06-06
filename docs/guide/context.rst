@@ -82,3 +82,184 @@ Of course you can load images from its byte strings.  Use
             session.rollback()
             raise
         session.commit()
+
+
+Getting image urls
+------------------
+
+In web environment, the most case you need just an url of an image, not its
+binary content.  So :class:`~sqlalchemy_imageattach.entity.ImageSet` object
+provide :meth:`~sqlalchemy_imageattach.entity.ImageSet.locate()` method::
+
+    def user_profile(request, user_id):
+        user = session.query(User).get(int(user_id))
+        with store_context(store):
+            picture_url = user.picture.locate()
+        return render_template('user_profile.html',
+                               user=user, picture_url=picture_url)
+
+It returns the url of the original image (which is not resized).
+Read about :ref:`thumbnail` if you want a thumbnail url.
+
+:class:`~sqlalchemy_imageattach.entity.ImageSet` also implements de facto
+standard ``__html__()`` special method, so it can be directly rendered in
+the most of template engines like Jinja2_, Mako_.  It's expanded to
+``<img>`` tag on templates:
+
+.. code-block:: html+jinja
+
+   <div class="user">
+       <a href="{{ url_for('user_prfile', user_id=user.id) }}"
+          title="{{ user.name }}">{{ user.picture }}</a>
+   </div>
+
+.. code-block:: html+mako
+
+   <div class="user">
+       <a href="${url_for('user_prfile', user_id=user.id)}"
+          title="${user.name}">${user.picture}</a>
+   </div>
+
+The above template codes are equivalent to:
+
+.. code-block:: html+jinja
+
+   <div class="user">
+       <a href="{{ url_for('user_prfile', user_id=user.id) }}"
+          title="{{ user.name }}"><img src="{{ user.picture.locate() }}"
+                                       width="{{ user.picture.width }}"
+                                       height="{{ user.picture.height }}"></a>
+   </div>
+
+.. code-block:: html+mako
+
+   <div class="user">
+       <a href="${url_for('user_prfile', user_id=user.id)}"
+          title="${user.name}"><img src="${user.picture.locate()}"
+                                    width="${user.picture.width}"
+                                    height="${user.picture.height}"></a>
+   </div>
+
+.. note::
+
+   Template expansion of :class:`~sqlalchemy_imageattach.entity.ImageSet`
+   might raise :exc:`~sqlalchemy_imageattach.context.ContextError`.
+   You should render the template in the context::
+
+       with store_context(store):
+           return render_template('user_profile.html', user=user)
+
+   Or use :ref:`implicit-context`.
+
+.. _Jinja2: http://jinja.pocoo.org/
+.. _Mako: http://makotemplates.org/
+
+
+.. _thumbnail:
+
+Thumbnails
+----------
+
+You can make thumbnails and then store them into the store using
+:meth:`~sqlalchemy_imageattach.entity.ImageSet.generate_thumbnail()` method.
+It takes one of three arguments: ``width``, ``height``, or ``ratio``::
+
+    with store_context(store):
+        # Make thumbnails
+        width_150 = user.picture.generate_thumbnail(width=150)
+        height_300 = user.picture.generate_thumbnail(height=300)
+        half = user.picture.generate_thumbnail(ratio=0.5)
+        # Get their urls
+        width_150_url = width_150.locate()
+        height_300_url = width_300.locate()
+        half = half.locate()
+
+Once made thumbnails can be found using :meth:`find_thumbnail()
+<sqlalchemy_imageattach.entity.ImageSet.find_thumbnail>`.  It takes one of
+two arguments: ``width`` or ``height``::
+
+    with store_context(store):
+        # Find thumbnails
+        width_150 = user.picture.find_thumbnail(width=150)
+        height_300 = user.picture.find_thumbnail(height=300)
+        # Get their urls
+        width_150_url = width_150.locate()
+        height_300_url = width_300.locate()
+
+It raises :exc:`~sqlalchemy.orm.exc.NoResultFound` exception when there's
+no such size.
+
+You can implement find-or-create pattern using these two methods::
+
+    def find_or_create(imageset, width=None, height=None):
+        assert width is not None or height is not None
+        try:
+            image = imageset.find_thumbnail(width=width, height=height)
+        except NoResultFound:
+            image = imageset.generate_thumbnail(width=width, height=height)
+        return image
+
+We recommend you to queue generating thumbnails and make it done by backend
+workers rather than web applications.  There're several tools for that like
+Celery_.
+
+.. _Celery: http://www.celeryproject.org/
+
+
+Expliciting storage
+-------------------
+
+It's so ad-hoc, but there's a way to explicit storage to use without any
+context: passing the storage to operations as an argument.  Every methods
+that need the context also optionally take ``store`` keyword::
+
+    user.picture.from_file(file_, store=store)
+    user.picture.from_blob(blob, store=store)
+    user.picture.locate(store=store)
+    user.picture.open_file(store=store)
+    user.picture.make_blob(store=store)
+    user.picture.generate_thumbnail(width=150, store=store)
+    user.picture.find_thumbnail(width=150, store=store)
+
+The above calls are all equivalent to the following calls in :keyword:`with`
+block::
+
+    with store_context(store):
+        user.picture.from_file(file_)
+        user.picture.from_blob(blob)
+        user.picture.locate()
+        user.picture.open_file()
+        user.picture.make_blob()
+        user.picture.generate_thumbnail(width=150)
+        user.picture.find_thumbnail(width=150)
+
+
+.. _implicit-context:
+
+Implicit contexts
+-----------------
+
+If your application already manage some context like request-response lifecycle,
+you can make context implicit by utilizing these hooks.  SQLAlchemy-ImageAttach
+exposes underlayer functions like :func:`push_store_context()
+<sqlalchemy_imageattach.context.push_store_context>` and
+:func:`~sqlalchemy_imageattach.context.pop_store_context()` that are used for
+implementing :func:`~sqlalchemy_imageattach.context.store_context()`.
+
+For example, use :meth:`~flask.Flask.before_request()` and
+:meth:`~flask.Flask.teardown_request()` if you are using Flask_::
+
+    from sqlalchemy_imageattach.context import (pop_store_context,
+                                                push_store_context)
+    from yourapp import app
+    from yourapp.config import store
+
+    @app.before_request
+    def start_implicit_store_context():
+        push_store_context(store)
+
+    @app.teardown_request
+    def stop_implicit_store_context():
+        pop_store_context()
+
+.. _Flask: http://flask.pocoo.org/
