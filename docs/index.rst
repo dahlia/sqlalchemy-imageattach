@@ -50,6 +50,7 @@ User's guide
 
    guide/declare
    guide/store
+   guide/context
    changes
 
 
