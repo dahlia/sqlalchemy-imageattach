@@ -97,7 +97,7 @@ Actually there are two kinds of filesystem storages:
 Implementing your own storage
 -----------------------------
 
-You can implement a new storage backend if you need.  Every stoage has to
+You can implement a new storage backend if you need.  Every storage has to
 inherit :class:`~sqlalchemy_imageattach.store.Store` and implement
 the following four methods:
 

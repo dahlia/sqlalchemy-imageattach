@@ -9,7 +9,7 @@ Storage backend interface
    and switch it to AWS S3_ when it's deployed to the production box.
    Or you can add a new backend implementation by yourself.
 
-Maintaining multple image sizes
+Maintaining multiple image sizes
    Any size of thumbnails can be generated from the original size
    without assuming the fixed set of sizes.  You can generate a thumbnail
    of a particular size if it doesn't exist yet when the size is requested.

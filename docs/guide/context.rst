@@ -58,7 +58,7 @@ It takes any file-like objects as well e.g.::
             raise
         session.commit()
 
-Note that the responisibility to close files is yours.  Because some file-like
+Note that the responsibility to close files is yours.  Because some file-like
 objects can be reused several times, or don't have to be closed (or some of
 them even don't have any ``close()`` method).
 
@@ -200,7 +200,7 @@ You can implement find-or-create pattern using these two methods::
         return image
 
 We recommend you to queue generating thumbnails and make it done by backend
-workers rather than web applications.  There're several tools for that like
+workers rather than web applications.  There are several tools for that like
 Celery_.
 
 .. _Celery: http://www.celeryproject.org/
