@@ -13,6 +13,86 @@ We recommend you to use :mod:`~sqlalchemy_imageattach.stores.fs` on your local
 development box, and switch it to :mod:`~sqlalchemy_imageattach.stores.s3` when
 you deploy it to the production system.
 
+If you need to use another storage backend, you can implement the interface
+by yourself: :ref:`implement-store`.
+
+
+Using filesystem on the local development box
+---------------------------------------------
+
+The most of computers have a filesystem, so using :mod:`fs
+<sqlalchemy_imageattach.stores.fs>` storage is suitable for development.
+It works even if you are offline.
+
+Actually there are two kinds of filesystem storages:
+
+:class:`~sqlalchemy_imageattach.stores.fs.FileSystemStore`
+   It just stores the images, and simply assumes that you have a separate
+   web server for routing static files e.g. Lighttpd_, Nginx_.  For example,
+   if you have a sever configuration like this:
+
+   .. code-block:: nginx
+
+      server {
+          listen 80;
+          server_name images.yourapp.com;
+          root /var/local/yourapp/images;
+      }
+
+   :class:`~sqlalchemy_imageattach.stores.fs.FileSystemStore` should
+   be configured like this::
+
+       sqlalchemy_imageattach.stores.fs.FileSystemStore(
+           path='/var/local/yourapp/images',
+           base_url='http://images.yourapp.com/'
+       )
+
+   .. _Lighttpd: http://www.lighttpd.net/
+   .. _Nginx: http://nginx.org/
+
+:class:`~sqlalchemy_imageattach.stores.fs.HttpExposedFileSystemStore`
+   In addition to :class:`~sqlalchemy_imageattach.stores.fs.FileSystemStore`'s
+   storing features, it does more for you: actually serving files through
+   WSGI.  It takes an optional ``prefix`` for url instead of ``base_url``::
+
+       sqlalchemy_imageattach.stores.fs.HttpExposedFileSystemStore(
+           path='/var/local/yourapp/images',
+           prefix='static/images/'
+       )
+
+   The default ``prefix`` is simply ``images/``.
+
+   It provides :meth:`wsgi_middleware()
+   <sqlalchemy_imageattach.stores.fs.HttpExposedFileSystemStore.wsgi_middleware>`
+   method to inject its own server to your WSGI application.  For example,
+   if you are using Flask_::
+
+       from yourapp import app
+       app.wsgi_app = store.wsgi_middleware(app.wsgi_app)
+
+   or if Pyramid_::
+
+       app = config.make_wsgi_app()
+       app = store.wsgi_middleware(app)
+
+   or if Bottle_::
+
+       app = bottle.app()
+       app = store.wsgi_middleware(app)
+
+   .. note::
+
+      The server provided by this isn't production-ready quality, so do not
+      use this for your production service.  We recommend you to use
+      :class:`~sqlalchemy_imageattach.stores.fs.FileSystemStore` with
+      a separate web server like Nginx_ or Lighttpd_ instead.
+
+   .. _Flask: http://flask.pocoo.org/
+   .. _Pyramid: http://www.pylonsproject.org/
+   .. _Bottle: http://bottlepy.org/
+
+
+.. _implement-store:
 
 Implementing your own storage
 -----------------------------
