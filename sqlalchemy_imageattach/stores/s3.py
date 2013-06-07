@@ -55,7 +55,9 @@ class S3Request(urllib2.Request):
             self.content_type = ''
         else:
             assert content_type
-            self.content_md5 = base64.b64encode(hashlib.md5(self.data).digest())
+            self.content_md5 = base64.b64encode(
+                hashlib.md5(self.data).digest()
+            ).decode('ascii')
             self.content_type = content_type
             self.add_header('Content-md5', self.content_md5)
             self.add_header('Content-type', content_type)
@@ -77,12 +79,19 @@ class S3Request(urllib2.Request):
         return url[url.index('/', 8):]
 
     def get_authorization(self):
-        return 'AWS {0}:{1}'.format(self.access_key, self.get_signature())
+        return 'AWS {0}:{1}'.format(
+            self.access_key,
+            self.get_signature().decode('utf-8')
+        )
 
     def get_signature(self):
         sign = self.sign()
         self.logger.debug('sign() = %r', sign)
-        d = hmac.new(self.secret_key, sign, hashlib.sha1)
+        d = hmac.new(
+            self.secret_key.encode('utf-8'),
+            sign.encode('utf-8'),
+            hashlib.sha1
+        )
         return base64.b64encode(d.digest())
 
     def sign(self):
@@ -305,7 +314,7 @@ class S3SandboxStore(Store):
         url = self.overriding.get_url(*args)
         self.overriding.upload_file(
             url,
-            data='',
+            data=b'',
             content_type=self.DELETED_MARK_MIMETYPE,
             rrs=True,
             acl='private'
