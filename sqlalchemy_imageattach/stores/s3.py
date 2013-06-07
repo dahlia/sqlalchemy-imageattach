@@ -15,13 +15,13 @@ import email.utils
 import hashlib
 import hmac
 import logging
-import mimetypes
 try:
     from urllib import request as urllib2
 except ImportError:
     import urllib2
 
 from ..store import Store
+from .fs import guess_extension
 
 __all__ = ('BASE_URL_FORMAT', 'DEFAULT_MAX_AGE',
            'S3Request', 'S3SandboxStore', 'S3Store')
@@ -164,7 +164,7 @@ class S3Store(Store):
     def get_key(self, object_type, object_id, width, height, mimetype):
         key = '{0}/{1}/{2}x{3}{4}'.format(
             object_type, object_id, width, height,
-            mimetypes.guess_extension(mimetype)
+            guess_extension(mimetype)
         )
         if self.prefix:
             return '{0}/{1}'.format(self.prefix, key)

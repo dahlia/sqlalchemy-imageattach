@@ -8,7 +8,8 @@ from webob import Request
 
 from sqlalchemy_imageattach.stores.fs import (FileSystemStore,
                                               HttpExposedFileSystemStore,
-                                              StaticServerMiddleware)
+                                              StaticServerMiddleware,
+                                              guess_extension)
 from ..conftest import sample_images_dir
 from .conftest import TestingImage, utcnow
 
@@ -117,3 +118,9 @@ def test_static_server(block_size):
     request = Request.blank('/static-not/')
     response = request.get_response(app)
     assert response.text == 'fallback: /static-not/'
+
+
+def test_guess_extension():
+    assert guess_extension('image/jpeg') == '.jpe'
+    assert guess_extension('image/png') == '.png'
+    assert guess_extension('image/gif') == '.gif'

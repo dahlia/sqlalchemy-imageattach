@@ -24,7 +24,30 @@ import shutil
 from ..store import Store
 
 __all__ = ('BaseFileSystemStore', 'FileSystemStore',
-           'HttpExposedFileSystemStore', 'StaticServerMiddleware')
+           'HttpExposedFileSystemStore', 'StaticServerMiddleware',
+           'guess_extension')
+
+
+def guess_extension(mimetype):
+    """Finds the right filename extension (e.g. ``'.png'``) for
+    the given ``mimetype`` (e.g. :mimetype:`image/png`).
+
+    :param mimetype: mimetype string e.g. ``'image/jpeg'``
+    :type mimetype: :class:`basestring`
+    :returns: filename extension for the mimetype
+    :rtype: :class:`basestring`
+
+    """
+    if mimetype == 'image/jpeg':
+        # mimetypes.guess_extension() had been returned '.jpe' for
+        # 'image/jpeg' until Python 3.3, but Python 3.3 has been
+        # returned '.jpeg' instead.
+        # We stick with '.jpe' to maintain consistency with
+        # already stored objects.
+        suffix = '.jpe'
+    else:
+        suffix = mimetypes.guess_extension(mimetype)
+    return suffix
 
 
 class BaseFileSystemStore(Store):
@@ -39,7 +62,7 @@ class BaseFileSystemStore(Store):
     def get_path(self, object_type, object_id, width, height, mimetype):
         id_segment_a = str(object_id % 1000)
         id_segment_b = str(object_id // 1000)
-        suffix = mimetypes.guess_extension(mimetype)
+        suffix = guess_extension(mimetype)
         filename = '{0}.{1}x{2}{3}'.format(object_id, width, height, suffix)
         return object_type, id_segment_a, id_segment_b, filename
 
