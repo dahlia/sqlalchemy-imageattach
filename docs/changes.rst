@@ -6,6 +6,7 @@ Version 0.8.0
 
 To be released.
 
+- Support Python 3.2 and 3.3.
 - Added manual :func:`~sqlalchemy_imageattach.context.push_store_context()` and
   :func:`~sqlalchemy_imageattach.context.pop_store_context()` API.  It's useful
   when you can't use :keyword:`with` keyword e.g. setup/teardown hooks.

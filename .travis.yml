@@ -11,15 +11,18 @@ env:
   - IMAGEATTACH_TEST_S3_SECRET_KEY=bar
   - IMAGEATTACH_TEST_S3_NAME=si-test
   - IMAGEATTACH_TEST_S3_SANDBOX_NAME=si-test-sandbox
+  - PY=`python -c 'import sys;print("pypy" if hasattr(sys,"pypy_version_info") else "%d.%d" % sys.version_info[:2])'`
   matrix:
   - DB=sqlite IMAGEATTACH_TEST_DATABASE_URL='sqlite://'
-  - DB=postgresql DRIVER=psycopg2ct IMAGEATTACH_TEST_DATABASE_URL='postgresql:///si_test?user=postgres'
-  - DB=mysql DRIVER=PyMySQL IMAGEATTACH_TEST_DATABASE_URL='mysql+pymysql://root@localhost/si_test'
+  - DB=postgresql IMAGEATTACH_TEST_DATABASE_URL='postgresql:///si_test?user=postgres'
+  - DB=mysql IMAGEATTACH_TEST_DATABASE_URL='mysql+oursql://root@localhost/si_test'
 before_install:
 - sudo apt-get update -qq
 - sudo apt-get install -qq s3cmd rubygems
 install:
-- pip install pytest WebOb pytest-capturelog pytest-cov coveralls $DRIVER
+- pip install pytest WebOb pytest-capturelog pytest-cov coveralls
+- if [ "$DB" = "postgresql" ]; then if [ "$PY" = "pypy" ]; then pip install psycopg2ct; else pip install psycopg2; fi; fi
+- if [ "$DB" = "mysql" ]; then if [ "$PY" = "pypy" ]; then pip install PyMySQL; export IMAGEATTACH_TEST_DATABASE_URL={$IMAGEATTACH_TEST_DATABASE_URL/oursql/pymysql} else pip install oursql; fi; fi
 - pip install -e .
 - gem install --user-install --no-ri --no-rdoc fakes3
 before_script:
