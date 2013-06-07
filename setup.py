@@ -57,7 +57,7 @@ setup(
     license='MIT License',
     packages=find_packages(exclude=['tests']),
     install_requires=install_requires,
-    tests_require=['pytest >= 2.3.0', 'Werkzeug >= 0.8'],
+    tests_require=['pytest >= 2.3.0', 'WebOb'],
     dependency_links=dependency_links,
     classifiers=[
         'Development Status :: 3 - Alpha',

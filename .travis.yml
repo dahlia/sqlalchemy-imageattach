@@ -19,7 +19,7 @@ before_install:
 - sudo apt-get update -qq
 - sudo apt-get install -qq s3cmd rubygems
 install:
-- pip install pytest Werkzeug pytest-capturelog pytest-cov coveralls $DRIVER
+- pip install pytest WebOb pytest-capturelog pytest-cov coveralls $DRIVER
 - pip install -e .
 - gem install --user-install --no-ri --no-rdoc fakes3
 before_script:

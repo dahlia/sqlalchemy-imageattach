@@ -4,8 +4,7 @@ import os.path
 import re
 
 from pytest import mark, raises
-from werkzeug.test import Client
-from werkzeug.wrappers import Response
+from webob import Request
 
 from sqlalchemy_imageattach.stores.fs import (FileSystemStore,
                                               HttpExposedFileSystemStore,
@@ -54,20 +53,25 @@ def test_http_fs_store(tmpdir):
         actual_data = actual.read()
     assert expected_data == actual_data
     expected_urls = (
-        'http://localhost/__images__/testing/234/1/1234.405x640.jpe',
-        'http://localhost/__images__/testing/234/1/1234.405x640.jpg'
+        'http://localhost:80/__images__/testing/234/1/1234.405x640.jpe',
+        'http://localhost:80/__images__/testing/234/1/1234.405x640.jpg'
     )
     def app(environ, start_response):
-        start_response('200 OK', [('Content-Type', 'text/plain')])
-        yield http_fs_store.locate(image)
+        start_response(
+            '200 OK',
+            [('Content-Type', 'text/plain; charset=utf-8')]
+        )
+        yield http_fs_store.locate(image).encode('utf-8')
     app = http_fs_store.wsgi_middleware(app)
-    client = Client(app, Response)
-    actual_url = client.get('/').data
-    assert remove_query(actual_url.decode()) in expected_urls
-    response = client.get('/__images__/testing/234/1/1234.405x640.jpe')
+    request = Request.blank('/')
+    response = request.get_response(app)
+    actual_url = response.text
+    assert remove_query(actual_url) in expected_urls
+    request = Request.blank('/__images__/testing/234/1/1234.405x640.jpe')
+    response = request.get_response(app)
     assert response.status_code == 200
-    assert response.data == expected_data
-    assert response.mimetype == 'image/jpeg'
+    assert response.body == expected_data
+    assert response.content_type == 'image/jpeg'
     http_fs_store.delete(image)
     with raises(IOError):
         http_fs_store.open(image)
@@ -77,33 +81,39 @@ def test_http_fs_store(tmpdir):
 @mark.parametrize('block_size', [None, 8192, 1024, 1024 * 1024])
 def test_static_server(block_size):
     def fallback_app(environ, start_response):
-        start_response('200 OK', [('Content-Type', 'text/plain')])
-        yield 'fallback: '
-        yield environ['PATH_INFO']
+        start_response(
+            '200 OK',
+            [('Content-Type', 'text/plain; charset=utf-8')]
+        )
+        yield b'fallback: '
+        yield environ['PATH_INFO'].encode('utf-8')
     test_dir = os.path.join(os.path.dirname(__file__), '..')
     if block_size:
         app = StaticServerMiddleware(fallback_app, '/static/', test_dir,
                                      block_size)
     else:
         app = StaticServerMiddleware(fallback_app, '/static/', test_dir)
-    client = Client(app, Response)
     # 200 OK
-    response = client.get('/static/context_test.py')
+    request = Request.blank('/static/context_test.py')
+    response = request.get_response(app)
     assert response.status_code == 200
-    assert response.mimetype == 'text/x-python'
+    assert response.content_type == 'text/x-python'
     with open(os.path.join(test_dir, 'context_test.py'), 'rb') as f:
-        assert response.data == f.read()
+        assert response.body == f.read()
         assert response.content_length == f.tell()
     # 200 OK: subdirectory
-    response = client.get('/static/stores/fs_test.py')
+    request = Request.blank('/static/stores/fs_test.py')
+    response = request.get_response(app)
     assert response.status_code == 200
-    assert response.mimetype == 'text/x-python'
+    assert response.content_type == 'text/x-python'
     with open(os.path.join(test_dir, 'stores', 'fs_test.py'), 'rb') as f:
-        assert response.data == f.read()
+        assert response.body == f.read()
         assert response.content_length == f.tell()
     # 404 Not Found
-    response = client.get('/static/not-exist')
+    request = Request.blank('/static/not-exist')
+    response = request.get_response(app)
     assert response.status_code == 404
     # fallback app
-    response = client.get('/static-not/')
-    assert response.data == b'fallback: /static-not/'
+    request = Request.blank('/static-not/')
+    response = request.get_response(app)
+    assert response.text == 'fallback: /static-not/'
