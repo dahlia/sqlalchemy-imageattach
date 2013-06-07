@@ -22,7 +22,7 @@ before_install:
 install:
 - pip install pytest WebOb pytest-capturelog pytest-cov coveralls
 - if [ "$DB" = "postgresql" ]; then if [ "$PY" = "pypy" ]; then pip install psycopg2ct; else pip install psycopg2; fi; fi
-- if [ "$DB" = "mysql" ]; then if [ "$PY" = "pypy" ]; then pip install PyMySQL; export IMAGEATTACH_TEST_DATABASE_URL={$IMAGEATTACH_TEST_DATABASE_URL/oursql/pymysql} else pip install oursql; fi; fi
+- if [ "$DB" = "mysql" ]; then if [ "$PY" = "pypy" ]; then pip install PyMySQL; export IMAGEATTACH_TEST_DATABASE_URL=${IMAGEATTACH_TEST_DATABASE_URL/oursql/pymysql}; else pip install oursql; fi; fi
 - pip install -e .
 - gem install --user-install --no-ri --no-rdoc fakes3
 before_script:
