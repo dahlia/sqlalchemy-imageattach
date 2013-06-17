@@ -270,7 +270,7 @@ texinfo_documents = [
 intersphinx_mapping = {
     'python': ('http://docs.python.org/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/rel_0_8/', None),
-    'wand': ('http://docs.wand-py.org/en/0.2-maintenance/', None),
+    'wand': ('http://docs.wand-py.org/en/0.3-maintenance/', None),
     'flask': ('http://flask.pocoo.org/docs/', None)
 }
 

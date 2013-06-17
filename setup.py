@@ -1,5 +1,4 @@
 import os.path
-import sys
 
 try:
     from setuptools import setup, find_packages
@@ -35,15 +34,8 @@ class pytest(test):
 
 install_requires = [
     'SQLAlchemy >= 0.8.0',
-    'Wand >= 0.2.0' if sys.version_info < (3,) else 'Wand >= 0.3.0a2'
+    'Wand >= 0.3.0'
 ]
-
-dependency_links = []
-
-if sys.version_info >= (3,):
-    dependency_links.extend([
-        'https://github.com/dahlia/wand/archive/python3.tar.gz#egg=Wand-0.3.0a2'
-    ])
 
 
 setup(
@@ -58,7 +50,6 @@ setup(
     packages=find_packages(exclude=['tests']),
     install_requires=install_requires,
     tests_require=['pytest >= 2.3.0', 'WebOb'],
-    dependency_links=dependency_links,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
