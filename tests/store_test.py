@@ -2,7 +2,7 @@ import datetime
 import io
 import os.path
 
-from pytest import raises
+from pytest import mark, raises
 from sqlalchemy_imageattach.store import Store
 
 from .conftest import sample_images_dir
@@ -13,8 +13,9 @@ class EmptyStore(Store):
     """Store subclass that doesn't implement abstract methods."""
 
 
-def miss_put_file():
-    store = EmptyStore()
+@mark.parametrize('store_cls', [EmptyStore, Store])
+def miss_put_file(store_cls):
+    store = store_cls()
     image_path = os.path.join(sample_images_dir, 'iu.jpg')
     with open(image_path, 'rb') as image_file:
         with raises(NotImplementedError):
@@ -27,8 +28,9 @@ def miss_put_file():
             store.store(image, image_file)
 
 
-def miss_delete_file():
-    store = EmptyStore()
+@mark.parametrize('store_cls', [EmptyStore, Store])
+def miss_delete_file(store_cls):
+    store = store_cls()
     with raises(NotImplementedError):
         store.delete_file('testing', 1234, 405, 640, 'image/jpeg')
     image = TestingImage(thing_id=1234, width=405, height=640,
@@ -38,8 +40,9 @@ def miss_delete_file():
         store.delete(image)
 
 
-def miss_get_file():
-    store = EmptyStore()
+@mark.parametrize('store_cls', [EmptyStore, Store])
+def miss_get_file(store_cls):
+    store = store_cls()
     with raises(NotImplementedError):
         store.get_file('testing', 1234, 405, 640, 'image/jpeg')
     image = TestingImage(thing_id=1234, width=405, height=640,
@@ -49,8 +52,9 @@ def miss_get_file():
         store.open(image)
 
 
-def miss_get_url():
-    store = EmptyStore()
+@mark.parametrize('store_cls', [EmptyStore, Store])
+def miss_get_url(store_cls):
+    store = store_cls()
     with raises(NotImplementedError):
         store.get_url('testing', 1234, 405, 640, 'image/jpeg')
     image = TestingImage(thing_id=1234, width=405, height=640,
