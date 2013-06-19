@@ -13,18 +13,25 @@
 
 import sys
 import os.path
+import subprocess
+
+__dir__ = os.path.dirname(__file__)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '..')))
 
 from sqlalchemy_imageattach.version import VERSION
 
 
-# Mocking C libraries to fake wand.api module which is unavailable
-# on ReadTheDocs builder.
 if os.environ.get('READTHEDOCS', 0):
+    # Clone bw_sphinxtheme
+    subprocess.call(['git', 'submodule', 'update', '--init'],
+                    cwd=os.path.join(__dir__, '..'))
+
+    # Mocking C libraries to fake wand.api module which is unavailable
+    # on ReadTheDocs builder.
     class Mock(object):
         def __init__(self, name):
             self.name = name
