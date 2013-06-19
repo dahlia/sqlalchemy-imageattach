@@ -115,15 +115,31 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'nature'
+if os.path.isdir('bw_sphinxtheme/bw_sphinxtheme'):
+    html_theme = 'bw'
+    pygments_style = 'pastie'
+else:
+    print '-' * 74
+    print 'Warning: bw_sphinxtheme unavailable. Building with default theme'
+    print 'If you want the bw_sphinxtheme, run this command and build again:'
+    print
+    print ' git submodule update --init'
+    print '-' * 74
+
+    html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {}
+html_theme_options = {
+    'github_ribbon': True,
+    'github_ribbon_link': 'https://github.com/crosspop/sqlalchemy-imageattach'
+} if html_theme == 'bw' else {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+html_theme_path = (['bw_sphinxtheme/bw_sphinxtheme/themes']
+                   if html_theme == 'bw'
+                   else [])
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".

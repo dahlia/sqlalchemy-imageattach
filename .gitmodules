@@ -1,0 +1,3 @@
+[submodule "docs/bw_sphinxtheme"]
+	path = docs/bw_sphinxtheme
+url=git://github.com/dahlia/bw_sphinxtheme.git
