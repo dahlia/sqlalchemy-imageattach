@@ -4,9 +4,10 @@ SQLAlchemy-ImageAttach Changelog
 Version 0.8.0
 -------------
 
-To be released.
+Released on June 20, 2013.
 
-- Support Python 3.2 and 3.3.
+- Support Python 3.2 and 3.3.  (Required minimum version of Wand also becomes
+  0.3.0 from 0.2.0.)
 - Added manual :func:`~sqlalchemy_imageattach.context.push_store_context()` and
   :func:`~sqlalchemy_imageattach.context.pop_store_context()` API.  It's useful
   when you can't use :keyword:`with` keyword e.g. setup/teardown hooks.
