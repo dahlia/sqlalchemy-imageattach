@@ -155,3 +155,40 @@ The constructor of it can be anything.  It's not part of the interface.
 If you believe your storage implementation could be widely used as well
 as for others, please contribute your code by sending a pull request!
 We always welcome your contributions.
+
+
+.. _migrate-store:
+
+Migrating storage
+-----------------
+
+SQLAlchemy-ImageAttach provides a simple basic utility to migrate
+image data in an old storage to a new storage (although it's not
+CLI but API).  In order to migrate storage data you need used
+database as well, not only storage.  Because some metadata are only
+saved to database.
+
+The following code shows you how to migrate all image data in ``old_store``
+to ``new_store``::
+
+    plan = migrate(session, Base, old_store, new_store)
+    plan.execute()
+
+In the above code, ``Base`` is declarative base class (which is created by
+:func:`sqlalchemy.ext.declarative.declarative_base()`), and ``session`` is
+an instance of SQLAlchemy :class:`~sqlalchemy.orm.session.Session`.
+
+If you want to know progress of migration, iterating the result::
+
+    plan = migrate(session, Base, old_store, new_store)
+    for image in plan:
+        print('Migrated ' + repr(image))
+
+Or pass a ``callback`` function to :meth:`execute()
+<sqlalchemy_imageattach.migration.Migration.execute>` method::
+
+    def progress(image):
+        print('Migrated ' + repr(image))
+
+    plan = migrate(session, Base, old_store, new_store)
+    plan.execute(progress)

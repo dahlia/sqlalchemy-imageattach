@@ -7,6 +7,7 @@ Version 0.8.1
 To be released.
 
 - Added :mod:`sqlalchemy_imageattach.migration` module for storage migration.
+  See also :ref:`migrate-store` guide.
 
 
 Version 0.8.0
