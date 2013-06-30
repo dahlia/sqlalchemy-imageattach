@@ -66,6 +66,7 @@ User's guide
   api/context
   api/entity
   api/file
+  api/migration
   api/store
   api/util
   api/version
