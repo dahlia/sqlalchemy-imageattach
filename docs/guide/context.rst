@@ -301,7 +301,7 @@ For example, use :meth:`~flask.Flask.before_request()` and
         push_store_context(store)
 
     @app.teardown_request
-    def stop_implicit_store_context():
+    def stop_implicit_store_context(exception=None):
         pop_store_context()
 
 .. _Flask: http://flask.pocoo.org/
