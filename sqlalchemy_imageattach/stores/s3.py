@@ -134,6 +134,12 @@ class S3Store(Store):
     :param prefix: the optional key prefix to logically separate stores
                    with the same bucket.  not used by default
     :type prefix: :class:`basestring`
+    :param public_base_url: an optional url base for public urls.
+                            useful when used with cdn
+    :type public_base_url: :class:`basestring`
+
+    .. versionchanged:: 0.8.1
+       Added ``public_base_url`` parameter.
 
     """
 
@@ -150,8 +156,11 @@ class S3Store(Store):
     #: stores with the same bucket.
     prefix = None
 
+    #: (:class:`basestring`) The optional url base for public urls.
+    public_base_url = None
+
     def __init__(self, bucket, access_key=None, secret_key=None,
-                 max_age=DEFAULT_MAX_AGE, prefix=''):
+                 max_age=DEFAULT_MAX_AGE, prefix='', public_base_url=None):
         self.bucket = bucket
         self.access_key = access_key
         self.secret_key = secret_key
@@ -159,7 +168,13 @@ class S3Store(Store):
         self.max_age = max_age
         self.prefix = prefix.strip()
         if self.prefix.endswith('/'):
-            self.prefix = self.prfix[:-1]
+            self.prefix = self.prefix.rstrip('/')
+        if public_base_url is None:
+            self.public_base_url = self.base_url
+        elif public_base_url.endswith('/'):
+            self.public_base_url = public_base_url.rstrip('/')
+        else:
+            self.public_base_url = public_base_url
 
     def get_key(self, object_type, object_id, width, height, mimetype):
         key = '{0}/{1}/{2}x{3}{4}'.format(
@@ -171,13 +186,19 @@ class S3Store(Store):
         return key
 
     def get_file(self, *args, **kwargs):
-        url = self.get_url(*args, **kwargs)
+        url = self.get_s3_url(*args, **kwargs)
         request = self.make_request(url)
         return urllib2.urlopen(request)
 
-    def get_url(self, *args, **kwargs):
+    def get_s3_url(self, *args, **kwargs):
         return '{0}/{1}'.format(
             self.base_url,
+            self.get_key(*args, **kwargs)
+        )
+
+    def get_url(self, *args, **kwargs):
+        return '{0}/{1}'.format(
+            self.public_base_url,
             self.get_key(*args, **kwargs)
         )
 
@@ -219,11 +240,11 @@ class S3Store(Store):
 
     def put_file(self, file, object_type, object_id, width, height, mimetype,
                  reproducible):
-        url = self.get_url(object_type, object_id, width, height, mimetype)
+        url = self.get_s3_url(object_type, object_id, width, height, mimetype)
         self.upload_file(url, file.read(), mimetype, rrs=reproducible)
 
     def delete_file(self, *args, **kwargs):
-        url = self.get_url(*args, **kwargs)
+        url = self.get_s3_url(*args, **kwargs)
         request = self.make_request(url, method='DELETE')
         urllib2.urlopen(request).read()
 
@@ -311,7 +332,7 @@ class S3SandboxStore(Store):
     def delete_file(self, object_type, object_id, width, height, mimetype):
         args = object_type, object_id, width, height, mimetype
         self.overriding.delete_file(*args)
-        url = self.overriding.get_url(*args)
+        url = self.overriding.get_s3_url(*args)
         self.overriding.upload_file(
             url,
             data=b'',

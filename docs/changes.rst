@@ -8,6 +8,11 @@ To be released.
 
 - Added :mod:`sqlalchemy_imageattach.migration` module for storage migration.
   See also :ref:`migrate-store` guide.
+- Added ``public_base_url`` option to :class:`S3Store
+  <sqlalchemy_imageattach.stores.s3.S3Store>`.  It's useful when used with
+  CDN e.g. CloudFront_.
+
+.. _CloudFront: http://aws.amazon.com/cloudfront/
 
 
 Version 0.8.0

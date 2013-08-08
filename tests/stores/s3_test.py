@@ -1,4 +1,5 @@
 import functools
+import itertools
 import os.path
 import re
 try:
@@ -75,9 +76,15 @@ def s3_sandbox_store_getter(request):
                              secret_key=secret_key)
 
 
-@mark.parametrize('prefix', ['', 'prefixtest'])
-def test_s3_store(prefix, s3_store_getter):
-    s3 = s3_store_getter(prefix=prefix)
+@mark.parametrize(
+    ('prefix', 'public_base_url'),
+    list(
+        itertools.product(['', 'prefixtest', 'prefixtest/'],
+                          [None, 'http://example.com', 'https://example.com/'])
+    )
+)
+def test_s3_store(prefix, public_base_url, s3_store_getter):
+    s3 = s3_store_getter(prefix=prefix, public_base_url=public_base_url)
     thing_id = uuid.uuid1().int
     image = TestingImage(thing_id=thing_id, width=405, height=640,
                          mimetype='image/jpeg', original=True,
@@ -90,7 +97,11 @@ def test_s3_store(prefix, s3_store_getter):
     with s3.open(image) as actual:
         actual_data = actual.read()
     assert expected_data == actual_data
-    expected_url = s3.get_url('testing', thing_id, 405, 640, 'image/jpeg')
+    key_args = 'testing', thing_id, 405, 640, 'image/jpeg'
+    if public_base_url:
+        expected_url = public_base_url.rstrip('/') + '/' + s3.get_key(*key_args)
+    else:
+        expected_url = s3.get_url(*key_args)
     actual_url = s3.locate(image)
     assert remove_query(expected_url) == remove_query(actual_url)
     if prefix:
