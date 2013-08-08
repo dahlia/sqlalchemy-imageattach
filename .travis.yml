@@ -7,33 +7,24 @@ python:
 - pypy
 env:
   global:
-  - IMAGEATTACH_TEST_S3_ACCESS_KEY=foo
-  - IMAGEATTACH_TEST_S3_SECRET_KEY=bar
-  - IMAGEATTACH_TEST_S3_NAME=si-test
-  - IMAGEATTACH_TEST_S3_SANDBOX_NAME=si-test-sandbox
+  - secure: "m2miJTnJPlSo2xFppOenQpzrCwxOyUztMlNdQ3GSrkVnE5g/USsFTfD018Si\nniQDBkt2B8+JJZWo42SdP+8rf75y6piwNRxgmMWyON8s9Jsq5g+QFHKaCwtc\nobEYzrrHkCahZ+lUedGL+8ff9zvYm+IcdKpiLQTET84K1ctrRyE="
+  - secure: "qnxIMBzUhRnT6TpEn1CfD6vQltzwppNjdJ2PL9bO12jyETIuwo+ktaJ8r5bc\nKVI8rZW5sdD4sO0qEsz5JJSGh2Ih+Y9YiXg8OzK28noLocXQgv0TItO7sghl\nHPHcwEzfH4PtkS8v+0f82nS74WXAEsNZLi2lhpghH3ODFd8ZYI0="
+  - IMAGEATTACH_TEST_S3_NAME=sqla-imageattach-test
+  - IMAGEATTACH_TEST_S3_SANDBOX_NAME=sqla-imageattach-test2
   matrix:
   - DB=sqlite IMAGEATTACH_TEST_DATABASE_URL='sqlite://'
   - DB=postgresql IMAGEATTACH_TEST_DATABASE_URL='postgresql:///si_test?user=postgres'
   - DB=mysql IMAGEATTACH_TEST_DATABASE_URL='mysql+mysqlconnector://root@localhost/si_test'
 before_install:
-- sudo apt-get update -qq
-- sudo apt-get install -qq s3cmd rubygems
 - export PY=`python -c 'import sys;print("pypy" if hasattr(sys,"pypy_version_info") else "%d.%d" % sys.version_info[:2])'`
 install:
 - pip install pytest WebOb pytest-capturelog pytest-cov coveralls
 - if [ "$DB" = "postgresql" ]; then if [ "$PY" = "pypy" ]; then pip install psycopg2ct; else pip install psycopg2; fi; fi
 - if [ "$DB" = "mysql" ]; then if [ "$PY" = "pypy" ]; then pip install PyMySQL; export IMAGEATTACH_TEST_DATABASE_URL=${IMAGEATTACH_TEST_DATABASE_URL/mysqlconnector/pymysql}; else pip install mysql-connector-python; fi; fi
 - pip install -e .
-- gem install --user-install --no-ri --no-rdoc fakes3
 before_script:
 - if [ "$DB" = "postgresql" ]; then createdb -U postgres -E utf8 -T postgres si_test; fi
 - if [ "$DB" = "mysql" ]; then mysql -e "CREATE DATABASE si_test;"; fi
-- sudo -b nohup ~/.gem/ruby/*/bin/fakes3 -r /tmp/fakes3 -p 80
-- echo 127.0.0.1 s3.amazonaws.com | sudo tee -a /etc/hosts
-- echo 127.0.0.1 si-test.s3.amazonaws.com | sudo tee -a /etc/hosts
-- echo 127.0.0.1 si-test-sandbox.s3.amazonaws.com | sudo tee -a /etc/hosts
-- s3cmd -c .travis-s3cfg mb s3://si-test
-- s3cmd -c .travis-s3cfg mb s3://si-test-sandbox
 script:
 - py.test --cov sqlalchemy_imageattach --durations=20
 after_success:
