@@ -109,14 +109,14 @@ the most of template engines like Jinja2_, Mako_.  It's expanded to
 .. code-block:: html+jinja
 
    <div class="user">
-       <a href="{{ url_for('user_prfile', user_id=user.id) }}"
+       <a href="{{ url_for('user_profile', user_id=user.id) }}"
           title="{{ user.name }}">{{ user.picture }}</a>
    </div>
 
 .. code-block:: html+mako
 
    <div class="user">
-       <a href="${url_for('user_prfile', user_id=user.id)}"
+       <a href="${url_for('user_profile', user_id=user.id)}"
           title="${user.name}">${user.picture}</a>
    </div>
 
@@ -125,7 +125,7 @@ The above template codes are equivalent to:
 .. code-block:: html+jinja
 
    <div class="user">
-       <a href="{{ url_for('user_prfile', user_id=user.id) }}"
+       <a href="{{ url_for('user_profile', user_id=user.id) }}"
           title="{{ user.name }}"><img src="{{ user.picture.locate() }}"
                                        width="{{ user.picture.width }}"
                                        height="{{ user.picture.height }}"></a>
@@ -134,7 +134,7 @@ The above template codes are equivalent to:
 .. code-block:: html+mako
 
    <div class="user">
-       <a href="${url_for('user_prfile', user_id=user.id)}"
+       <a href="${url_for('user_profile', user_id=user.id)}"
           title="${user.name}"><img src="${user.picture.locate()}"
                                     width="${user.picture.width}"
                                     height="${user.picture.height}"></a>
