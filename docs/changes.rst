@@ -4,7 +4,7 @@ SQLAlchemy-ImageAttach Changelog
 Version 0.8.1
 -------------
 
-To be released.
+Released on August 26, 2013.
 
 - Added :mod:`sqlalchemy_imageattach.migration` module for storage migration.
   See also :ref:`migrate-store` guide.
