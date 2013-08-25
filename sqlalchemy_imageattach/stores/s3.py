@@ -120,6 +120,12 @@ class S3Store(Store):
     """Image storage backend implementation using S3_.  It implements
     :class:`~sqlalchemy_imageattach.store.Store` interface.
 
+    If you'd like to use it with Amazon CloudFront_, pass the base url of
+    the distribution to ``public_base_url``.  Note that you should configure
+    *Forward Query Strings* to *Yes* when you create the distribution.
+    Because SQLAlchemy-ImageAttach will add query strings to public URLs
+    to invalidate cache when the image is updated.
+
     :param bucket: the buckect name
     :type bucket: :class:`basestring`
     :type access_key: AWS access key for the bucket.
@@ -140,6 +146,8 @@ class S3Store(Store):
 
     .. versionchanged:: 0.8.1
        Added ``public_base_url`` parameter.
+
+    .. _CloudFront: http://aws.amazon.com/cloudfront/
 
     """
 
