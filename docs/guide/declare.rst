@@ -81,7 +81,7 @@ If the primary key is a pair, encode a pair into an integer::
     @property
     def object_id(self):
         a = self.id_a
-        b = selg.id_b
+        b = self.id_b
         return (a + b) * (a + b) + a
 
 If the primary key is composite of three or more columns, encode a tuple
