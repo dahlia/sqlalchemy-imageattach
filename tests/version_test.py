@@ -15,8 +15,9 @@ def test_version_info():
 
 
 def test_sqlalchemy_version():
-    assert list(map(int, __version__.split('.')[:2])) == list(VERSION_INFO[:2])
-    assert __version__.split('.')[:2] == VERSION.split('.')[:2]
+    sqla_version_info = list(map(int, __version__.split('.')[:2]))
+    assert sqla_version_info >= list(VERSION_INFO[:2])
+    assert __version__.split('.')[:2] >= VERSION.split('.')[:2]
 
 
 def test_version():
