@@ -27,7 +27,7 @@ before_script:
 - if [ "$DB" = "mysql" ]; then mysql -e "CREATE DATABASE si_test;"; fi
 script:
 - py.test --cov sqlalchemy_imageattach --durations=20  # SQLAlchemy 0.9
-- pip uninstall SQLAlchemy
+- pip uninstall --yes SQLAlchemy
 - pip install "SQLAlchemy>=0.8.0,<0.9.0"
 - py.test sqlalchemy_imageattach  # SQLAlchemy 0.8
 after_success:
