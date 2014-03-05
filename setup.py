@@ -47,7 +47,7 @@ setup(
     author='Hong Minhee',
     author_email='minhee' '@' 'dahlia.kr',
     license='MIT License',
-    packages=find_packages(exclude=['tests']),
+    packages=find_packages(exclude=['tests', 'tests.stores']),
     install_requires=install_requires,
     tests_require=['pytest >= 2.3.0', 'WebOb'],
     classifiers=[

@@ -21,12 +21,15 @@ install:
 - pip install pytest WebOb pytest-capturelog pytest-cov coveralls
 - if [ "$DB" = "postgresql" ]; then if [ "$PY" = "pypy" ]; then pip install psycopg2ct; else pip install psycopg2; fi; fi
 - if [ "$DB" = "mysql" ]; then if [ "$PY" = "pypy" ]; then pip install PyMySQL; export IMAGEATTACH_TEST_DATABASE_URL=${IMAGEATTACH_TEST_DATABASE_URL/mysqlconnector/pymysql}; else pip install mysql-connector-python; fi; fi
-- pip install -e .
+- pip install "SQLAlchemy>=0.9.0" -e .
 before_script:
 - if [ "$DB" = "postgresql" ]; then createdb -U postgres -E utf8 -T postgres si_test; fi
 - if [ "$DB" = "mysql" ]; then mysql -e "CREATE DATABASE si_test;"; fi
 script:
-- py.test --cov sqlalchemy_imageattach --durations=20
+- py.test --cov sqlalchemy_imageattach --durations=20  # SQLAlchemy 0.9
+- pip uninstall SQLAlchemy
+- pip install "SQLAlchemy>=0.8.0,<0.9.0"
+- py.test sqlalchemy_imageattach  # SQLAlchemy 0.8
 after_success:
 - coveralls
 notifications:
