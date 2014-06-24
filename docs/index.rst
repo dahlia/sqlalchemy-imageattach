@@ -107,7 +107,7 @@ Check out :doc:`changes` as well.
    :target: https://coveralls.io/r/crosspop/sqlalchemy-imageattach
 
 
-.. _Hong Minhee: http://dahlia.kr/
+.. _Hong Minhee: http://hongminhee.org/
 .. _Crosspop: http://crosspop.in/
 .. _MIT license: http://minhee.mit-license.org/
 .. _GitHub repository: https://github.com/crosspop/sqlalchemy-imageattach
