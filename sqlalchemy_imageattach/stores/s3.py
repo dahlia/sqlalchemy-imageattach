@@ -240,7 +240,7 @@ class S3Store(Store):
                     raise
                 self.logger.debug(e)
                 continue
-            except IOError:
+            except IOError as e:
                 self.logger.debug(e)
                 continue
             else:
