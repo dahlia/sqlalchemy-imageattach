@@ -4,8 +4,9 @@ SQLAlchemy-ImageAttach Changelog
 Version 0.8.2
 -------------
 
-To be released.
+Released on July 30, 2014.
 
+- Support Python 3.4.
 - Fix :exc:`UnboundLocalError` of :class:`S3Store
   <sqlalchemy_imageattach.stores.s3.S3Store>`.  [:issue:`20` by Peter Lada]
 

@@ -72,7 +72,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'SQLAlchemy-ImageAttach'
-copyright = '2013, Hong Minhee'
+copyright = '2013–2014, Hong Minhee'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
