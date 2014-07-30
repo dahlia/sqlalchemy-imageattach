@@ -1,6 +1,15 @@
 SQLAlchemy-ImageAttach Changelog
 ================================
 
+Version 0.8.2
+-------------
+
+To be released.
+
+- Fix :exc:`UnboundLocalError` of :class:`S3Store
+  <sqlalchemy_imageattach.stores.s3.S3Store>`.  [:issue:`20` by Peter Lada]
+
+
 Version 0.8.1
 -------------
 
