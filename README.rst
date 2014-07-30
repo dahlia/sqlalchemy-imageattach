@@ -22,7 +22,7 @@ SQLAlchemy transaction aware
    Saved file are removed when the ongoing transaction has been rolled back.
 
 Tested on various environments
-   - Python versions: Python 2.6, 2.7, 3.2, 3.3, PyPy_
+   - Python versions: Python 2.6, 2.7, 3.2, 3.3, 3.4, PyPy_
    - DBMS: PostgreSQL, MySQL, SQLite
    - SQLAlchemy: 0.8 or higher
 
@@ -41,20 +41,24 @@ Docs
 Package Index (Cheeseshop)
    https://pypi.python.org/pypi/SQLAlchemy-ImageAttach
 
+   .. image:: https://badge.fury.io/py/SQLAlchemy-ImageAttach.svg?
+      :target: https://pypi.python.org/pypi/SQLAlchemy-ImageAttach
+      :alt: Latest PyPI version
+
 GitHub
    https://github.com/crosspop/sqlalchemy-imageattach
 
 Continuous Integration (Travis CI)
    http://travis-ci.org/crosspop/sqlalchemy-imageattach
 
-   .. image:: https://secure.travis-ci.org/crosspop/sqlalchemy-imageattach.png
+   .. image:: https://secure.travis-ci.org/crosspop/sqlalchemy-imageattach.svg?
       :alt: Build Status
-      :target: http://travis-ci.org/crosspop/sqlalchemy-imageattach
+      :target: https://travis-ci.org/crosspop/sqlalchemy-imageattach
 
 Code Coverage
    https://coveralls.io/r/crosspop/sqlalchemy-imageattach
 
-   .. image:: https://coveralls.io/repos/crosspop/sqlalchemy-imageattach/badge.png
+   .. image:: https://img.shields.io/coveralls/crosspop/sqlalchemy-imageattach/badge.svg?
       :alt: Coverage Status
       :target: https://coveralls.io/r/crosspop/sqlalchemy-imageattach
 

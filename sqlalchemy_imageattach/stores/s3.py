@@ -72,7 +72,7 @@ class S3Request(urllib2.Request):
         self.add_header('Authorization', authorization)
 
     def get_method(self):
-        return self.method or urllib2.Request.get_method(self)
+        return self.method or urllib2.Request.get_method(self) or 'GET'
 
     def get_path_with_query(self):
         url = self.get_full_url()
