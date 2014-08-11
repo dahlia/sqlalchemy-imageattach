@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, with_statement
 import hashlib
 import os.path
 
-from pytest import fixture, raises
+from pytest import yield_fixture, raises
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import Column, ForeignKey
@@ -20,10 +20,10 @@ class ExpectedException(Exception):
     """Exception to be expected to rise."""
 
 
-@fixture
-def tmp_store(request, tmpdir):
-    request.addfinalizer(tmpdir.remove)
-    return FileSystemStore(tmpdir.strpath, 'http://localhost/')
+@yield_fixture
+def tmp_store(tmpdir):
+    yield FileSystemStore(tmpdir.strpath, 'http://localhost/')
+    tmpdir.remove()
 
 
 class Something(Base):

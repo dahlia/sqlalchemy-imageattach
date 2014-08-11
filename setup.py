@@ -37,6 +37,11 @@ install_requires = [
     'Wand >= 0.3.0'
 ]
 
+tests_require = [
+    'pytest >= 2.6.0',
+    'WebOb'
+]
+
 
 setup(
     name='SQLAlchemy-ImageAttach',
@@ -49,7 +54,8 @@ setup(
     license='MIT License',
     packages=find_packages(exclude=['tests', 'tests.stores']),
     install_requires=install_requires,
-    tests_require=['pytest >= 2.3.0', 'WebOb'],
+    tests_require=tests_require,
+    extras_require={'tests': tests_require},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
