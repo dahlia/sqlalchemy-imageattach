@@ -97,7 +97,11 @@ from .file import ReusableFileProxy
 from .store import Store
 from .util import append_docstring_attributes
 
-__all__ = 'Image', 'ImageSet', 'image_attachment'
+__all__ = 'VECTOR_TYPES', 'Image', 'ImageSet', 'image_attachment'
+
+
+#: (:class:`collections.Set`) The set of vector image types.
+VECTOR_TYPES = frozenset(['image/svg+xml', 'application/pdf'])
 
 
 def image_attachment(*args, **kwargs):
@@ -282,6 +286,21 @@ class Image(object):
         dict((k, v) for k, v in locals().items()
                     if isinstance(v, declared_attr))
     )
+
+
+class NoopContext(object):
+    """Null context manager that does nothing."""
+
+    __slots__ = 'object_',
+
+    def __init__(self, object_):
+        self.object_ = object_
+
+    def __enter__(self, *args, **kwargs):
+        return self.object_
+
+    def __exit__(self, *args, **kwargs):
+        pass
 
 
 class ImageSet(Query):
@@ -673,6 +692,8 @@ class ImageSet(Query):
                 with WandImage(file=f) as img:
                     img = _preprocess_image(img)
             with img:
+                if img.mimetype in VECTOR_TYPES:
+                    img.format = 'png'
                 original_size = img.size
                 if callable(width):
                     width = width(original_size)
@@ -690,14 +711,20 @@ class ImageSet(Query):
                         return query.one()
                     except NoResultFound:
                         pass
-                img.resize(width, height, filter=filter)
-                if _postprocess_image is None:
-                    mimetype = img.mimetype
-                    img.save(file=data)
+                if len(img.sequence) > 1:
+                    img_ctx = img.sequence[0].clone()
+                    img_ctx.resize(width, height, filter=filter)
                 else:
-                    with _postprocess_image(img) as img:
+                    img_ctx = NoopContext(img)
+                with img_ctx as single_img:
+                    single_img.resize(width, height, filter=filter)
+                    if _postprocess_image is None:
                         mimetype = img.mimetype
-                        img.save(file=data)
+                        single_img.save(file=data)
+                    else:
+                        with _postprocess_image(img) as img:
+                            mimetype = img.mimetype
+                            single_img.save(file=data)
         return self.from_raw_file(data, store,
                                   size=(width, height),
                                   mimetype=mimetype,
