@@ -99,7 +99,8 @@ def test_s3_store(prefix, public_base_url, s3_store_getter):
     assert expected_data == actual_data
     key_args = 'testing', thing_id, 405, 640, 'image/jpeg'
     if public_base_url:
-        expected_url = public_base_url.rstrip('/') + '/' + s3.get_key(*key_args)
+        expected_url = (public_base_url.rstrip('/') + '/' +
+                        s3.get_key(*key_args))
     else:
         expected_url = s3.get_url(*key_args)
     actual_url = s3.locate(image)

@@ -19,7 +19,7 @@ env:
 before_install:
 - export PY=`python -c 'import sys;print("pypy" if hasattr(sys,"pypy_version_info") else "%d.%d" % sys.version_info[:2])'`
 install:
-- pip install pytest WebOb pytest-capturelog pytest-cov coveralls
+- pip install pytest WebOb pytest-capturelog pytest-cov flake8 coveralls
 - if [ "$DB" = "postgresql" ]; then if [ "$PY" = "pypy" ]; then pip install psycopg2ct; else pip install psycopg2; fi; fi
 - if [ "$DB" = "mysql" ]; then if [ "$PY" = "pypy" ]; then pip install PyMySQL; export IMAGEATTACH_TEST_DATABASE_URL=${IMAGEATTACH_TEST_DATABASE_URL/mysqlconnector/pymysql}; else pip install --allow-all-external mysql-connector-python; fi; fi
 - pip install "SQLAlchemy>=0.9.0" -e .
@@ -31,6 +31,7 @@ script:
 - pip uninstall --yes SQLAlchemy
 - pip install "SQLAlchemy>=0.8.0,<0.9.0"
 - py.test sqlalchemy_imageattach  # SQLAlchemy 0.8
+- flake8
 after_success:
 - coveralls
 notifications:

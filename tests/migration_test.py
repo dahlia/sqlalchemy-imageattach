@@ -54,7 +54,8 @@ def fx_migration(fx_session, fx_source_store):
             b1.cover.generate_thumbnail(height=125)
             b2 = Samething(name='b2')
             fx_session.add(b2)
-            with open(os.path.join(sample_images_dir, 'shinji.jpg'), 'rb') as f:
+            with open(os.path.join(sample_images_dir, 'shinji.jpg'),
+                      'rb') as f:
                 b2.cover.from_file(f)
 
 

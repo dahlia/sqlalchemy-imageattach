@@ -151,10 +151,11 @@ class HttpExposedFileSystemStore(BaseFileSystemStore):
 
         """
         _app = StaticServerMiddleware(app, '/' + self.prefix, self.path)
+
         def app(environ, start_response):
             if not hasattr(self, 'host_url'):
-                self.host_url = environ['wsgi.url_scheme'] + '://' + \
-                                environ['HTTP_HOST'] + '/'
+                self.host_url = (environ['wsgi.url_scheme'] + '://' +
+                                 environ['HTTP_HOST'] + '/')
             return _app(environ, start_response)
         return app
 

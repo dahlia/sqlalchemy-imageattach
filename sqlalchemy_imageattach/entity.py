@@ -283,8 +283,9 @@ class Image(object):
 
     __doc__ = append_docstring_attributes(
         __doc__,
-        dict((k, v) for k, v in locals().items()
-                    if isinstance(v, declared_attr))
+        dict(
+            (k, v) for k, v in locals().items() if isinstance(v, declared_attr)
+        )
     )
 
 
@@ -396,11 +397,11 @@ class ImageSet(Query):
         """
         for image, store in cls._deleted_images:
             for stored_image, _ in cls._stored_images:
-                if (stored_image.object_type == image.object_type and
-                    stored_image.object_id == image.object_id and
-                    stored_image.width == image.width and
-                    stored_image.height == image.height and
-                    stored_image.mimetype == image.mimetype):
+                if stored_image.object_type == image.object_type and \
+                   stored_image.object_id == image.object_id and \
+                   stored_image.width == image.width and \
+                   stored_image.height == image.height and \
+                   stored_image.mimetype == image.mimetype:
                     break
             else:
                 store.delete(image)
@@ -806,4 +807,5 @@ class ImageSet(Query):
 listen(Session, 'after_soft_rollback', ImageSet._images_failed)
 listen(Session, 'after_commit', ImageSet._images_succeeded)
 listen(Image, 'after_insert', ImageSet._mark_image_file_stored, propagate=True)
-listen(Image, 'after_delete', ImageSet._mark_image_file_deleted, propagate=True)
+listen(Image, 'after_delete', ImageSet._mark_image_file_deleted,
+       propagate=True)

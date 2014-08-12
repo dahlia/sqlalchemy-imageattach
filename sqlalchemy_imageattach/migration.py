@@ -60,6 +60,7 @@ def migrate(session, declarative_base, source, destination):
         for cls in declarative_base._decl_class_registry.values()
         if isinstance(cls, type) and issubclass(cls, Image)
     )
+
     # FIXME: it's not aware of single table inheritance
     @MigrationPlan
     def result():
@@ -111,6 +112,7 @@ def migrate_class(session, cls, source, destination):
         raise TypeError('destination must be an instance of '
                         'sqlalchemy_imageattach.store.Store, not ' +
                         repr(source))
+
     @MigrationPlan
     def result():
         for instance in session.query(cls):

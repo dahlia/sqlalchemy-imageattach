@@ -24,7 +24,7 @@ cmd_options_intiailized = False
 
 
 def pytest_addoption(parser):
-    global cmd_options_intiailized 
+    global cmd_options_intiailized
     if cmd_options_intiailized:
         return
     env = os.environ.get

@@ -14,7 +14,6 @@ from ..conftest import sample_images_dir
 from .conftest import TestingImage, utcnow
 
 
-
 def test_fs_store(tmpdir):
     fs_store = FileSystemStore(tmpdir.strpath, 'http://mock/img/')
     image = TestingImage(thing_id=1234, width=405, height=640,
@@ -57,6 +56,7 @@ def test_http_fs_store(tmpdir):
         'http://localhost:80/__images__/testing/234/1/1234.405x640.jpe',
         'http://localhost:80/__images__/testing/234/1/1234.405x640.jpg'
     )
+
     def app(environ, start_response):
         start_response(
             '200 OK',

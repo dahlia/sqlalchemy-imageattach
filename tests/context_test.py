@@ -73,6 +73,7 @@ def test_thread_context():
     values = []
     store_1 = Store()
     store_2 = Store()
+
     def context_1():
         try:
             s = get_current_store()
@@ -91,6 +92,7 @@ def test_thread_context():
             values.append('error')
         else:
             values.append(s)
+
     def context_2():
         try:
             s = get_current_store()
@@ -112,6 +114,7 @@ def test_greenlet_context():
     values = []
     store_1 = Store()
     store_2 = Store()
+
     def context_1():
         try:
             s = get_current_store()
@@ -129,6 +132,7 @@ def test_greenlet_context():
             values.append('error')
         else:
             values.append(s)
+
     def context_2():
         try:
             s = get_current_store()
@@ -150,6 +154,7 @@ def test_stackless_context():
     values = []
     store_1 = Store()
     store_2 = Store()
+
     def context_1(channel, join_channel):
         try:
             s = get_current_store()
@@ -169,6 +174,7 @@ def test_stackless_context():
         else:
             values.append(s)
         join_channel.send(None)
+
     def context_2(channel):
         try:
             s = get_current_store()
