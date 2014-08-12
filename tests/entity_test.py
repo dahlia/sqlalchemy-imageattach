@@ -43,10 +43,17 @@ class SomethingCover(Base, Image):
 
     __tablename__ = 'something_cover'
 
+    def __repr__(self):
+        return '<SomethingCover something_id={0!r} {1!r}x{2!r}{3}>'.format(
+            self.something_id, self.width, self.height,
+            ' original' if self.original else ''
+        )
 
-def from_raw_file(fx_session, tmp_store):
+
+def test_from_raw_file(fx_session, fx_sample_image, tmp_store):
+    filepath, mimetype, (width, height) = fx_sample_image
     something = Something(name='some name')
-    with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+    with open(filepath, 'rb') as f:
         expected = f.read()
         f.seek(0)
         img = something.cover.from_raw_file(f, tmp_store, original=True)
@@ -78,7 +85,7 @@ def from_raw_file(fx_session, tmp_store):
     # overwriting + thumbnail generation
     something.cover.generate_thumbnail(ratio=0.5, store=tmp_store)
     assert something.cover.count() == 2
-    with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+    with open(filepath, 'rb') as f:
         expected = f.read()
         f.seek(0)
         img3 = something.cover.from_raw_file(f, tmp_store, original=True)
@@ -162,10 +169,11 @@ def test_composite_key_object_id():
         o.object_id
 
 
-def test_from_raw_file_implicitly(fx_session, tmp_store):
+def test_from_raw_file_implicitly(fx_session, fx_sample_image, tmp_store):
+    filepath, mimetype, (width, height) = fx_sample_image
     with store_context(tmp_store):
         something = Something(name='some name')
-        with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+        with open(filepath, 'rb') as f:
             expected = f.read()
             f.seek(0)
             img = something.cover.from_raw_file(f, original=True)
@@ -181,9 +189,10 @@ def test_from_raw_file_implicitly(fx_session, tmp_store):
     assert actual == expected
 
 
-def test_from_blob(fx_session, tmp_store):
+def test_from_blob(fx_session, fx_sample_image, tmp_store):
+    filepath, mimetype, (width, height) = fx_sample_image
     something = Something(name='some name')
-    with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+    with open(filepath, 'rb') as f:
         expected = f.read()
         img = something.cover.from_blob(expected, tmp_store)
         assert something.cover.original is img
@@ -208,10 +217,11 @@ def test_from_blob(fx_session, tmp_store):
     assert something.cover.make_blob(tmp_store) == expected
 
 
-def test_from_blob_implicitly(fx_session, tmp_store):
+def test_from_blob_implicitly(fx_session, fx_sample_image, tmp_store):
+    filepath, mimetype, (width, height) = fx_sample_image
     with store_context(tmp_store):
         something = Something(name='some name')
-        with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+        with open(filepath, 'rb') as f:
             expected = f.read()
             img = something.cover.from_blob(expected)
             assert something.cover.original is img
@@ -224,12 +234,13 @@ def test_from_blob_implicitly(fx_session, tmp_store):
         assert something.cover.make_blob() == expected
 
 
-def test_rollback_from_raw_file(fx_session, tmp_store):
+def test_rollback_from_raw_file(fx_session, fx_sample_image, tmp_store):
     """When the transaction fails, file shoud not be stored."""
+    filepath, mimetype, (width, height) = fx_sample_image
     something = Something(name='some name')
     with fx_session.begin():
         fx_session.add(something)
-    with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+    with open(filepath, 'rb') as f:
         with raises(ExpectedException):
             with fx_session.begin():
                 image = something.cover.from_raw_file(f, tmp_store,
@@ -246,13 +257,15 @@ def test_rollback_from_raw_file(fx_session, tmp_store):
         print(tmp_store.get_file(*args))
 
 
-def test_rollback_from_raw_file_implitcitly(fx_session, tmp_store):
+def test_rollback_from_raw_file_implitcitly(fx_session, fx_sample_image,
+                                            tmp_store):
     """When the transaction fails, file shoud not be stored."""
+    filepath, mimetype, (width, height) = fx_sample_image
     with store_context(tmp_store):
         something = Something(name='some name')
         with fx_session.begin():
             fx_session.add(something)
-        with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+        with open(filepath, 'rb') as f:
             with raises(ExpectedException):
                 with fx_session.begin():
                     image = something.cover.from_raw_file(f, original=True)
@@ -268,10 +281,11 @@ def test_rollback_from_raw_file_implitcitly(fx_session, tmp_store):
         print(tmp_store.get_file(*args))
 
 
-def test_delete(fx_session, tmp_store):
+def test_delete(fx_session, fx_sample_image, tmp_store):
+    filepath, mimetype, (width, height) = fx_sample_image
     with store_context(tmp_store):
         something = Something(name='some name')
-        with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+        with open(filepath, 'rb') as f:
             image = something.cover.from_file(f)
             assert something.cover.original is image
             with fx_session.begin():
@@ -286,11 +300,12 @@ def test_delete(fx_session, tmp_store):
             tmp_store.get_file(*args)
 
 
-def test_rollback_from_delete(fx_session, tmp_store):
+def test_rollback_from_delete(fx_session, fx_sample_image, tmp_store):
     """When the transaction fails, file should not be deleted."""
+    filepath, mimetype, (width, height) = fx_sample_image
     with store_context(tmp_store):
         something = Something(name='some name')
-        with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+        with open(filepath, 'rb') as f:
             expected = f.read()
         image = something.cover.from_blob(expected)
         assert something.cover.original is image
@@ -308,10 +323,11 @@ def test_rollback_from_delete(fx_session, tmp_store):
     assert actual == expected
 
 
-def test_delete_parent(fx_session, tmp_store):
+def test_delete_parent(fx_session, fx_sample_image, tmp_store):
+    filepath, mimetype, (width, height) = fx_sample_image
     with store_context(tmp_store):
         something = Something(name='some name')
-        with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+        with open(filepath, 'rb') as f:
             image = something.cover.from_file(f)
             assert something.cover.original is image
             with fx_session.begin():
@@ -345,10 +361,11 @@ class SamethingCover(Base, Image):
     __tablename__ = 'samething_cover'
 
 
-def test_delete_from_persistence(fx_session, tmp_store):
+def test_delete_from_persistence(fx_session, fx_sample_image, tmp_store):
+    filepath, mimetype, (width, height) = fx_sample_image
     with store_context(tmp_store):
         something = Something(name='some name')
-        with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+        with open(filepath, 'rb') as f:
             image = something.cover.from_file(f)
             assert something.cover.original is image
             with fx_session.begin():
@@ -367,16 +384,20 @@ def test_delete_from_persistence(fx_session, tmp_store):
                           .one()
         with fx_session.begin():
             fx_session.delete(cover)
-        samething = fx_session.query(Samething).filter_by(id=something.id).one()
+        samething = fx_session.query(Samething) \
+                              .filter_by(id=something.id) \
+                              .one()
         assert samething.cover.original is None
         with raises(IOError):
             print(tmp_store.get_file(*args))
 
 
-def test_delete_parent_from_persistence(fx_session, tmp_store):
+def test_delete_parent_from_persistence(fx_session, fx_sample_image,
+                                        tmp_store):
+    filepath, mimetype, (width, height) = fx_sample_image
     with store_context(tmp_store):
         something = Something(name='some name')
-        with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+        with open(filepath, 'rb') as f:
             image = something.cover.from_file(f)
             assert something.cover.original is image
             with fx_session.begin():
@@ -390,7 +411,9 @@ def test_delete_parent_from_persistence(fx_session, tmp_store):
                                'SELECT * FROM something_cover')
             f.seek(0)
             tmp_store.put_file(f, *(args + (False,)))
-        samething = fx_session.query(Samething).filter_by(id=something.id).one()
+        samething = fx_session.query(Samething) \
+                              .filter_by(id=something.id) \
+                              .one()
         with fx_session.begin():
             fx_session.delete(samething)
         assert samething.cover.original is None
@@ -398,11 +421,12 @@ def test_delete_parent_from_persistence(fx_session, tmp_store):
             print(tmp_store.get_file(*args))
 
 
-def test_rollback_from_delete_parent(fx_session, tmp_store):
+def test_rollback_from_delete_parent(fx_session, fx_sample_image, tmp_store):
     """When the transaction fails, file should not be deleted."""
+    filepath, mimetype, (width, height) = fx_sample_image
     with store_context(tmp_store):
         something = Something(name='some name')
-        with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+        with open(filepath, 'rb') as f:
             expected = f.read()
         image = something.cover.from_blob(expected)
         assert something.cover.original is image
@@ -420,39 +444,52 @@ def test_rollback_from_delete_parent(fx_session, tmp_store):
     assert something.cover.original is image
 
 
-def test_generate_thumbnail(fx_session, tmp_store):
+def test_generate_thumbnail(fx_session, fx_sample_image, tmp_store):
+    filepath, mimetype, (width, height) = fx_sample_image
     something = Something(name='some name')
     with raises(IOError):
         something.cover.generate_thumbnail(ratio=0.5, store=tmp_store)
-    with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+    with open(filepath, 'rb') as f:
         original = something.cover.from_file(f, tmp_store)
         assert something.cover.original is original
         double = something.cover.generate_thumbnail(ratio=2, store=tmp_store)
-        thumbnail = something.cover.generate_thumbnail(height=320,
+        thumbnail = something.cover.generate_thumbnail(height=height // 2,
                                                        store=tmp_store)
-        assert (something.cover.generate_thumbnail(width=810, store=tmp_store)
+        assert (something.cover.generate_thumbnail(width=width * 2,
+                                                   store=tmp_store)
                 is double)
         with fx_session.begin():
             fx_session.add(something)
             assert something.cover.original is original
     assert something.cover.count() == 3
     assert original is something.cover.original
-    assert double.size == (810, 1280)
-    assert thumbnail.size == (202, 320)
-    assert (something.cover.generate_thumbnail(width=202, store=tmp_store)
+    assert double.size == (width * 2, height * 2)
+    half_width = width // 2
+    assert thumbnail.height == height // 2
+    # workaround off-by-one error
+    assert thumbnail.width in (half_width - 1, half_width, half_width + 1)
+    half_width = thumbnail.width
+    assert (something.cover.generate_thumbnail(width=half_width,
+                                               store=tmp_store)
             is thumbnail)
     with fx_session.begin():
-        x3 = something.cover.generate_thumbnail(width=1215, store=tmp_store)
+        x3 = something.cover.generate_thumbnail(width=width * 3,
+                                                store=tmp_store)
     assert something.cover.count() == 4
-    x3.size == (1215, 1920)
-    for size in [(405, 640), (810, 1280), (202, 320)]:
+    x3.size == (width * 3, height * 3)
+    thumbnail_sizes = [
+        (width, height),
+        (width * 2, height * 2),
+        (half_width, height // 2)
+    ]
+    for size in thumbnail_sizes:
         fail_hint = 'size = {0!r}, sizes = {1!r}'.format(
             size, [i.size for i in something.cover]
         )
-        assert something.cover.find_thumbnail(width=size[0]).size == size, \
-               fail_hint
-        assert something.cover.find_thumbnail(height=size[1]).size == size, \
-               fail_hint
+        assert something.cover.find_thumbnail(width=size[0]) \
+                        .size == size, fail_hint
+        assert something.cover.find_thumbnail(height=size[1]) \
+                        .size == size, fail_hint
         assert something.cover.find_thumbnail(*size).size == size, fail_hint
     with raises(NoResultFound):
         something.cover.find_thumbnail(270)
@@ -462,29 +499,36 @@ def test_generate_thumbnail(fx_session, tmp_store):
         something.cover.find_thumbnail(270, 426)
 
 
-def test_generate_thumbnail_implicitly(fx_session, tmp_store):
+def test_generate_thumbnail_implicitly(fx_session, fx_sample_image, tmp_store):
+    filepath, mimetype, (width, height) = fx_sample_image
     with store_context(tmp_store):
         something = Something(name='some name')
         with raises(IOError):
             something.cover.generate_thumbnail(ratio=0.5)
-        with open(os.path.join(sample_images_dir, 'iu.jpg'), 'rb') as f:
+        with open(filepath, 'rb') as f:
             original = something.cover.from_file(f)
             assert something.cover.original is original
             double = something.cover.generate_thumbnail(ratio=2)
-            thumbnail = something.cover.generate_thumbnail(height=320)
-            assert something.cover.generate_thumbnail(width=810) is double
+            thumbnail = something.cover.generate_thumbnail(height=height // 2)
+            assert something.cover \
+                            .generate_thumbnail(width=width * 2) is double
             with fx_session.begin():
                 fx_session.add(something)
                 assert something.cover.original is original
         assert something.cover.count() == 3
         assert original is something.cover.original
-        assert double.size == (810, 1280)
-        assert thumbnail.size == (202, 320)
-        assert something.cover.generate_thumbnail(width=202) is thumbnail
+        assert double.size == (width * 2, height * 2)
+        assert thumbnail.height == height // 2
+        half_width = width // 2
+        # workaround off-by-one error
+        assert thumbnail.width in (half_width - 1, half_width, half_width + 1)
+        half_width = thumbnail.width
+        assert something.cover \
+                        .generate_thumbnail(width=half_width) is thumbnail
         with fx_session.begin():
-            x3 = something.cover.generate_thumbnail(width=1215)
+            x3 = something.cover.generate_thumbnail(width=width * 3)
         assert something.cover.count() == 4
-        x3.size == (1215, 1920)
+        x3.size == (width * 3, height * 3)
 
 
 def test_imageset_should_be_cleared(fx_session, tmp_store):

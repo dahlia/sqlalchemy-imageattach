@@ -79,9 +79,20 @@ def fx_session(request):
     metadata.drop_all(bind=engine)
     metadata.create_all(bind=engine)
     session = Session(bind=engine, autocommit=True)
+
     @request.addfinalizer
     def finalize_session():
         session.rollback()
         metadata.drop_all(bind=engine)
         engine.dispose()
     return session
+
+
+@fixture(scope='function', params=[
+    ('iu.jpg', 'image/jpeg', 405, 640),
+    ('grapefruit_final.svg', 'image/svg+xml', 450, 450),
+    ('INNOVA-W3C.pdf', 'application/pdf', 842, 595),
+])
+def fx_sample_image(request):
+    filename, mimetype, w, h = request.param
+    return (os.path.join(sample_images_dir, filename), mimetype, (w, h))
