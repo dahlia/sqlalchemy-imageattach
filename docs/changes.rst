@@ -6,6 +6,9 @@ Version 0.9.0
 
 To be released.
 
+- Support SVG (:mimetype:`image/svg+xml`) and
+  PDF (:mimetype:`application/pdf`).
+
 
 Version 0.8.2
 -------------
@@ -13,7 +16,7 @@ Version 0.8.2
 Released on July 30, 2014.
 
 - Support Python 3.4.
-- Fix :exc:`UnboundLocalError` of :class:`S3Store
+- Fixed :exc:`UnboundLocalError` of :class:`S3Store
   <sqlalchemy_imageattach.stores.s3.S3Store>`.  [:issue:`20` by Peter Lada]
 
 
