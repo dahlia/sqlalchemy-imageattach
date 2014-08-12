@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function, with_statement
 
+import contextlib
 import hashlib
 import os.path
 
@@ -11,7 +12,7 @@ from sqlalchemy.types import Integer, String
 from wand.image import Image as WandImage
 
 from sqlalchemy_imageattach.context import store_context
-from sqlalchemy_imageattach.entity import Image, image_attachment
+from sqlalchemy_imageattach.entity import Image, NoopContext, image_attachment
 from sqlalchemy_imageattach.stores.fs import FileSystemStore
 from .conftest import Base, sample_images_dir
 
@@ -536,3 +537,19 @@ def test_compile_image_columns(fx_session):
     query.order_by(Image.mimetype).all()
     query.order_by(Image.original).all()
     query.order_by(Image.created_at).all()
+
+
+def test_noop_context():
+    counter = [0]
+
+    @contextlib.contextmanager
+    def object_():
+        counter[0] += 1
+        yield ()
+        counter[0] += 1
+    obj = object_()
+    assert counter[0] == 0
+    with NoopContext(obj) as o:
+        assert counter[0] == 0
+        assert o is obj
+    assert counter[0] == 0

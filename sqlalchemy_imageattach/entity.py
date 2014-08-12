@@ -284,6 +284,21 @@ class Image(object):
     )
 
 
+class NoopContext(object):
+    """Null context manager that does nothing."""
+
+    __slots__ = 'object_',
+
+    def __init__(self, object_):
+        self.object_ = object_
+
+    def __enter__(self, *args, **kwargs):
+        return self.object_
+
+    def __exit__(self, *args, **kwargs):
+        pass
+
+
 class ImageSet(Query):
     """The subtype of :class:`~sqlalchemy.orm.query.Query` specialized
     for :class:`Image`.  It provides more methods and properties over
