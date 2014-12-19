@@ -140,7 +140,7 @@ else:
 # documentation.
 html_theme_options = {
     'github_ribbon': True,
-    'github_ribbon_link': 'https://github.com/crosspop/sqlalchemy-imageattach'
+    'github_ribbon_link': 'https://github.com/dahlia/sqlalchemy-imageattach'
 } if html_theme == 'bw' else {}
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -300,8 +300,8 @@ intersphinx_mapping = {
 
 extlinks = {
     'pypi': ('https://pypi.python.org/pypi/%s', ''),
-    'issue': ('https://github.com/crosspop/sqlalchemy-imageattach/issues/%s',
+    'issue': ('https://github.com/dahlia/sqlalchemy-imageattach/issues/%s',
               '#'),
-    'commit': ('https://github.com/crosspop/sqlalchemy-imageattach/commit/%s',
+    'commit': ('https://github.com/dahlia/sqlalchemy-imageattach/commit/%s',
                '')
 }

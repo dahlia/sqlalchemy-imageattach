@@ -46,21 +46,21 @@ Package Index (Cheeseshop)
       :alt: Latest PyPI version
 
 GitHub
-   https://github.com/crosspop/sqlalchemy-imageattach
+   https://github.com/dahlia/sqlalchemy-imageattach
 
 Continuous Integration (Travis CI)
-   http://travis-ci.org/crosspop/sqlalchemy-imageattach
+   http://travis-ci.org/dahlia/sqlalchemy-imageattach
 
-   .. image:: https://secure.travis-ci.org/crosspop/sqlalchemy-imageattach.svg?
+   .. image:: https://secure.travis-ci.org/dahlia/sqlalchemy-imageattach.svg?
       :alt: Build Status
-      :target: https://travis-ci.org/crosspop/sqlalchemy-imageattach
+      :target: https://travis-ci.org/dahlia/sqlalchemy-imageattach
 
 Code Coverage
-   https://coveralls.io/r/crosspop/sqlalchemy-imageattach
+   https://coveralls.io/r/dahlia/sqlalchemy-imageattach
 
-   .. image:: https://img.shields.io/coveralls/crosspop/sqlalchemy-imageattach/badge.svg?
+   .. image:: https://img.shields.io/coveralls/dahlia/sqlalchemy-imageattach/badge.svg?
       :alt: Coverage Status
-      :target: https://coveralls.io/r/crosspop/sqlalchemy-imageattach
+      :target: https://coveralls.io/r/dahlia/sqlalchemy-imageattach
 
 Author Website
    http://hongminhee.org/

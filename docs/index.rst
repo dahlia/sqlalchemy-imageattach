@@ -95,24 +95,24 @@ SQLAlchemy-ImageAttach is an open source software written by `Hong Minhee`_
 
 .. code-block:: console
 
-   $ git clone git://github.com/crosspop/sqlalchemy-imageattach.git
+   $ git clone git://github.com/dahlia/sqlalchemy-imageattach.git
 
 If you find any bug, please create an issue to the `issue tracker`_.
 Pull requests are also always welcome!
 
 Check out :doc:`changes` as well.
 
-.. image:: https://secure.travis-ci.org/crosspop/sqlalchemy-imageattach.svg
+.. image:: https://secure.travis-ci.org/dahlia/sqlalchemy-imageattach.svg
    :alt: Build Status
-   :target: https://travis-ci.org/crosspop/sqlalchemy-imageattach
+   :target: https://travis-ci.org/dahlia/sqlalchemy-imageattach
 
-.. image:: https://img.shields.io/coveralls/crosspop/sqlalchemy-imageattach/badge.svg
+.. image:: https://img.shields.io/coveralls/dahlia/sqlalchemy-imageattach/badge.svg
    :alt: Coverage Status
-   :target: https://coveralls.io/r/crosspop/sqlalchemy-imageattach
+   :target: https://coveralls.io/r/dahlia/sqlalchemy-imageattach
 
 
 .. _Hong Minhee: http://hongminhee.org/
-.. _Crosspop: http://crosspop.in/
+.. _Crosspop: http://dahlia.in/
 .. _MIT license: http://minhee.mit-license.org/
-.. _GitHub repository: https://github.com/crosspop/sqlalchemy-imageattach
-.. _issue tracker: https://github.com/crosspop/sqlalchemy-imageattach/issues
+.. _GitHub repository: https://github.com/dahlia/sqlalchemy-imageattach
+.. _issue tracker: https://github.com/dahlia/sqlalchemy-imageattach/issues
