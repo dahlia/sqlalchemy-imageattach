@@ -16,6 +16,10 @@ env:
   - DB=sqlite IMAGEATTACH_TEST_DATABASE_URL='sqlite://'
   - DB=postgresql IMAGEATTACH_TEST_DATABASE_URL='postgresql:///si_test?user=postgres'
   - DB=mysql IMAGEATTACH_TEST_DATABASE_URL='mysql+mysqlconnector://root@localhost/si_test'
+matrix:
+  exclude:
+  - python: 3.2
+    env: DB=mysql IMAGEATTACH_TEST_DATABASE_URL='mysql+mysqlconnector://root@localhost/si_test'
 before_install:
 - export PY=`python -c 'import sys;print("pypy" if hasattr(sys,"pypy_version_info") else "%d.%d" % sys.version_info[:2])'`
 install:
