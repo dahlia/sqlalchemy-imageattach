@@ -4,7 +4,7 @@ SQLAlchemy-ImageAttach Changelog
 Version 0.9.0
 -------------
 
-To be released.
+Released on March 2, 2015.
 
 - Support SVG (:mimetype:`image/svg+xml`) and
   PDF (:mimetype:`application/pdf`).
