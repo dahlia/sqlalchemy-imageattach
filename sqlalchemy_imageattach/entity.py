@@ -661,7 +661,9 @@ class ImageSet(Query):
                     return query.one()
                 except NoResultFound:
                     pass
-            height = lambda sz: sz[1] * (width / sz[0])
+
+            def height(sz):
+                return sz[1] * (width / sz[0])
         elif height is not None:
             if not isinstance(height, numbers.Integral):
                 raise TypeError('height must be integer, not ' + repr(height))
@@ -678,13 +680,19 @@ class ImageSet(Query):
                     return query.one()
                 except NoResultFound:
                     pass
-            width = lambda sz: sz[0] * (height / sz[1])
+
+            def width(sz):
+                return sz[0] * (height / sz[1])
         elif ratio is not None:
             if not isinstance(ratio, numbers.Real):
                 raise TypeError('ratio must be an instance of numbers.Real, '
                                 'not ' + repr(ratio))
-            width = lambda sz: sz[0] * ratio
-            height = lambda sz: sz[1] * ratio
+
+            def width(sz):
+                return sz[0] * ratio
+
+            def height(sz):
+                return sz[1] * ratio
         data = io.BytesIO()
         with self.open_file(store=store) as f:
             if _preprocess_image is None:

@@ -76,7 +76,7 @@ try:
 except ImportError:
     stackless = None
 
-from .store import Store
+from .store import Store  # noqa
 
 __all__ = ('ContextError', 'LocalProxyStore', 'context_stacks',
            'current_store', 'get_current_context_id', 'get_current_store',
