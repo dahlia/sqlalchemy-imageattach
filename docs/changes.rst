@@ -1,6 +1,15 @@
 SQLAlchemy-ImageAttach Changelog
 ================================
 
+Version 0.9.1
+-------------
+
+To be released.
+
+- Added ``host_url_getter`` option to :class:`HttpExposedFileSystemStore
+  <sqlalchemy_imageattach.stores.fs.HttpExposedFileSystemStore>`.
+
+
 Version 0.9.0
 -------------
 

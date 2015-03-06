@@ -123,19 +123,86 @@ class HttpExposedFileSystemStore(BaseFileSystemStore):
         fs_store = HttpExposedFileSystemStore('userimages', 'images/')
         app.wsgi_app = fs_store.wsgi_middleware(app.wsgi_app)
 
+    To determine image urls, the address of server also has to be determined.
+    Although it can be automatically detected using :meth:`wsgi_middleware()`,
+    WSGI unfortunately is not always there.  For example, Celery tasks aren't
+    executed by HTTP requests, so there's no reachable :mailheader:`Host`
+    header.
+
+    When its host url is not determined you would get :exc:`RuntimeError`
+    if you try locating image urls:
+
+    .. code-block:: pytb
+
+       Traceback (most recent call last):
+         ...
+         File "/.../sqlalchemy_imageattach/stores/fs.py", line 93, in get_url
+           base_url = self.base_url
+         File "/.../sqlalchemy_imageattach/stores/fs.py", line 151, in base_url
+           type(self)
+       RuntimeError: could not determine image url. there are two ways to \
+workaround this:
+       - set host_url_getter parameter to sqlalchemy_imageattach.stores.fs.\
+HttpExposedFileSystemStore
+       - use sqlalchemy_imageattach.stores.fs.HttpExposedFileSystemStore.\
+wsgi_middleware
+       see docs of sqlalchemy_imageattach.stores.fs.\
+HttpExposedFileSystemStore for more details
+
+    For such case, you can optionally set ``host_url_getter`` option.
+    It takes a callable which takes no arguments and returns a host url string
+    like ``'http://servername/'``.  ::
+
+        fs_store = HttpExposedFileSystemStore(
+            'userimages', 'images/',
+            host_url_getter=lambda:
+                'https://{0}/'.format(app.config['SERVER_NAME'])
+        )
+
+    :param path: file system path of the directory to store image files
+    :type path: :class:`basestring`
+    :param prefix: the prepended path of the url.
+                   ``'__images__'`` by default
+    :type prefix: :class:`basestring`
+    :param host_url_getter: optional parameter to manually determine host url.
+                            it has to be a callable that takes nothing and
+                            returns a host url string
+    :type host_url_getter: :class:`collections.Callable`
+
+    .. versionadded:: 0.9.1
+       Added ``host_url_getter`` option.
+
     """
 
-    def __init__(self, path, prefix='__images__'):
+    def __init__(self, path, prefix='__images__', host_url_getter=None):
+        if not (callable(host_url_getter) or host_url_getter is None):
+            raise TypeError('host_url_getter must be callable')
         super(HttpExposedFileSystemStore, self).__init__(path)
         if prefix.startswith('/'):
             prefix = prefix[1:]
         if prefix.endswith('/'):
             prefix = prefix[:-1]
         self.prefix = prefix
+        self.host_url_getter = host_url_getter
 
     @property
     def base_url(self):
-        return self.host_url + self.prefix + '/'
+        if self.host_url_getter is not None:
+            host_url = self.host_url_getter()
+            if host_url.endswith('/'):
+                return '{0}{1}/'.format(host_url, self.prefix)
+            return '{0}/{1}/'.format(host_url, self.prefix)
+        elif getattr(self, 'host_url', None):
+            return self.host_url + self.prefix + '/'
+        raise RuntimeError(
+            'could not determine image url. '
+            'there are two ways to workaround this:\n'
+            '- set host_url_getter parameter to {0.__module__}.{0.__name__}\n'
+            '- use {0.__module__}.{0.__name__}.wsgi_middleware\n'
+            'see docs of {0.__module__}.{0.__name__} for more details'.format(
+                type(self)
+            )
+        )
 
     def wsgi_middleware(self, app):
         """WSGI middlewares that wraps the given ``app`` and serves
@@ -158,6 +225,11 @@ class HttpExposedFileSystemStore(BaseFileSystemStore):
                                  environ['HTTP_HOST'] + '/')
             return _app(environ, start_response)
         return app
+
+    def __repr__(self):
+        return '{0.__module__}.{0.__name__}({1!r}, {2!r}, {3!r})'.format(
+            type(self), self.path, self.prefix, self.host_url_getter
+        )
 
 
 class StaticServerMiddleware(object):

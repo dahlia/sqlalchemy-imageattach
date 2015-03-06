@@ -39,8 +39,8 @@ def test_fs_store(tmpdir):
 remove_query = functools.partial(re.compile(r'\?.*$').sub, '')
 
 
-def test_http_fs_store(tmpdir):
-    http_fs_store = HttpExposedFileSystemStore(tmpdir.strpath)
+def test_http_fs_store(tmpdir, **kwargs):
+    http_fs_store = HttpExposedFileSystemStore(tmpdir.strpath, **kwargs)
     image = TestingImage(thing_id=1234, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
@@ -56,6 +56,15 @@ def test_http_fs_store(tmpdir):
         'http://localhost:80/__images__/testing/234/1/1234.405x640.jpe',
         'http://localhost:80/__images__/testing/234/1/1234.405x640.jpg'
     )
+    return http_fs_store, image, expected_data, expected_urls
+
+
+def test_http_fs_store_wsgi_middleware(tmpdir):
+    http_fs_store, image, expected_data, expected_urls = \
+        test_http_fs_store(tmpdir)
+    # host_url is uninitialized, so image url can't be determined
+    with raises(RuntimeError):
+        http_fs_store.locate(image)
 
     def app(environ, start_response):
         start_response(
@@ -76,6 +85,15 @@ def test_http_fs_store(tmpdir):
     http_fs_store.delete(image)
     with raises(IOError):
         http_fs_store.open(image)
+    tmpdir.remove()
+
+
+def test_http_fs_store_host_url_getter(tmpdir):
+    http_fs_store, image, expected_data, expected_urls = test_http_fs_store(
+        tmpdir,
+        host_url_getter=lambda: 'http://localhost:80/'
+    )
+    assert remove_query(http_fs_store.locate(image)) in expected_urls
     tmpdir.remove()
 
 
