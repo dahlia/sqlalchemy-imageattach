@@ -27,7 +27,7 @@ class Store(object):
     """
 
     def put_file(self, file, object_type, object_id, width, height, mimetype,
-                 reproducible):
+                 reproducible=False):
         """Puts the ``file`` of the image.
 
         :param file: the image file to put
@@ -48,6 +48,7 @@ class Store(object):
                              computing e.g. resized thumbnails.
                              ``False`` if it cannot be reproduced
                              e.g. original images
+                             default is ``False``
         :type reproducible: :class:`bool`
 
         .. note::
@@ -61,7 +62,8 @@ class Store(object):
         """
         raise NotImplementedError('put_file() has to be implemented')
 
-    def delete_file(self, object_type, object_id, width, height, mimetype):
+    def delete_file(self, object_type, object_id, width, height, mimetype,
+                    reproducible=False):
         """Deletes all reproducible files related to the image.
         It doesn't raise any exception even if there's no such file.
 
@@ -77,11 +79,18 @@ class Store(object):
         :param mimetype: the mimetype of the image to delete
                          e.g. ``'image/jpeg'``
         :type mimetype: :class:`basestring`
+        :param reproducible: ``True`` only if it's reproducible by
+                             computing e.g. resized thumbnails.
+                             ``False`` if it cannot be reproduced
+                             e.g. original images
+                             default is ``False``
+        :type reproducible: :class:`bool`
 
         """
         raise NotImplementedError('delete_file() has to be implemented')
 
-    def get_file(self, object_type, object_id, width, height, mimetype):
+    def get_file(self, object_type, object_id, width, height, mimetype,
+                 reproducible=False):
         """Gets the file-like object of the given criteria.
 
         :param object_type: the object type of the image to find
@@ -96,6 +105,12 @@ class Store(object):
         :param mimetype: the mimetype of the image to find
                          e.g. ``'image/jpeg'``
         :type mimetype: :class:`basestring`
+        :param reproducible: ``True`` only if it's reproducible by
+                             computing e.g. resized thumbnails.
+                             ``False`` if it cannot be reproduced
+                             e.g. original images
+                             default is ``False``
+        :type reproducible: :class:`bool`
         :returns: the file of the image
         :rtype: file-like object, :class:`file`
         :raises exceptions.IOError: when such file doesn't exist
@@ -111,7 +126,8 @@ class Store(object):
         """
         raise NotImplementedError('get_file() has to be implemented')
 
-    def get_url(self, object_type, object_id, width, height, mimetype):
+    def get_url(self, object_type, object_id, width, height, mimetype,
+                reproducible=False):
         """Gets the file-like object of the given criteria.
 
         :param object_type: the object type of the image to find
@@ -126,6 +142,12 @@ class Store(object):
         :param mimetype: the mimetype of the image to find
                          e.g. ``'image/jpeg'``
         :type mimetype: :class:`basestring`
+        :param reproducible: ``True`` only if it's reproducible by
+                             computing e.g. resized thumbnails.
+                             ``False`` if it cannot be reproduced
+                             e.g. original images
+                             default is ``False``
+        :type reproducible: :class:`bool`
         :returns: the url locating the image
         :rtype: :class:`basestring`
 
@@ -162,7 +184,7 @@ class Store(object):
                             'implements read() method, not ' + repr(file))
         self.put_file(file, image.object_type, image.object_id,
                       image.width, image.height, image.mimetype,
-                      not image.original)
+                      reproducible=not image.original)
 
     def delete(self, image):
         """Delete the file of the given ``image``.
@@ -176,7 +198,8 @@ class Store(object):
             raise TypeError('image must be a sqlalchemy_imageattach.entity.'
                             'Image instance, not ' + repr(image))
         self.delete_file(image.object_type, image.object_id,
-                         image.width, image.height, image.mimetype)
+                         image.width, image.height, image.mimetype,
+                         reproducible=not image.original)
 
     def open(self, image, use_seek=False):
         """Opens the file-like object of the given ``image``.
@@ -267,7 +290,8 @@ class Store(object):
             raise TypeError('image must be a sqlalchemy_imageattach.entity.'
                             'Image instance, not ' + repr(image))
         url = self.get_url(image.object_type, image.object_id,
-                           image.width, image.height, image.mimetype)
+                           image.width, image.height, image.mimetype,
+                           reproducible=not image.original)
         if '?' in url:
             fmt = '{0}&_ts={1}'
         else:
