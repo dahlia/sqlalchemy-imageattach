@@ -138,6 +138,8 @@ class S3Store(Store):
     :param max_age: the ``max-age`` seconds of :mailheader:`Cache-Control`.
                     default is :const:`DEFAULT_MAX_AGE`
     :type max_age: :class:`numbers.Integral`
+    :param acl: the ``acl`` option of uploaded key. default is :const:`public-read`
+    :type acl: :class:`basestring`
     :param prefix: the optional key prefix to logically separate stores
                    with the same bucket.  not used by default
     :type prefix: :class:`basestring`
@@ -167,6 +169,9 @@ class S3Store(Store):
     #: :mailheader:`Cache-Control`.
     max_age = None
 
+    #: (:class:`basestring`) The ``acl`` option of uploaded key.
+    acl = None
+
     #: (:class:`basestring`) The optional key prefix to logically separate
     #: stores with the same bucket.
     prefix = None
@@ -182,13 +187,14 @@ class S3Store(Store):
     #: (:class:`basestring`) The optional url base for public urls.
     public_base_url = None
 
-    def __init__(self, bucket, access_key=None, secret_key=None,
-                 max_age=DEFAULT_MAX_AGE, prefix='', public_base_url=None):
+    def __init__(self, bucket, access_key=None, secret_key=None, max_age=DEFAULT_MAX_AGE, acl='public-read',
+                 prefix='', original_prefix='', reproducible_prefix='', public_base_url=None):
         self.bucket = bucket
         self.access_key = access_key
         self.secret_key = secret_key
         self.base_url = BASE_URL_FORMAT.format(bucket)
         self.max_age = max_age
+        self.acl = acl
         self.prefix = prefix.strip()
         if self.prefix.endswith('/'):
             self.prefix = self.prefix.rstrip('/')
@@ -239,10 +245,10 @@ class S3Store(Store):
                          secret_key=self.secret_key,
                          **kwargs)
 
-    def upload_file(self, url, data, content_type, rrs, acl='public-read'):
+    def upload_file(self, url, data, content_type, rrs):
         headers = {
             'Cache-Control': 'max-age=' + str(self.max_age),
-            'x-amz-acl': acl,
+            'x-amz-acl': self.acl,
             'x-amz-storage-class': 'REDUCED_REDUNDANCY' if rrs else 'STANDARD'
         }
         request = self.make_request(
