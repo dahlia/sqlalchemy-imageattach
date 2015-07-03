@@ -3,7 +3,8 @@ Declaring Image Entities
 
 It's easy to use with :mod:`sqlalchemy.ext.declarative`::
 
-    from sqlalchemy import Column, ForeignKey, Integer, Unicode, relationship
+    from sqlalchemy import Column, ForeignKey, Integer, Unicode
+    from sqlalchemy.orm import relationship
     from sqlalchemy.ext.declarative import declarative_base
     from sqlalchemy_imageattach.entity import Image, image_attachment
 
@@ -23,7 +24,7 @@ It's easy to use with :mod:`sqlalchemy.ext.declarative`::
     class UserPicture(Base, Image):
         """User picture model."""
 
-        user_id = Column(Integer, ForeignKey('User.id'), primary_key=True)
+        user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
         user = relationship('User')
         __tablename__ = 'user_picture'
 
