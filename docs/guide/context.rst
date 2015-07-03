@@ -19,6 +19,7 @@ block::
     with store_context(store):
         with open('image_to_attach.jpg') as f:
             entity.picture.from_file(f)
+        # session handling must be here - inside of context
 
 You would face :exc:`~sqlalchemy_imageattach.context.ContextError`
 when you try attaching images without any context.
