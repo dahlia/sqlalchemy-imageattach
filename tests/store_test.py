@@ -73,26 +73,29 @@ class FakeStore(Store):
         self.log = []
 
     def put_file(self, file, object_type, object_id, width, height, mimetype,
-                 reproducible):
+                 reproducible, created_at):
         self.log.append(
             (file.read(), object_type, object_id, width, height,
              mimetype, reproducible)
         )
 
-    def delete_file(self, object_type, object_id, width, height, mimetype):
+    def delete_file(self, object_type, object_id, width, height, mimetype,
+                    created_at):
         self.log = [
             log
             for log in self.log
             if log[1:6] != (object_type, object_id, width, height, mimetype)
         ]
 
-    def get_file(self, object_type, object_id, width, height, mimetype):
+    def get_file(self, object_type, object_id, width, height, mimetype,
+                 created_at):
         for log in self.log:
             if log[1:6] == (object_type, object_id, width, height, mimetype):
                 return io.BytesIO(log[0])
         raise IOError()
 
-    def get_url(self, object_type, object_id, width, height, mimetype):
+    def get_url(self, object_type, object_id, width, height, mimetype,
+                created_at):
         hash_ = hash((object_type, object_id, width, height, mimetype))
         url = 'http://fakeurl.com/' + hex(hash_)
         if object_id == self.INCLUDE_QUERY_FOR_URL:

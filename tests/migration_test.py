@@ -16,11 +16,12 @@ class SourceStore(Store):
         self.files = {}
 
     def put_file(self, file, object_type, object_id, width, height, mimetype,
-                 reproducible):
+                 reproducible, created_at):
         key = object_type, object_id, width, height, mimetype
         self.files[key] = file.read(), reproducible
 
-    def get_file(self, object_type, object_id, width, height, mimetype):
+    def get_file(self, object_type, object_id, width, height, mimetype,
+                 created_at):
         key = object_type, object_id, width, height, mimetype
         return io.BytesIO(self.files[key][0])
 

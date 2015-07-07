@@ -195,25 +195,28 @@ class LocalProxyStore(Store):
         self.repr_string = repr_string
 
     def put_file(self, file, object_type, object_id, width, height,
-                 mimetype, reproducible):
+                 mimetype, reproducible, created_at=None):
         self.get_current_object().put_file(
             file, object_type, object_id, width, height,
-            mimetype, reproducible
+            mimetype, reproducible, created_at
         )
 
-    def delete_file(self, object_type, object_id, width, height, mimetype):
+    def delete_file(self, object_type, object_id, width, height, mimetype,
+                    created_at=None):
         self.get_current_object().delete_file(
-            object_type, object_id, width, height, mimetype
+            object_type, object_id, width, height, mimetype, created_at
         )
 
-    def get_file(self, object_type, object_id, width, height, mimetype):
+    def get_file(self, object_type, object_id, width, height, mimetype,
+                 created_at=None):
         return self.get_current_object().get_file(
-            object_type, object_id, width, height, mimetype
+            object_type, object_id, width, height, mimetype, created_at
         )
 
-    def get_url(self, object_type, object_id, width, height, mimetype):
+    def get_url(self, object_type, object_id, width, height, mimetype,
+                created_at=None):
         return self.get_current_object().get_url(
-            object_type, object_id, width, height, mimetype
+            object_type, object_id, width, height, mimetype, created_at
         )
 
     def __eq__(self, other):
