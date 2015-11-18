@@ -487,7 +487,7 @@ class BaseImageSet(object):
     """
 
     def from_raw_file(self, raw_file, store=current_store, size=None,
-                      mimetype=None, original=True):
+                      mimetype=None, original=True, extra_args=None, extra_kwargs=None):
         """Similar to :meth:`from_file()` except it's lower than that.
         It assumes that ``raw_file`` is readable and seekable while
         :meth:`from_file()` only assumes the file is readable.
@@ -517,6 +517,10 @@ class BaseImageSet(object):
                          it is an original image or not.
                          defualt is ``True`` (meaning original)
         :type original: :class:`bool`
+        :param extra_args: additional arguments to pass to the model's constructor
+        :type extra_args: :class:`list`
+        :param extra_kwargs: additional keyword arguments to pass to the model's constructor
+        :type extra_kwargs: :class:`dict`
         :returns: the created image instance
         :rtype: :class:`Image`
 
@@ -550,15 +554,21 @@ class BaseImageSet(object):
         if mimetype.startswith('image/x-'):
             mimetype = 'image/' + mimetype[8:]
 
-        image = cls(size=size, mimetype=mimetype, original=original,
-                    **self.identity_map)
+        if extra_kwargs is None:
+            extra_kwargs = dict()
+        extra_kwargs.update(self.identity_map)
+
+        if extra_args is None:
+            extra_args = list()
+
+        image = cls(size=size, mimetype=mimetype, original=original, *extra_args, **extra_kwargs)
         raw_file.seek(0)
         image.file = raw_file
         image.store = store
         query.append(image)
         return image
 
-    def from_blob(self, blob, store=current_store):
+    def from_blob(self, blob, store=current_store, extra_args=None, extra_kwargs=None):
         """Stores the ``blob`` (byte string) for the image
         into the ``store``.
 
@@ -568,14 +578,18 @@ class BaseImageSet(object):
                       :data:`~sqlalchemy_imageattach.context.current_store`
                       by default
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
+        :param extra_args: additional arguments to pass to the model's constructor
+        :type extra_args: :class:`list`
+        :param extra_kwargs: additional keyword arguments to pass to the model's constructor
+        :type extra_kwargs: :class:`dict`
         :returns: the created image instance
         :rtype: :class:`Image`
 
         """
         data = io.BytesIO(blob)
-        return self.from_raw_file(data, store, original=True)
+        return self.from_raw_file(data, store, original=True, extra_args=None, extra_kwargs=None)
 
-    def from_file(self, file, store=current_store):
+    def from_file(self, file, store=current_store, extra_args=None, extra_kwargs=None):
         """Stores the ``file`` for the image into the ``store``.
 
         :param file: the readable file of the image
@@ -584,6 +598,10 @@ class BaseImageSet(object):
                       :data:`~sqlalchemy_imageattach.context.current_store`
                       by default
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
+        :param extra_args: additional arguments to pass to the model's constructor
+        :type extra_args: :class:`list`
+        :param extra_kwargs: additional keyword arguments to pass to the model's constructor
+        :type extra_kwargs: :class:`dict`
         :returns: the created image instance
         :rtype: :class:`Image`
 
@@ -591,7 +609,7 @@ class BaseImageSet(object):
         data = io.BytesIO()
         shutil.copyfileobj(file, data)
         data.seek(0)
-        return self.from_raw_file(data, store, original=True)
+        return self.from_raw_file(data, store, original=True, extra_args=None, extra_kwargs=None)
 
     def generate_thumbnail(self, ratio=None, width=None, height=None,
                            filter='undefined', store=current_store,
