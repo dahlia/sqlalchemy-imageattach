@@ -97,7 +97,8 @@ from .file import ReusableFileProxy
 from .store import Store
 from .util import append_docstring_attributes
 
-__all__ = 'VECTOR_TYPES', 'Image', 'ImageSet', 'image_attachment'
+__all__ = ('VECTOR_TYPES', 'Image', 'SingleImageSet', 'MultipleImageSet',
+           'ImageSubset', 'image_attachment', 'ImageSet')
 
 
 #: (:class:`collections.Set`) The set of vector image types.
@@ -127,9 +128,12 @@ def image_attachment(*args, **kwargs):
        implementation.
 
     """
+    if kwargs.get('uselist', False):
+        kwargs.setdefault('query_class', MultipleImageSet)
+    else:
+        kwargs.setdefault('query_class', SingleImageSet)
+    kwargs['uselist'] = True
     kwargs.setdefault('lazy', 'dynamic')
-    kwargs.setdefault('query_class', ImageSet)
-    kwargs.setdefault('uselist', True)
     kwargs.setdefault('cascade', 'all, delete-orphan')
     return relationship(*args, **kwargs)
 
@@ -179,13 +183,36 @@ class Image(object):
         composite key.
 
         """
-        key_columns = inspect(type(self)).primary_key
-        pk = [c.name for c in key_columns if c.name not in ('width', 'height')]
+        pk = self.identity_attributes()
         if len(pk) == 1:
             pk_value = getattr(self, pk[0])
             if isinstance(pk_value, numbers.Integral):
                 return pk_value
         raise NotImplementedError('object_id property has to be implemented')
+
+    @classmethod
+    def identity_attributes(cls):
+        """A list of the names of primary key fields.
+
+        :returns: A list of the names of primary key fields
+        :rtype: :class:`collections.str`
+
+        """
+        columns = inspect(cls).primary_key
+        names = [c.name for c in columns if c.name not in ('width', 'height')]
+        return names
+
+    @property
+    def identity_map(self):
+        """(:class:`collections.object`) A dictionary of the values of primary
+        key fields with their names.
+
+        """
+        pk = self.identity_attributes()
+        values = {}
+        for name in pk:
+            values[name] = getattr(self, name)
+        return values
 
     #: (:class:`numbers.Integral`) The image's width.
     width = Column('width', Integer, primary_key=True)
@@ -258,6 +285,14 @@ class Image(object):
             raise TypeError('store must be an instance of '
                             'sqlalchemy_imageattach.store.Store, not ' +
                             repr(store))
+
+        if Session.object_session(self) is None:
+            try:
+                file = self.file
+            except AttributeError:
+                raise IOError('no stored original image file')
+            return ReusableFileProxy(file)
+
         return store.open(self, use_seek)
 
     def locate(self, store=current_store):
@@ -304,27 +339,10 @@ class NoopContext(object):
         pass
 
 
-class ImageSet(Query):
+class BaseImageQuery(Query):
     """The subtype of :class:`~sqlalchemy.orm.query.Query` specialized
     for :class:`Image`.  It provides more methods and properties over
     :class:`~sqlalchemy.orm.query.Query`.
-
-    Note that it implements :meth:`__html__()` method, a de facto
-    standard special method for HTML templating.  So you can simply use
-    it in Jinja2 like:
-
-    .. sourcecode:: jinja
-
-       {{ user.profile }}
-
-    instead of:
-
-    .. sourcecode:: html+jinja
-
-       <img src="{{ user.profile|permalink }}"
-            width="{{ user.profile.original.width }}"
-            height="{{ user.profile.original.height }}">
-
     """
 
     #: (:class:`collections.MutableSet`) The set of instances that their
@@ -408,6 +426,66 @@ class ImageSet(Query):
         cls._stored_images.clear()
         cls._deleted_images.clear()
 
+    def _original_images(self, **kwargs):
+        """A list of the original images.
+
+        :returns: A list of the original images.
+        :rtype: :class:`collections.Image`
+        """
+
+        def test(image):
+            if not image.original:
+                return False
+            for filter, value in kwargs.items():
+                if getattr(image, filter) != value:
+                    return False
+            return True
+
+        if Session.object_session(self.instance) is None:
+            images = []
+            for image, store in self._stored_images:
+                if test(image):
+                    images.append(image)
+
+            state = instance_state(self.instance)
+            try:
+                added = state.committed_state[self.attr.key].added_items
+            except KeyError:
+                pass
+            else:
+                for image in added:
+                    if test(image):
+                        images.append(image)
+            if self.session:
+                for image in self.session.new:
+                    if test(image):
+                        images.append(image)
+        else:
+            query = self.filter_by(original=True, **kwargs)
+            images = query.all()
+        return images
+
+
+class BaseImageSet(object):
+    """The interface of each image set.
+
+    Note that it implements :meth:`__html__()` method, a de facto
+    standard special method for HTML templating.  So you can simply use
+    it in Jinja2 like:
+
+    .. sourcecode:: jinja
+
+       {{ user.profile }}
+
+    instead of:
+
+    .. sourcecode:: html+jinja
+
+       <img src="{{ user.profile|permalink }}"
+            width="{{ user.profile.original.width }}"
+            height="{{ user.profile.original.height }}">
+    """
+
     def from_raw_file(self, raw_file, store=current_store, size=None,
                       mimetype=None, original=True):
         """Similar to :meth:`from_file()` except it's lower than that.
@@ -443,31 +521,41 @@ class ImageSet(Query):
         :rtype: :class:`Image`
 
         """
-        cls = self.column_descriptions[0]['type']
+        query = self.query
+        cls = query.column_descriptions[0]['type']
         if not (isinstance(cls, type) and issubclass(cls, Image)):
             raise TypeError('the first entity must be a subtype of '
                             'sqlalchemy_imageattach.entity.Image')
-        if original and self.session:
+
+        if original and query.session:
             if store is current_store:
-                for existing in self:
-                    self.remove(existing)
-                self.session.flush()
+                for existing in query:
+                    test_data = existing.identity_map.copy()
+                    test_data.update(self.identity_map)
+                    if existing.identity_map == test_data:
+                        query.remove(existing)
+                query.session.flush()
             else:
                 with store_context(store):
-                    for existing in self:
-                        self.remove(existing)
-                    self.session.flush()
+                    for existing in query:
+                        test_data = existing.identity_map.copy()
+                        test_data.update(self.identity_map)
+                        if existing.identity_map == test_data:
+                            query.remove(existing)
+                    query.session.flush()
         if size is None or mimetype is None:
             with WandImage(file=raw_file) as wand:
                 size = size or wand.size
                 mimetype = mimetype or wand.mimetype
         if mimetype.startswith('image/x-'):
             mimetype = 'image/' + mimetype[8:]
-        image = cls(size=size, mimetype=mimetype, original=original)
+
+        image = cls(size=size, mimetype=mimetype, original=original,
+                    **self.identity_map)
         raw_file.seek(0)
         image.file = raw_file
         image.store = store
-        self.append(image)
+        query.append(image)
         return image
 
     def from_blob(self, blob, store=current_store):
@@ -504,85 +592,6 @@ class ImageSet(Query):
         shutil.copyfileobj(file, data)
         data.seek(0)
         return self.from_raw_file(data, store, original=True)
-
-    @property
-    def original(self):
-        """(:class:`Image`) The original image.  It could be ``None``
-        if there are no stored images yet.
-
-        """
-        if Session.object_session(self.instance) is None:
-            for image, store in self._stored_images:
-                if image.original:
-                    return image
-            state = instance_state(self.instance)
-            try:
-                added = state.committed_state[self.attr.key].added_items
-            except KeyError:
-                pass
-            else:
-                for image in added:
-                    if image.original:
-                        return image
-            if self.session:
-                for image in self.session.new:
-                    if image.original:
-                        return image
-            return
-        query = self.filter_by(original=True)
-        try:
-            return query.one()
-        except NoResultFound:
-            pass
-
-    def require_original(self):
-        """Returns the :attr:`original` image or just raise
-        :exc:`~exceptions.IOError` (instead of returning ``None``).
-        That means it guarantees the return value is never ``None``
-        but always :class:`Image`.
-
-        :returns: the :attr:`original` image
-        :rtype: :class:`Image`
-        :raises exceptions.IOError: when there's no :attr:`original`
-                                    image yet
-
-        """
-        original = self.original
-        if original is None:
-            raise IOError('there is no original image yet')
-        return original
-
-    def find_thumbnail(self, width=None, height=None):
-        """Finds the thumbnail of the image with the given ``width``
-        and/or ``height``.
-
-        :param width: the thumbnail width
-        :type width: :class:`numbers.Integral`
-        :param height: the thumbnail height
-        :type height: :class:`numbers.Integral`
-        :returns: the thumbnail image
-        :rtype: :class:`Image`
-        :raises sqlalchemy.orm.exc.NoResultFound:
-           when there's no image of such size
-
-        """
-        if width is None and height is None:
-            raise TypeError('required width and/or height')
-        q = self
-        if width is not None:
-            q = q.filter_by(width=width)
-        if height is not None:
-            q = q.filter_by(height=height)
-        try:
-            return q.one()
-        except NoResultFound:
-            if width is not None and height is not None:
-                msg = 'size: ' + repr((width, height))
-            elif width is not None:
-                msg = 'width: ' + repr(width)
-            else:
-                msg = 'height: ' + repr(height)
-            raise NoResultFound('no thumbnail image of such ' + msg)
 
     def generate_thumbnail(self, ratio=None, width=None, height=None,
                            filter='undefined', store=current_store,
@@ -639,10 +648,12 @@ class ImageSet(Query):
             raise TypeError('pass only one argument in ratio, width, or '
                             'height; these parameters are exclusive for '
                             'each other')
-        transient = Session.object_session(self.instance) is None
-        state = instance_state(self.instance)
+
+        query = self.query
+        transient = Session.object_session(query.instance) is None
+        state = instance_state(query.instance)
         try:
-            added = state.committed_state[self.attr.key].added_items
+            added = state.committed_state[query.attr.key].added_items
         except KeyError:
             added = []
         if width is not None:
@@ -656,9 +667,9 @@ class ImageSet(Query):
                 if image.width == width:
                     return image
             if not transient:
-                query = self.filter_by(width=width)
+                q = query.filter_by(width=width)
                 try:
-                    return query.one()
+                    return q.one()
                 except NoResultFound:
                     pass
 
@@ -675,9 +686,9 @@ class ImageSet(Query):
                 if image.height == height:
                     return image
             if not transient:
-                query = self.filter_by(height=height)
+                q = query.filter_by(height=height)
                 try:
-                    return query.one()
+                    return q.one()
                 except NoResultFound:
                     pass
 
@@ -694,7 +705,8 @@ class ImageSet(Query):
             def height(sz):
                 return sz[1] * ratio
         data = io.BytesIO()
-        with self.open_file(store=store) as f:
+        image = self.require_original()
+        with image.open_file(store=store) as f:
             if _preprocess_image is None:
                 img = WandImage(file=f)
             else:
@@ -715,9 +727,9 @@ class ImageSet(Query):
                     if image.width == width and image.height == height:
                         return image
                 if not transient:
-                    query = self.filter_by(width=width, height=height)
+                    q = query.filter_by(width=width, height=height)
                     try:
-                        return query.one()
+                        return q.one()
                     except NoResultFound:
                         pass
                 if len(img.sequence) > 1:
@@ -738,6 +750,65 @@ class ImageSet(Query):
                                   size=(width, height),
                                   mimetype=mimetype,
                                   original=False)
+
+    @property
+    def original(self):
+        """(:class:`Image`) The original image.  It could be ``None``
+        if there are no stored images yet.
+
+        """
+        images = self.query._original_images(**self.identity_map)
+        if images:
+            return images[0]
+
+    def require_original(self):
+        """Returns the :attr:`original` image or just raise
+        :exc:`~exceptions.IOError` (instead of returning ``None``).
+        That means it guarantees the return value is never ``None``
+        but always :class:`Image`.
+
+        :returns: the :attr:`original` image
+        :rtype: :class:`Image`
+        :raises exceptions.IOError: when there's no :attr:`original`
+                                    image yet
+
+        """
+        image = self.original
+        if not image:
+            raise IOError('there is no original image yet')
+        return image
+
+    def find_thumbnail(self, width=None, height=None):
+        """Finds the thumbnail of the image with the given ``width``
+        and/or ``height``.
+
+        :param width: the thumbnail width
+        :type width: :class:`numbers.Integral`
+        :param height: the thumbnail height
+        :type height: :class:`numbers.Integral`
+        :returns: the thumbnail image
+        :rtype: :class:`Image`
+        :raises sqlalchemy.orm.exc.NoResultFound:
+           when there's no image of such size
+
+        """
+        if width is None and height is None:
+            raise TypeError('required width and/or height')
+        q = self
+        if width is not None:
+            q = q.filter_by(width=width)
+        if height is not None:
+            q = q.filter_by(height=height)
+        try:
+            return q.one()
+        except NoResultFound:
+            if width is not None and height is not None:
+                msg = 'size: ' + repr((width, height))
+            elif width is not None:
+                msg = 'width: ' + repr(width)
+            else:
+                msg = 'height: ' + repr(height)
+            raise NoResultFound('no thumbnail image of such ' + msg)
 
     def open_file(self, store=current_store, use_seek=False):
         """The shorthand of :meth:`~Image.open_file()` for
@@ -760,12 +831,6 @@ class ImageSet(Query):
 
         """
         original = self.require_original()
-        if Session.object_session(self.instance) is None:
-            try:
-                file = original.file
-            except AttributeError:
-                raise IOError('no stored original image file')
-            return ReusableFileProxy(file)
         return original.open_file(store, use_seek)
 
     def make_blob(self, store=current_store):
@@ -812,8 +877,58 @@ class ImageSet(Query):
         return '<img src="{0}" width="{1}" height="{2}">'.format(url, *size)
 
 
-listen(Session, 'after_soft_rollback', ImageSet._images_failed)
-listen(Session, 'after_commit', ImageSet._images_succeeded)
-listen(Image, 'after_insert', ImageSet._mark_image_file_stored, propagate=True)
-listen(Image, 'after_delete', ImageSet._mark_image_file_deleted,
+class SingleImageSet(BaseImageQuery, BaseImageSet):
+    """Image query as an image set when the parent entity has only one
+    image set.
+    """
+
+    @property
+    def identity_map(self):
+        return {}
+
+    @property
+    def query(self):
+        return self
+
+
+#: .. deprecated:: Use :class:`SingleImageSet` to distinguish from
+#:                 :class:`MultipleImageSet`.
+ImageSet = SingleImageSet  # backward compatibility
+
+
+class MultipleImageSet(BaseImageQuery):
+    """Image query with additional interfaces to handle multiple entity sets.
+    """
+
+    def imageset(self, **pk):
+        return ImageSubset(self, **pk)
+
+    def imagesets(self):
+        images = self._original_images()
+        for image in images:
+            yield ImageSubset(self, **image.identity_map)
+
+
+class ImageSubset(BaseImageSet):
+    """Proxy interface as an image set when the parent entity has only one
+    image set.
+    """
+    def __init__(self, _query, **identity_map):
+        self.query = _query
+        cls = _query.column_descriptions[0]['type']
+        if set(identity_map.keys()) > set(cls.identity_attributes()):
+            raise TypeError("identity_map got unexpected key. (%s) It must be one"
+                            "of the primary key columns. (%s)" %
+                            (identity_map.keys(), cls.identity_attributes()))
+        self.identity_map = identity_map
+
+    def count(self):
+        return self.query.filter_by(**self.identity_map).count()
+
+
+listen(Session, 'after_soft_rollback', BaseImageQuery._images_failed)
+listen(Session, 'after_commit', BaseImageQuery._images_succeeded)
+listen(Image, 'after_insert', BaseImageQuery._mark_image_file_stored,
+       propagate=True)
+listen(Image, 'after_delete', BaseImageQuery._mark_image_file_deleted,
        propagate=True)
