@@ -44,7 +44,7 @@ tests_require = [
 
 
 setup(
-    name='SQLAlchemy-MediaAttach',
+    name='SQLAlchemy-ImageAttach',
     version=VERSION,
     description='SQLAlchemy extension for attaching images to entity objects',
     long_description=readme(),
