@@ -506,6 +506,8 @@ class ImageSet(Query):
         :rtype: :class:`Image`
 
         """
+        if isinstance(file, cgi.FieldStorage):
+            file = file.file
         data = io.BytesIO()
         shutil.copyfileobj(file, data)
         data.seek(0)
