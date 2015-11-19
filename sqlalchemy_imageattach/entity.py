@@ -472,7 +472,7 @@ class ImageSet(Query):
             kwargs = dict()
 
         if args is None:
-            args = list
+            args = list()
 
         image = cls(size=size, mimetype=mimetype, original=original, *args, **kwargs)
         raw_file.seek(0)
@@ -481,7 +481,7 @@ class ImageSet(Query):
         self.append(image)
         return image
 
-    def from_blob(self, blob, store=current_store, **kwargs):
+    def from_blob(self, blob, store=current_store, args=None, kwargs=None):
         """Stores the ``blob`` (byte string) for the image
         into the ``store``.
 
@@ -497,10 +497,10 @@ class ImageSet(Query):
         :rtype: :class:`Image`
 
         """
-        data = io.BytesIO(blob)
+        data = io.BytesIO(blob, args=args, kwargs=kwargs)
         return self.from_raw_file(data, store, original=True, **kwargs)
 
-    def from_file(self, file, store=current_store, **kwargs):
+    def from_file(self, file, store=current_store, args=None, kwargs=None):
         """Stores the ``file`` for the image into the ``store``.
 
         :param file: the readable file of the image
@@ -520,7 +520,7 @@ class ImageSet(Query):
         data = io.BytesIO()
         shutil.copyfileobj(file, data)
         data.seek(0)
-        return self.from_raw_file(data, store, original=True, **kwargs)
+        return self.from_raw_file(data, store, original=True, args=args, kwargs=kwargs)
 
     @property
     def original(self):
