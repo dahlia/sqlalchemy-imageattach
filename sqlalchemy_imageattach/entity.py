@@ -587,7 +587,7 @@ class BaseImageSet(object):
 
         """
         data = io.BytesIO(blob)
-        return self.from_raw_file(data, store, original=True, extra_args=None, extra_kwargs=None)
+        return self.from_raw_file(data, store, original=True, extra_args=extra_args, extra_kwargs=extra_kwargs)
 
     def from_file(self, file, store=current_store, extra_args=None, extra_kwargs=None):
         """Stores the ``file`` for the image into the ``store``.
@@ -611,7 +611,7 @@ class BaseImageSet(object):
         data = io.BytesIO()
         shutil.copyfileobj(file, data)
         data.seek(0)
-        return self.from_raw_file(data, store, original=True, extra_args=None, extra_kwargs=None)
+        return self.from_raw_file(data, store, original=True, extra_args=extra_args, extra_kwargs=extra_kwargs)
 
     def generate_thumbnail(self, ratio=None, width=None, height=None,
                            filter='undefined', store=current_store,
