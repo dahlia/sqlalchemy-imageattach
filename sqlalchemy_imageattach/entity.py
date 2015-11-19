@@ -517,9 +517,9 @@ class BaseImageSet(object):
                          it is an original image or not.
                          defualt is ``True`` (meaning original)
         :type original: :class:`bool`
-        :param extra_args: additional arguments to pass to the model's constructor
+        :param extra_args: additional arguments to pass to the model's constructor.
         :type extra_args: :class:`list`
-        :param extra_kwargs: additional keyword arguments to pass to the model's constructor
+        :param extra_kwargs: additional keyword arguments to pass to the model's constructor.
         :type extra_kwargs: :class:`dict`
         :returns: the created image instance
         :rtype: :class:`Image`
@@ -578,9 +578,9 @@ class BaseImageSet(object):
                       :data:`~sqlalchemy_imageattach.context.current_store`
                       by default
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
-        :param extra_args: additional arguments to pass to the model's constructor
+        :param extra_args: additional arguments to pass to the model's constructor.
         :type extra_args: :class:`list`
-        :param extra_kwargs: additional keyword arguments to pass to the model's constructor
+        :param extra_kwargs: additional keyword arguments to pass to the model's constructor.
         :type extra_kwargs: :class:`dict`
         :returns: the created image instance
         :rtype: :class:`Image`
@@ -598,9 +598,9 @@ class BaseImageSet(object):
                       :data:`~sqlalchemy_imageattach.context.current_store`
                       by default
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
-        :param extra_args: additional arguments to pass to the model's constructor
+        :param extra_args: additional arguments to pass to the model's constructor.
         :type extra_args: :class:`list`
-        :param extra_kwargs: additional keyword arguments to pass to the model's constructor
+        :param extra_kwargs: additional keyword arguments to pass to the model's constructor.
         :type extra_kwargs: :class:`dict`
         :returns: the created image instance
         :rtype: :class:`Image`
