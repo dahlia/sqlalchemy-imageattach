@@ -517,9 +517,15 @@ class BaseImageSet(object):
                          it is an original image or not.
                          defualt is ``True`` (meaning original)
         :type original: :class:`bool`
+<<<<<<< HEAD
         :param extra_args: additional arguments to pass to the model's constructor.
         :type extra_args: :class:`list`
         :param extra_kwargs: additional keyword arguments to pass to the model's constructor.
+=======
+        :param extra_args: additional arguments to pass to the model's constructor
+        :type extra_args: :class:`list`
+        :param extra_kwargs: additional keyword arguments to pass to the model's constructor
+>>>>>>> 34e2e6f54decf7015cc9f1370329de29d5d4c872
         :type extra_kwargs: :class:`dict`
         :returns: the created image instance
         :rtype: :class:`Image`
