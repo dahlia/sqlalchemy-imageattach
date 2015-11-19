@@ -487,7 +487,7 @@ class BaseImageSet(object):
     """
 
     def from_raw_file(self, raw_file, store=current_store, size=None,
-                      mimetype=None, original=True, **kwargs):
+                      mimetype=None, original=True, args=None, kwargs=None):
         """Similar to :meth:`from_file()` except it's lower than that.
         It assumes that ``raw_file`` is readable and seekable while
         :meth:`from_file()` only assumes the file is readable.
@@ -517,7 +517,9 @@ class BaseImageSet(object):
                          it is an original image or not.
                          defualt is ``True`` (meaning original)
         :type original: :class:`bool`
-        :param kwargs: additional parameters to pass to the model constructor
+        :param args: additional arguments to pass to the model's constructor
+        :type args: :class:`list`
+        :param kwargs: additional keyword arguments to pass to the model's constructor
         :type kwargs: :class:`dict`
         :returns: the created image instance
         :rtype: :class:`Image`
@@ -552,9 +554,14 @@ class BaseImageSet(object):
         if mimetype.startswith('image/x-'):
             mimetype = 'image/' + mimetype[8:]
 
-        image = cls(size=size, mimetype=mimetype, original=original,
-                    **self.identity_map)
+        if kwargs is None:
+            kwargs = dict()
+        kwargs.update(self.identity_map)
 
+        if args is None:
+            args = list
+
+        image = cls(size=size, mimetype=mimetype, original=original, *args, **kwargs)
         raw_file.seek(0)
         image.file = raw_file
         image.store = store
