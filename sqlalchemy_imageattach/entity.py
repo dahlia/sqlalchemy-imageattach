@@ -559,7 +559,7 @@ class BaseImageSet(object):
         kwargs.update(self.identity_map)
 
         if args is None:
-            args = list
+            args = list()
 
         image = cls(size=size, mimetype=mimetype, original=original, *args, **kwargs)
         raw_file.seek(0)
@@ -568,7 +568,7 @@ class BaseImageSet(object):
         query.append(image)
         return image
 
-    def from_blob(self, blob, store=current_store, **kwargs):
+    def from_blob(self, blob, store=current_store, args=None, kwargs=None):
         """Stores the ``blob`` (byte string) for the image
         into the ``store``.
 
@@ -584,10 +584,10 @@ class BaseImageSet(object):
         :rtype: :class:`Image`
 
         """
-        data = io.BytesIO(blob)
+        data = io.BytesIO(blob, args=args, kwargs=kwargs)
         return self.from_raw_file(data, store, original=True, **kwargs)
 
-    def from_file(self, file, store=current_store, **kwargs):
+    def from_file(self, file, store=current_store, args=None, kwargs=None):
         """Stores the ``file`` for the image into the ``store``.
 
         :param file: the readable file of the image
@@ -607,7 +607,7 @@ class BaseImageSet(object):
         data = io.BytesIO()
         shutil.copyfileobj(file, data)
         data.seek(0)
-        return self.from_raw_file(data, store, original=True, **kwargs)
+        return self.from_raw_file(data, store, original=True, args=args, kwargs=kwargs)
 
     def generate_thumbnail(self, ratio=None, width=None, height=None,
                            filter='undefined', store=current_store,
