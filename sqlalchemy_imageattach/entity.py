@@ -517,12 +517,17 @@ class BaseImageSet(object):
                          it is an original image or not.
                          defualt is ``True`` (meaning original)
         :type original: :class:`bool`
-        :param extra_args: additional arguments to pass to the model's constructor.
+        :param extra_args: additional arguments to pass to the model's
+                           constructor.
         :type extra_args: :class:`list`
-        :param extra_kwargs: additional keyword arguments to pass to the model's constructor.
+        :param extra_kwargs: additional keyword arguments to pass to the
+                             model's constructor.
         :type extra_kwargs: :class:`dict`
         :returns: the created image instance
         :rtype: :class:`Image`
+
+        .. versionadded:: 0.9.1
+            The ``extra_args`` and ``extra_kwargs`` options.
 
         """
         query = self.query
@@ -578,16 +583,24 @@ class BaseImageSet(object):
                       :data:`~sqlalchemy_imageattach.context.current_store`
                       by default
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
-        :param extra_args: additional arguments to pass to the model's constructor.
+        :param extra_args: additional arguments to pass to the model's
+                           constructor.
         :type extra_args: :class:`list`
-        :param extra_kwargs: additional keyword arguments to pass to the model's constructor.
+        :param extra_kwargs: additional keyword arguments to pass to the
+                             model's constructor.
         :type extra_kwargs: :class:`dict`
         :returns: the created image instance
         :rtype: :class:`Image`
 
+        .. versionadded:: 0.9.1
+            The ``extra_args`` and ``extra_kwargs`` options.
+
         """
         data = io.BytesIO(blob)
-        return self.from_raw_file(data, store, original=True, extra_args=extra_args, extra_kwargs=extra_kwargs)
+        return self.from_raw_file(data, store,
+                                  original=True,
+                                  extra_args=extra_args,
+                                  extra_kwargs=extra_kwargs)
 
     def from_file(self, file, store=current_store, extra_args=None, extra_kwargs=None):
         """Stores the ``file`` for the image into the ``store``.
@@ -598,12 +611,17 @@ class BaseImageSet(object):
                       :data:`~sqlalchemy_imageattach.context.current_store`
                       by default
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
-        :param extra_args: additional arguments to pass to the model's constructor.
+        :param extra_args: additional arguments to pass to the model's
+                           constructor.
         :type extra_args: :class:`list`
-        :param extra_kwargs: additional keyword arguments to pass to the model's constructor.
+        :param extra_kwargs: additional keyword arguments to pass to the
+                             model's constructor.
         :type extra_kwargs: :class:`dict`
         :returns: the created image instance
         :rtype: :class:`Image`
+
+        .. versionadded:: 0.9.1
+            The ``extra_args`` and ``extra_kwargs`` options.
 
         """
         if isinstance(file, cgi.FieldStorage):
@@ -611,7 +629,10 @@ class BaseImageSet(object):
         data = io.BytesIO()
         shutil.copyfileobj(file, data)
         data.seek(0)
-        return self.from_raw_file(data, store, original=True, extra_args=extra_args, extra_kwargs=extra_kwargs)
+        return self.from_raw_file(data, store,
+                                  original=True,
+                                  extra_args=extra_args,
+                                  extra_kwargs=extra_kwargs)
 
     def generate_thumbnail(self, ratio=None, width=None, height=None,
                            filter='undefined', store=current_store,
