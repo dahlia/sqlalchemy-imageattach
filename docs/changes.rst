@@ -8,6 +8,10 @@ To be released.
 
 - Added ``host_url_getter`` option to :class:`HttpExposedFileSystemStore
   <sqlalchemy_imageattach.stores.fs.HttpExposedFileSystemStore>`.
+- Now :meth:`~sqlalchemy_imageattach.entity.BaseImageSet.from_file()` and
+  :meth:`~sqlalchemy_imageattach.entity.BaseImageSet.from_blob()` can take
+  ``extra_args``/``extra_kwargs`` to be passed to entity model's constructor.
+  [:issue:`32`, :issue:`33` by Vahid]
 
 
 Version 0.9.0

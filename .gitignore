@@ -6,3 +6,6 @@ SQLAlchemy_ImageAttach.egg-info/
 .tox/
 .*.swp
 *.pyc
+
+# Pycharm project files
+.idea/*
