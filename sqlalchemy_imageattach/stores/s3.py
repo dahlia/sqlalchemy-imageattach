@@ -15,6 +15,7 @@ import email.utils
 import hashlib
 import hmac
 import logging
+import os.path
 try:
     from urllib import request as urllib2
 except ImportError:
@@ -137,9 +138,17 @@ class S3Store(Store):
     :param max_age: the ``max-age`` seconds of :mailheader:`Cache-Control`.
                     default is :const:`DEFAULT_MAX_AGE`
     :type max_age: :class:`numbers.Integral`
+    :param acl: the ``acl`` option of uploaded key. default is :const:`public-read`
+    :type acl: :class:`basestring`
     :param prefix: the optional key prefix to logically separate stores
                    with the same bucket.  not used by default
     :type prefix: :class:`basestring`
+    :param original_prefix: the optional key prefix to logically separate stores
+                            with the same bucket.  not used by default
+    :type original_prefix: :class:`basestring`
+    :param reproducible_prefix: the optional key prefix to logically separate stores
+                                with the same bucket.  not used by default
+    :type reproducible_prefix: :class:`basestring`
     :param public_base_url: an optional url base for public urls.
                             useful when used with cdn
     :type public_base_url: :class:`basestring`
@@ -160,23 +169,41 @@ class S3Store(Store):
     #: :mailheader:`Cache-Control`.
     max_age = None
 
+    #: (:class:`basestring`) The ``acl`` option of uploaded key.
+    acl = None
+
     #: (:class:`basestring`) The optional key prefix to logically separate
     #: stores with the same bucket.
     prefix = None
 
+    #: (:class:`basestring`) The optional key prefix to logically separate
+    #: stores with the same bucket.
+    original_prefix = None
+
+    #: (:class:`basestring`) The optional key prefix to logically separate
+    #: stores with the same bucket.
+    reproducible_prefix = None
+
     #: (:class:`basestring`) The optional url base for public urls.
     public_base_url = None
 
-    def __init__(self, bucket, access_key=None, secret_key=None,
-                 max_age=DEFAULT_MAX_AGE, prefix='', public_base_url=None):
+    def __init__(self, bucket, access_key=None, secret_key=None, max_age=DEFAULT_MAX_AGE, acl='public-read',
+                 prefix='', original_prefix='', reproducible_prefix='', public_base_url=None):
         self.bucket = bucket
         self.access_key = access_key
         self.secret_key = secret_key
         self.base_url = BASE_URL_FORMAT.format(bucket)
         self.max_age = max_age
+        self.acl = acl
         self.prefix = prefix.strip()
         if self.prefix.endswith('/'):
             self.prefix = self.prefix.rstrip('/')
+        self.original_prefix = original_prefix.strip()
+        if self.original_prefix.endswith('/'):
+            self.original_prefix = self.original_prefix.rstrip('/')
+        self.reproducible_prefix = reproducible_prefix.strip()
+        if self.reproducible_prefix.endswith('/'):
+            self.reproducible_prefix = self.reproducible_prefix.rstrip('/')
         if public_base_url is None:
             self.public_base_url = self.base_url
         elif public_base_url.endswith('/'):
@@ -184,13 +211,14 @@ class S3Store(Store):
         else:
             self.public_base_url = public_base_url
 
-    def get_key(self, object_type, object_id, width, height, mimetype):
+    def get_key(self, object_type, object_id, width, height, mimetype, reproducible=False):
         key = '{0}/{1}/{2}x{3}{4}'.format(
             object_type, object_id, width, height,
             guess_extension(mimetype)
         )
-        if self.prefix:
-            return '{0}/{1}'.format(self.prefix, key)
+        prefix = os.path.join(self.prefix, self.reproducible_prefix if reproducible else self.original_prefix)
+        if prefix:
+            return '{0}/{1}'.format(prefix, key)
         return key
 
     def get_file(self, *args, **kwargs):
@@ -217,10 +245,10 @@ class S3Store(Store):
                          secret_key=self.secret_key,
                          **kwargs)
 
-    def upload_file(self, url, data, content_type, rrs, acl='public-read'):
+    def upload_file(self, url, data, content_type, rrs):
         headers = {
             'Cache-Control': 'max-age=' + str(self.max_age),
-            'x-amz-acl': acl,
+            'x-amz-acl': self.acl,
             'x-amz-storage-class': 'REDUCED_REDUNDANCY' if rrs else 'STANDARD'
         }
         request = self.make_request(
@@ -246,9 +274,8 @@ class S3Store(Store):
             else:
                 break
 
-    def put_file(self, file, object_type, object_id, width, height, mimetype,
-                 reproducible):
-        url = self.get_s3_url(object_type, object_id, width, height, mimetype)
+    def put_file(self, file, object_type, object_id, width, height, mimetype, reproducible=False):
+        url = self.get_s3_url(object_type, object_id, width, height, mimetype, reproducible=reproducible)
         self.upload_file(url, file.read(), mimetype, rrs=reproducible)
 
     def delete_file(self, *args, **kwargs):
@@ -337,10 +364,10 @@ class S3SandboxStore(Store):
     def put_file(self, *args, **kwargs):
         self.overriding.put_file(*args, **kwargs)
 
-    def delete_file(self, object_type, object_id, width, height, mimetype):
+    def delete_file(self, object_type, object_id, width, height, mimetype, reproducible=False):
         args = object_type, object_id, width, height, mimetype
-        self.overriding.delete_file(*args)
-        url = self.overriding.get_s3_url(*args)
+        self.overriding.delete_file(*args, reproducible=reproducible)
+        url = self.overriding.get_s3_url(*args, reproducible=reproducible)
         self.overriding.upload_file(
             url,
             data=b'',

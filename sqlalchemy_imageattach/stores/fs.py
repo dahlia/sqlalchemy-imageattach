@@ -56,19 +56,25 @@ class BaseFileSystemStore(Store):
 
     """
 
-    def __init__(self, path):
+    def __init__(self, path, original_prefix='', reproducible_prefix=''):
         self.path = path
+        if original_prefix.endswith('/'):
+            original_prefix = original_prefix.rstrip('/')
+        self.original_prefix = original_prefix
+        if reproducible_prefix.endswith('/'):
+            reproducible_prefix = reproducible_prefix.rstrip('/')
+        self.reproducible_prefix = reproducible_prefix
 
-    def get_path(self, object_type, object_id, width, height, mimetype):
+    def get_path(self, object_type, object_id, width, height, mimetype, reproducible=False):
         id_segment_a = str(object_id % 1000)
         id_segment_b = str(object_id // 1000)
         suffix = guess_extension(mimetype)
         filename = '{0}.{1}x{2}{3}'.format(object_id, width, height, suffix)
-        return object_type, id_segment_a, id_segment_b, filename
+        prefix = self.reproducible_prefix if reproducible else self.original_prefix
+        return prefix, id_segment_a, id_segment_b, filename
 
-    def put_file(self, file, object_type, object_id, width, height, mimetype,
-                 reproducible):
-        path = self.get_path(object_type, object_id, width, height, mimetype)
+    def put_file(self, file, object_type, object_id, width, height, mimetype, reproducible=False):
+        path = self.get_path(object_type, object_id, width, height, mimetype, reproducible=reproducible)
         for i in range(len(path)):
             d = os.path.join(self.path, *path[:i])
             if not os.path.isdir(d):
@@ -104,8 +110,10 @@ class FileSystemStore(BaseFileSystemStore):
 
     """
 
-    def __init__(self, path, base_url):
-        super(FileSystemStore, self).__init__(path)
+    def __init__(self, path, base_url, original_prefix='', reproducible_prefix=''):
+        super(FileSystemStore, self).__init__(path,
+                                              original_prefix=original_prefix,
+                                              reproducible_prefix=reproducible_prefix)
         if not base_url.endswith('/'):
             base_url += '/'
         self.base_url = base_url
@@ -174,10 +182,13 @@ HttpExposedFileSystemStore for more details
 
     """
 
-    def __init__(self, path, prefix='__images__', host_url_getter=None):
+    def __init__(self, path, prefix='__images__', host_url_getter=None,
+                 original_prefix='', reproducible_prefix=''):
         if not (callable(host_url_getter) or host_url_getter is None):
             raise TypeError('host_url_getter must be callable')
-        super(HttpExposedFileSystemStore, self).__init__(path)
+        super(HttpExposedFileSystemStore, self).__init__(path,
+                                                         original_prefix=original_prefix,
+                                                         reproducible_prefix=reproducible_prefix)
         if prefix.startswith('/'):
             prefix = prefix[1:]
         if prefix.endswith('/'):
