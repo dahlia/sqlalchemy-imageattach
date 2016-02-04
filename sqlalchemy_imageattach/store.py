@@ -26,8 +26,20 @@ class Store(object):
 
     """
 
+    @staticmethod
+    def created_tag(created_at):
+        """Default datetime to string converter for created_at in image.
+
+        :param created_at: the created_at of an image.
+        :type created_at: :class:`datetime.datetime
+        :return: string representation of created_at
+        """
+        if created_at is None:
+            return ''  # backward compatibility
+        return created_at.strftime('%Y%m%d%H%M%S%f')
+
     def put_file(self, file, object_type, object_id, width, height, mimetype,
-                 reproducible):
+                 reproducible, created_at=None):
         """Puts the ``file`` of the image.
 
         :param file: the image file to put
@@ -49,6 +61,8 @@ class Store(object):
                              ``False`` if it cannot be reproduced
                              e.g. original images
         :type reproducible: :class:`bool`
+        :param created_at: the created_at of the image to put
+        :type created_at: :class:`datetime.datetime`
 
         .. note::
 
@@ -61,7 +75,8 @@ class Store(object):
         """
         raise NotImplementedError('put_file() has to be implemented')
 
-    def delete_file(self, object_type, object_id, width, height, mimetype):
+    def delete_file(self, object_type, object_id, width, height, mimetype,
+                    created_at=None):
         """Deletes all reproducible files related to the image.
         It doesn't raise any exception even if there's no such file.
 
@@ -77,11 +92,14 @@ class Store(object):
         :param mimetype: the mimetype of the image to delete
                          e.g. ``'image/jpeg'``
         :type mimetype: :class:`basestring`
+        :param created_at: the created_at of the image to delete
+        :type created_at: :class:`datetime.datetime`
 
         """
         raise NotImplementedError('delete_file() has to be implemented')
 
-    def get_file(self, object_type, object_id, width, height, mimetype):
+    def get_file(self, object_type, object_id, width, height, mimetype,
+                 created_at=None):
         """Gets the file-like object of the given criteria.
 
         :param object_type: the object type of the image to find
@@ -96,6 +114,8 @@ class Store(object):
         :param mimetype: the mimetype of the image to find
                          e.g. ``'image/jpeg'``
         :type mimetype: :class:`basestring`
+        :param created_at: the created_at of the image to find
+        :type created_at: :class:`datetime.datetime`
         :returns: the file of the image
         :rtype: file-like object, :class:`file`
         :raises exceptions.IOError: when such file doesn't exist
@@ -111,7 +131,8 @@ class Store(object):
         """
         raise NotImplementedError('get_file() has to be implemented')
 
-    def get_url(self, object_type, object_id, width, height, mimetype):
+    def get_url(self, object_type, object_id, width, height, mimetype,
+                created_at=None):
         """Gets the file-like object of the given criteria.
 
         :param object_type: the object type of the image to find
@@ -126,6 +147,8 @@ class Store(object):
         :param mimetype: the mimetype of the image to find
                          e.g. ``'image/jpeg'``
         :type mimetype: :class:`basestring`
+        :param created_at: the created_at of the image to find
+        :type created_at: :class:`datetime.datetime`
         :returns: the url locating the image
         :rtype: :class:`basestring`
 
@@ -162,7 +185,7 @@ class Store(object):
                             'implements read() method, not ' + repr(file))
         self.put_file(file, image.object_type, image.object_id,
                       image.width, image.height, image.mimetype,
-                      not image.original)
+                      not image.original, image.created_at)
 
     def delete(self, image):
         """Delete the file of the given ``image``.
@@ -176,7 +199,8 @@ class Store(object):
             raise TypeError('image must be a sqlalchemy_imageattach.entity.'
                             'Image instance, not ' + repr(image))
         self.delete_file(image.object_type, image.object_id,
-                         image.width, image.height, image.mimetype)
+                         image.width, image.height, image.mimetype,
+                         image.created_at)
 
     def open(self, image, use_seek=False):
         """Opens the file-like object of the given ``image``.
@@ -231,7 +255,8 @@ class Store(object):
             raise TypeError('image.object_id must be integer, not ' +
                             repr(image.object_id))
         f = self.get_file(image.object_type, image.object_id,
-                          image.width, image.height, image.mimetype)
+                          image.width, image.height, image.mimetype,
+                          image.created_at)
         for method in 'read', 'readline', 'readlines':
             if not callable(getattr(f, method, None)):
                 raise TypeError(
@@ -267,7 +292,8 @@ class Store(object):
             raise TypeError('image must be a sqlalchemy_imageattach.entity.'
                             'Image instance, not ' + repr(image))
         url = self.get_url(image.object_type, image.object_id,
-                           image.width, image.height, image.mimetype)
+                           image.width, image.height, image.mimetype,
+                           image.created_at)
         if '?' in url:
             fmt = '{0}&_ts={1}'
         else:

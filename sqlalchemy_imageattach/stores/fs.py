@@ -56,19 +56,24 @@ class BaseFileSystemStore(Store):
 
     """
 
-    def __init__(self, path):
+    def __init__(self, path, unique_url=False):
         self.path = path
+        self.unique_url = unique_url
 
-    def get_path(self, object_type, object_id, width, height, mimetype):
+    def get_path(self, object_type, object_id, width, height, mimetype,
+                 created_at=None):
         id_segment_a = str(object_id % 1000)
         id_segment_b = str(object_id // 1000)
+        created_tag = self.created_tag(created_at) if self.unique_url else ''
         suffix = guess_extension(mimetype)
-        filename = '{0}.{1}x{2}{3}'.format(object_id, width, height, suffix)
+        filename = '{0}{1}.{2}x{3}{4}'.format(object_id, created_tag,
+                                              width, height, suffix)
         return object_type, id_segment_a, id_segment_b, filename
 
     def put_file(self, file, object_type, object_id, width, height, mimetype,
-                 reproducible):
-        path = self.get_path(object_type, object_id, width, height, mimetype)
+                 reproducible, created_at=None):
+        path = self.get_path(object_type, object_id, width, height, mimetype,
+                             created_at)
         for i in range(len(path)):
             d = os.path.join(self.path, *path[:i])
             if not os.path.isdir(d):
@@ -104,8 +109,8 @@ class FileSystemStore(BaseFileSystemStore):
 
     """
 
-    def __init__(self, path, base_url):
-        super(FileSystemStore, self).__init__(path)
+    def __init__(self, path, base_url, unique_url=False):
+        super(FileSystemStore, self).__init__(path, unique_url=unique_url)
         if not base_url.endswith('/'):
             base_url += '/'
         self.base_url = base_url
@@ -174,10 +179,12 @@ HttpExposedFileSystemStore for more details
 
     """
 
-    def __init__(self, path, prefix='__images__', host_url_getter=None):
+    def __init__(self, path, prefix='__images__', host_url_getter=None,
+                 unique_url=False):
         if not (callable(host_url_getter) or host_url_getter is None):
             raise TypeError('host_url_getter must be callable')
-        super(HttpExposedFileSystemStore, self).__init__(path)
+        super(HttpExposedFileSystemStore, self).__init__(path,
+                                                         unique_url=unique_url)
         if prefix.startswith('/'):
             prefix = prefix[1:]
         if prefix.endswith('/'):

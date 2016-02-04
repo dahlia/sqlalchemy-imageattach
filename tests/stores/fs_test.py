@@ -16,9 +16,10 @@ from .conftest import TestingImage, utcnow
 
 def test_fs_store(tmpdir):
     fs_store = FileSystemStore(tmpdir.strpath, 'http://mock/img/')
+    now = utcnow()
     image = TestingImage(thing_id=1234, width=405, height=640,
                          mimetype='image/jpeg', original=True,
-                         created_at=utcnow())
+                         created_at=now)
     image_path = os.path.join(sample_images_dir, 'iu.jpg')
     with open(image_path, 'rb') as image_file:
         expected_data = image_file.read()
@@ -35,6 +36,13 @@ def test_fs_store(tmpdir):
         fs_store.open(image)
     tmpdir.remove()
 
+    fs_unique_store = FileSystemStore(tmpdir.strpath, 'http://mock/img/',
+                                      unique_url=True)
+    created_tag = now.strftime('%Y%m%d%H%M%S%f')
+    expected_url = 'http://mock/img/testing/234/1/1234' + created_tag + \
+                   '.405x640.jpe'
+    actual_url = fs_unique_store.locate(image)
+    assert expected_url == re.sub(r'\?.*$', '', actual_url)
 
 remove_query = functools.partial(re.compile(r'\?.*$').sub, '')
 

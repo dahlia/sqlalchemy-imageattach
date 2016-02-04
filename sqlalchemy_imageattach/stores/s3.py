@@ -168,13 +168,15 @@ class S3Store(Store):
     public_base_url = None
 
     def __init__(self, bucket, access_key=None, secret_key=None,
-                 max_age=DEFAULT_MAX_AGE, prefix='', public_base_url=None):
+                 max_age=DEFAULT_MAX_AGE, prefix='', public_base_url=None,
+                 unique_url=False):
         self.bucket = bucket
         self.access_key = access_key
         self.secret_key = secret_key
         self.base_url = BASE_URL_FORMAT.format(bucket)
         self.max_age = max_age
         self.prefix = prefix.strip()
+        self.unique_url = unique_url
         if self.prefix.endswith('/'):
             self.prefix = self.prefix.rstrip('/')
         if public_base_url is None:
@@ -184,9 +186,11 @@ class S3Store(Store):
         else:
             self.public_base_url = public_base_url
 
-    def get_key(self, object_type, object_id, width, height, mimetype):
-        key = '{0}/{1}/{2}x{3}{4}'.format(
-            object_type, object_id, width, height,
+    def get_key(self, object_type, object_id, width, height, mimetype,
+                created_at):
+        created_tag = self.created_tag(created_at) if self.unique_url else ''
+        key = '{0}/{1}{2}/{3}x{4}{5}'.format(
+            object_type, object_id, created_tag, width, height,
             guess_extension(mimetype)
         )
         if self.prefix:
@@ -247,8 +251,9 @@ class S3Store(Store):
                 break
 
     def put_file(self, file, object_type, object_id, width, height, mimetype,
-                 reproducible):
-        url = self.get_s3_url(object_type, object_id, width, height, mimetype)
+                 reproducible, created_at):
+        url = self.get_s3_url(object_type, object_id, width, height, mimetype,
+                              created_at)
         self.upload_file(url, file.read(), mimetype, rrs=reproducible)
 
     def delete_file(self, *args, **kwargs):
@@ -304,13 +309,15 @@ class S3SandboxStore(Store):
 
     def __init__(self, underlying, overriding,
                  access_key=None, secret_key=None, max_age=DEFAULT_MAX_AGE,
-                 underlying_prefix='', overriding_prefix=''):
+                 underlying_prefix='', overriding_prefix='', unique_url=False):
         self.underlying = S3Store(underlying,
                                   access_key=access_key, secret_key=secret_key,
-                                  max_age=max_age, prefix=underlying_prefix)
+                                  max_age=max_age, prefix=underlying_prefix,
+                                  unique_url=unique_url)
         self.overriding = S3Store(overriding,
                                   access_key=access_key, secret_key=secret_key,
-                                  max_age=max_age, prefix=overriding_prefix)
+                                  max_age=max_age, prefix=overriding_prefix,
+                                  unique_url=unique_url)
 
     def get_file(self, *args, **kwargs):
         try:

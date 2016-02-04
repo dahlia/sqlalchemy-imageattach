@@ -144,7 +144,8 @@ def test_s3_sandbox_store(underlying_prefix, overriding_prefix,
     with s3.open(under_image) as actual:
         actual_data = actual.read()
     assert expected_data == actual_data
-    expected_url = under.get_url('testing', under_id, 405, 640, 'image/jpeg')
+    expected_url = under.get_url('testing', under_id, 405, 640, 'image/jpeg',
+                                 '20150101')
     actual_url = s3.locate(under_image)
     assert remove_query(expected_url) == remove_query(actual_url)
     # Store an image to sandbox store
@@ -159,14 +160,16 @@ def test_s3_sandbox_store(underlying_prefix, overriding_prefix,
     with s3.open(image) as actual:
         actual_data = actual.read()
     assert expected_data == actual_data
-    expected_url = over.get_url('testing', over_id, 405, 640, 'image/jpeg')
+    expected_url = over.get_url('testing', over_id, 405, 640, 'image/jpeg',
+                                '20150101')
     actual_url = s3.locate(image)
     assert remove_query(expected_url) == remove_query(actual_url)
     # Image has to be physically stored into the overriding store
     with over.open(image) as actual:
         actual_data = actual.read()
     assert expected_data == actual_data
-    expected_url = over.get_url('testing', over_id, 405, 640, 'image/jpeg')
+    expected_url = over.get_url('testing', over_id, 405, 640, 'image/jpeg',
+                                '20150101')
     actual_url = s3.locate(image)
     assert remove_query(expected_url) == remove_query(actual_url)
     # Images must not be physically stored into the underlying store
@@ -179,7 +182,8 @@ def test_s3_sandbox_store(underlying_prefix, overriding_prefix,
     with under.open(under_image) as actual:
         actual_data = actual.read()
     assert expected_data == actual_data
-    expected_url = over.get_url('testing', under_id, 405, 640, 'image/jpeg')
+    expected_url = over.get_url('testing', under_id, 405, 640, 'image/jpeg',
+                                '20150101')
     actual_url = s3.locate(under_image)
     assert remove_query(expected_url) == remove_query(actual_url)
     # Clean up fixtures
