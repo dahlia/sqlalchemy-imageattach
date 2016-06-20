@@ -36,7 +36,11 @@ Links
 -----
 
 Docs
-   https://sqlalchemy-imageattach.readthedocs.org/
+   https://sqlalchemy-imageattach.readthedocs.io/
+
+   .. image:: https://readthedocs.org/projects/sqlalchemy-imageattach/badge/
+      :target: https://sqlalchemy-imageattach.readthedocs.io/
+      :alt: Documentation Status
 
 Package Index (Cheeseshop)
    https://pypi.python.org/pypi/SQLAlchemy-ImageAttach
