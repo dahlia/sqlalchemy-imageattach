@@ -6,6 +6,20 @@ Version 0.9.1
 
 To be released.
 
+- Added :ref:`multiple-image-sets` support.  [:issue:`30` by Jeong YunWon]
+
+  - :func:`~sqlalchemy_imageattach.entity.image_attachment()` function
+    now can take ``uselist=True`` option.  It configures to the relationship
+    to attach multiple images.
+  - :class:`~sqlalchemy_imageattach.entity.ImageSet` became deprecated,
+    because it was separated to :class:`SingleImageSet
+    <sqlalchemy_imageattach.entity.SingleImageSet>`, and :class:`BaseImageSet
+    <sqlalchemy_imageattach.entity.BaseImageSet>` which is a common base
+    class for :class:`~sqlalchemy_imageattach.entity.SingleImageSet` and
+    :class:`~sqlalchemy_imageattach.entity.MultipleImageSet`.
+  - Added :class:`~sqlalchemy_imageattach.entity.MultipleImageSet` and
+    :class:`~sqlalchemy_imageattach.entity.ImageSubset`.
+
 - Added ``host_url_getter`` option to :class:`HttpExposedFileSystemStore
   <sqlalchemy_imageattach.stores.fs.HttpExposedFileSystemStore>`.
 - Now :meth:`~sqlalchemy_imageattach.entity.BaseImageSet.from_file()` and

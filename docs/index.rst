@@ -56,6 +56,7 @@ User's guide
    guide/declare
    guide/store
    guide/context
+   guide/multiset
    changes
 
 

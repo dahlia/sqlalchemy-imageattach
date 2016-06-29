@@ -97,8 +97,8 @@ from .file import ReusableFileProxy
 from .store import Store
 from .util import append_docstring_attributes
 
-__all__ = ('VECTOR_TYPES', 'Image', 'SingleImageSet', 'MultipleImageSet',
-           'ImageSubset', 'image_attachment', 'ImageSet')
+__all__ = ('VECTOR_TYPES', 'Image', 'ImageSet', 'ImageSubset',
+           'MultipleImageSet', 'SingleImageSet', 'image_attachment')
 
 
 #: (:class:`collections.Set`) The set of vector image types.
@@ -111,6 +111,13 @@ def image_attachment(*args, **kwargs):
     relationships between :class:`Image` subtypes.
 
     It takes the same parameters as :func:`~sqlalchemy.orm.relationship()`.
+
+    If ``uselist`` is :const:`True`, it becomes possible to attach multiple
+    image sets.  In order to attach multiple image sets, image entity types
+    must have extra discriminating primary key columns to group each image set.
+
+    If ``uselist`` is :const:`False` (which is default), it becomes
+    possible to attach only a single image.
 
     :param \*args: the same arguments as
                    :func:`~sqlalchemy.orm.relationship()`
@@ -468,7 +475,24 @@ class BaseImageQuery(Query):
 
 
 class BaseImageSet(object):
-    """The interface of each image set.
+    """The abstract class of the following two image set types:
+
+    - :class:`SingleImageSet`
+    - :class:`ImageSubset`
+
+    The common things about them, abstracted by :class:`BaseImageSet`, are:
+
+    - It always has an :attr:`original` image, and has only one
+      :attr:`original` image.
+    - It consists of zero or more thumbnails generated from :attr:`original`
+      image.
+    - Thumbnails can be generated using :func:`generate_thumbnail()` method.
+    - Generated thumbnails can be found using :func:`find_thumbnail()` method.
+
+    You can think image set of an abstract image hiding its size details.
+    It actually encapsulates physical images of different sizes but having
+    all the same look.  So only its :attr:`original` image is canon, and other
+    thumbnails are replica of it.
 
     Note that it implements :meth:`__html__()` method, a de facto
     standard special method for HTML templating.  So you can simply use
@@ -925,8 +949,12 @@ class BaseImageSet(object):
 
 
 class SingleImageSet(BaseImageQuery, BaseImageSet):
-    """Image query as an image set when the parent entity has only one
-    image set.
+    """Used for :func:`image_attachment()` is congirued ``uselist=False``
+    option (which is default).
+
+    It contains one canonical :attr:`~BaseImageSet.original` image and
+    its thumbnails, as it's a subtype of :class:`BaseImageSet`.
+
     """
 
     @property
@@ -946,21 +974,48 @@ ImageSet = SingleImageSet  # backward compatibility
 
 
 class MultipleImageSet(BaseImageQuery):
-    """Image query with additional interfaces to handle multiple entity sets.
+    """Used for :func:`image_attachment()` is congirued with ``uselist=True``
+    option.
+
+    Like :class:`SingleImageSet`, it is a subtype of :class:`BaseImageQuery`.
+    It can be filtered using :func:`~sqlalchemy.orm.query.Query.filter()`
+    method or sorted using :func:`~sqlalchemy.orm.query.Query.order()` method.
+
+    Unlike :class:`SingleImageSet`, it is not a subtype of
+    :class:`BaseImageSet`, as it can contain multiple image sets.
+    That means, it's not image set, but set of image sets.
+    Its elements are :class:`ImageSubset` objects, that are image sets.
+
     """
 
     def imageset(self, **pk):
+        """Choose a single image set to deal with.  It takes criteria through
+        keyword arguments.  The given criteria doesn't have to be satisfied by
+        any already attached images.  Null image sets returned by such criteria
+        can be used for attaching a new image set.
+
+        :param \*\*pk: keyword arguments of extra discriminating primary key
+                       column names to its values
+        :return: a single image set
+        :rtype: :class:`ImageSubset`
+
+        """
         return ImageSubset(self, **pk)
 
     def imagesets(self):
+        """(:class:`collections.Iterable`) The set of attached image sets."""
         images = self._original_images()
         for image in images:
             yield ImageSubset(self, **image.identity_map)
 
 
 class ImageSubset(BaseImageSet):
-    """Proxy interface as an image set when the parent entity has only one
-    image set.
+    """Image set which is contained by :class:`MultipleImageSet`.
+
+    It contains one canonical :attr:`~BaseImageSet.original` image and
+    its thumbnails, as it's also a subtype of :class:`BaseImageSet`
+    like :class:`SingleImageSet`.
+
     """
 
     def __init__(self, _query, **identity_map):

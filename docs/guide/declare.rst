@@ -1,3 +1,5 @@
+.. _declare-image-entities:
+
 Declaring Image Entities
 ========================
 
@@ -38,7 +40,7 @@ entities.  You can understand it as one-to-many relationship.
 Object type
 -----------
 
-Every image class has :attr:`~sqlalchemy_imageattach.entry.Image.object_type`
+Every image class has :attr:`~sqlalchemy_imageattach.entity.Image.object_type`
 string, which is used by the storage.
 
 ``UserPicture`` in the above example omits :attr:`object_type
@@ -48,21 +50,23 @@ but it can be overridden if needed.  Its default value is the table name
 
 
 When would you need to override :attr:`object_type
-<sqlalchemy_imageattach.entry.Image.object_type>`?  The most common case
+<sqlalchemy_imageattach.entity.Image.object_type>`?  The most common case
 is when you changed the table name.  Identifiers like path names that
 are internally used by the stoage won't be automatically renamed even if
 you change the table name in the relational database.  So you need to
-maintain the same :attr:`~sqlalchemy_imageattach.entry.Image.object_type`
+maintain the same :attr:`~sqlalchemy_imageattach.entity.Image.object_type`
 value.
 
+
+.. _object-identifier:
 
 Object identifier
 -----------------
 
-Every image instance has :attr:`~sqlalchemy_imageattach.entry.Image.object_id`
+Every image instance has :attr:`~sqlalchemy_imageattach.entity.Image.object_id`
 number, which is used by the storage.  A pair of (:attr:`object_type
-<~sqlalchemy_imageattach.entry.Image.object_type>`, :attr:`object_id
-<~sqlalchemy_imageattach.entry.Image.object_id>` is an unique key for an image.
+<~sqlalchemy_imageattach.entity.Image.object_type>`, :attr:`object_id
+<~sqlalchemy_imageattach.entity.Image.object_id>` is an unique key for an image.
 
 ``UserPicture`` in the above example omits :attr:`object_id
 <sqlalchemy_imageattach.entity.Image.object_id>` property, because it
@@ -70,7 +74,7 @@ provides the default value when the primary key is integer.  It has to be
 explicitly implemented when the primary key is not integer or composite key.
 
 For example, the most simple and easiest (although naive) way to implement
-:attr:`~sqlalchemy_imageattach.entry.Image.object_id` for the string primary
+:attr:`~sqlalchemy_imageattach.entity.Image.object_id` for the string primary
 key is hashing it::
 
     @property
