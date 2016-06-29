@@ -603,7 +603,7 @@ class Manything(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
-    cover = image_attachment('ManythingCover', uselist=True)
+    covers = image_attachment('ManythingCover', uselist=True)
 
     __tablename__ = 'manything'
 
@@ -630,7 +630,7 @@ class ManythingCover(Base, Image):
 def test_many_images(fx_session, fx_sample_image, tmp_store):
     filepath, mimetype, (width, height) = fx_sample_image
     manything = Manything(name='many name')
-    imageset0 = manything.cover.imageset(cover_id=0)
+    imageset0 = manything.covers.get_image_set(cover_id=0)
     with open(filepath, 'rb') as f:
         expected = f.read()
         f.seek(0)
@@ -639,20 +639,20 @@ def test_many_images(fx_session, fx_sample_image, tmp_store):
         with fx_session.begin():
             fx_session.add(manything)
             assert imageset0.original is img
-    assert manything.cover.count() == 1
+    assert manything.covers.count() == 1
     assert imageset0.count() == 1
-    assert len(list(manything.cover.imagesets())) == 1
+    assert len(list(manything.covers.image_sets)) == 1
     assert img is imageset0.original
     with imageset0.open_file(tmp_store) as f:
         actual = f.read()
     assert actual == expected
 
-    # imageset0.generate_thumbnail(ratio=0.5)
-    # assert manything.cover.count() == 2
-    # assert imageset0.count() == 2
-    # assert len(list(manything.cover.imagesets())) == 1
+    imageset0.generate_thumbnail(ratio=0.5, store=tmp_store)
+    assert manything.covers.count() == 2
+    assert imageset0.count() == 2
+    assert len(list(manything.covers.image_sets)) == 1
 
-    imageset1 = manything.cover.imageset(cover_id=1)
+    imageset1 = manything.covers.get_image_set(cover_id=1)
     with open(filepath, 'rb') as f:
         expected = f.read()
         f.seek(0)
@@ -661,9 +661,9 @@ def test_many_images(fx_session, fx_sample_image, tmp_store):
         with fx_session.begin():
             fx_session.add(manything)
             assert imageset1.original is img
-    assert manything.cover.count() == 2
+    assert manything.covers.count() == 3
     assert imageset1.count() == 1
-    assert len(list(manything.cover.imagesets())) == 2
+    assert len(list(manything.covers.image_sets)) == 2
     assert img is imageset1.original
     with imageset1.open_file(tmp_store) as f:
         actual = f.read()
@@ -673,7 +673,7 @@ def test_many_images(fx_session, fx_sample_image, tmp_store):
         imageset0.from_raw_file(f, tmp_store, original=True)
         with fx_session.begin():
             fx_session.add(manything)
-    assert manything.cover.count() == 2
-    # assert imageset0.count() == 2
+    assert manything.covers.count() == 2
+    assert imageset0.count() == 1
     assert imageset1.count() == 1
-    assert len(list(manything.cover.imagesets())) == 2
+    assert len(list(manything.covers.image_sets)) == 2

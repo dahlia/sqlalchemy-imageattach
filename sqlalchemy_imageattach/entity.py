@@ -988,7 +988,7 @@ class MultipleImageSet(BaseImageQuery):
 
     """
 
-    def imageset(self, **pk):
+    def get_image_set(self, **pk):
         """Choose a single image set to deal with.  It takes criteria through
         keyword arguments.  The given criteria doesn't have to be satisfied by
         any already attached images.  Null image sets returned by such criteria
@@ -1002,7 +1002,8 @@ class MultipleImageSet(BaseImageQuery):
         """
         return ImageSubset(self, **pk)
 
-    def imagesets(self):
+    @property
+    def image_sets(self):
         """(:class:`collections.Iterable`) The set of attached image sets."""
         images = self._original_images()
         for image in images:
