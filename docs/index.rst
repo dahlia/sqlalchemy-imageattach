@@ -27,8 +27,8 @@ Tested on various environments
    - SQLAlchemy: 0.8 or higher
 
 .. _SQLAlchemy: http://www.sqlalchemy.org/
-.. _S3: http://aws.amazon.com/s3/
-.. _RRS: http://aws.amazon.com/s3/#rss
+.. _S3: https://aws.amazon.com/s3/
+.. _RRS: https://aws.amazon.com/s3/reduced-redundancy/
 .. _PyPy: http://pypy.org/
 
 
@@ -89,9 +89,9 @@ User's guide
 Open source
 -----------
 
-SQLAlchemy-ImageAttach is an open source software written by `Hong Minhee`_
-(initially written for Crosspop_).  The source code is distributed under
-`MIT license`_ and you can find it at `GitHub repository`_.  Check out now:
+SQLAlchemy-ImageAttach is an open source software written by `Hong Minhee`_.
+The source code is distributed under `MIT license`_, and you can find it
+at `GitHub repository`_:
 
 .. code-block:: console
 
@@ -111,8 +111,7 @@ Check out :doc:`changes` as well.
    :target: https://coveralls.io/r/dahlia/sqlalchemy-imageattach
 
 
-.. _Hong Minhee: http://hongminhee.org/
-.. _Crosspop: http://dahlia.in/
-.. _MIT license: http://minhee.mit-license.org/
+.. _Hong Minhee: https://hongminhee.org/
+.. _MIT license: https://minhee.mit-license.org/
 .. _GitHub repository: https://github.com/dahlia/sqlalchemy-imageattach
 .. _issue tracker: https://github.com/dahlia/sqlalchemy-imageattach/issues
