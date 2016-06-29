@@ -3,7 +3,9 @@ import numbers
 import os
 
 from sqlalchemy import __version__
-from sqlalchemy_imageattach.version import VERSION, VERSION_INFO
+from sqlalchemy_imageattach.version import (SQLA_COMPAT_VERSION,
+                                            SQLA_COMPAT_VERSION_INFO,
+                                            VERSION, VERSION_INFO)
 
 
 def test_version_info():
@@ -15,9 +17,14 @@ def test_version_info():
 
 
 def test_sqlalchemy_version():
-    sqla_version_info = list(map(int, __version__.split('.')[:2]))
-    assert sqla_version_info >= list(VERSION_INFO[:2])
-    assert __version__.split('.')[:2] >= VERSION.split('.')[:2]
+    def parse_int(s):
+        try:
+            return int(s)
+        except ValueError:
+            return -1
+    sqla_version_info = tuple(map(parse_int, __version__.split('.')[:3]))
+    assert sqla_version_info >= SQLA_COMPAT_VERSION_INFO
+    assert __version__.split('.')[:3] >= SQLA_COMPAT_VERSION.split('.')[:2]
 
 
 def test_version():
