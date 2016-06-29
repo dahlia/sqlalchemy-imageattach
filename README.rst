@@ -67,4 +67,4 @@ Code Coverage
       :target: https://coveralls.io/r/dahlia/sqlalchemy-imageattach
 
 Author Website
-   http://hongminhee.org/
+   https://hongminhee.org/

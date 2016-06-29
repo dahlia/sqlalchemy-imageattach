@@ -1,4 +1,3 @@
-- Storage migration tool e.g. migrate(metadata, src, dst)
 - Routing storage e.g. RoutingStorage({object_type: store, ...})
 - Widely-used backends implementations
   - Windows Azure Storage

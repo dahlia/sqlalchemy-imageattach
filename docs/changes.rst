@@ -4,7 +4,7 @@ SQLAlchemy-ImageAttach Changelog
 Version 1.0.0
 -------------
 
-To be released.
+Released on June 30, 2016.
 
 - Added :ref:`multiple-image-sets` support.  [:issue:`30` by Jeong YunWon]
 
