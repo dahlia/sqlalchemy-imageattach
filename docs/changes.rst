@@ -1,7 +1,7 @@
 SQLAlchemy-ImageAttach Changelog
 ================================
 
-Version 0.9.1
+Version 1.0.0
 -------------
 
 To be released.

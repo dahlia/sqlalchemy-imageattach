@@ -169,7 +169,7 @@ HttpExposedFileSystemStore for more details
                             returns a host url string
     :type host_url_getter: :class:`collections.Callable`
 
-    .. versionadded:: 0.9.1
+    .. versionadded:: 1.0.0
        Added ``host_url_getter`` option.
 
     """

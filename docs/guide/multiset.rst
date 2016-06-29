@@ -3,6 +3,8 @@
 Multiple Image Sets
 ===================
 
+.. versionadded:: 1.0.0
+
 In the :ref:`previous example <declare-image-entities>`, each ``User`` can have
 only a single image set of ``UserPicture``.  Although each ``User`` has
 multiple sizes of ``UserPicture`` objects, these ``UserPicture`` must be

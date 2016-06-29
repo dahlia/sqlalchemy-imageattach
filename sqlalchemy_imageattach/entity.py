@@ -126,6 +126,9 @@ def image_attachment(*args, **kwargs):
     :returns: the relationship property
     :rtype: :class:`sqlalchemy.orm.properties.RelationshipProperty`
 
+    .. versionadded:: 1.0.0
+       The ``uselist`` parameter.
+
     .. todo::
 
        It currently doesn't support population (eager loading) on
@@ -204,6 +207,8 @@ class Image(object):
         :returns: A list of the names of primary key fields
         :rtype: :class:`collections.Sequence`
 
+        .. versionadded:: 1.0.0
+
         """
         columns = inspect(cls).primary_key
         names = [c.name for c in columns if c.name not in ('width', 'height')]
@@ -213,6 +218,8 @@ class Image(object):
     def identity_map(self):
         """(:class:`collections.Mapping`) A dictionary of the values of primary
         key fields with their names.
+
+        .. versionadded:: 1.0.0
 
         """
         pk = self.identity_attributes()
@@ -350,6 +357,8 @@ class BaseImageQuery(Query):
     """The subtype of :class:`~sqlalchemy.orm.query.Query` specialized
     for :class:`Image`.  It provides more methods and properties over
     :class:`~sqlalchemy.orm.query.Query`.
+
+    .. versionadded:: 1.0.0
 
     """
 
@@ -553,7 +562,7 @@ class BaseImageSet(object):
         :returns: the created image instance
         :rtype: :class:`Image`
 
-        .. versionadded:: 0.9.1
+        .. versionadded:: 1.0.0
            The ``extra_args`` and ``extra_kwargs`` options.
 
         """
@@ -621,7 +630,7 @@ class BaseImageSet(object):
         :returns: the created image instance
         :rtype: :class:`Image`
 
-        .. versionadded:: 0.9.1
+        .. versionadded:: 1.0.0
            The ``extra_args`` and ``extra_kwargs`` options.
 
         """
@@ -649,7 +658,7 @@ class BaseImageSet(object):
         :returns: the created image instance
         :rtype: :class:`Image`
 
-        .. versionadded:: 0.9.1
+        .. versionadded:: 1.0.0
            The ``extra_args`` and ``extra_kwargs`` options.
 
         """
@@ -955,6 +964,9 @@ class SingleImageSet(BaseImageQuery, BaseImageSet):
     It contains one canonical :attr:`~BaseImageSet.original` image and
     its thumbnails, as it's a subtype of :class:`BaseImageSet`.
 
+    .. versionadded:: 1.0.0
+       Renamed from :class:`ImageSet`.
+
     """
 
     @property
@@ -970,6 +982,10 @@ class SingleImageSet(BaseImageQuery, BaseImageSet):
 #:
 #: .. deprecated:: Use :class:`SingleImageSet` to distinguish from
 #:                 :class:`MultipleImageSet`.
+#:
+#: .. versionchanged:: 1.0.0
+#:    Renamed to :class:`SingleImageSet`, and this remains only for backward
+#:    compatibility.  It will be completely removed in the future.
 ImageSet = SingleImageSet  # backward compatibility
 
 
@@ -985,6 +1001,8 @@ class MultipleImageSet(BaseImageQuery):
     :class:`BaseImageSet`, as it can contain multiple image sets.
     That means, it's not image set, but set of image sets.
     Its elements are :class:`ImageSubset` objects, that are image sets.
+
+    .. versionadded:: 1.0.0
 
     """
 
@@ -1016,6 +1034,8 @@ class ImageSubset(BaseImageSet):
     It contains one canonical :attr:`~BaseImageSet.original` image and
     its thumbnails, as it's also a subtype of :class:`BaseImageSet`
     like :class:`SingleImageSet`.
+
+    .. versionadded:: 1.0.0
 
     """
 
