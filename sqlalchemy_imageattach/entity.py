@@ -195,7 +195,7 @@ class Image(object):
         """A list of the names of primary key fields.
 
         :returns: A list of the names of primary key fields
-        :rtype: :class:`collections.str`
+        :rtype: :class:`collections.Sequence`
 
         """
         columns = inspect(cls).primary_key
@@ -204,7 +204,7 @@ class Image(object):
 
     @property
     def identity_map(self):
-        """(:class:`collections.object`) A dictionary of the values of primary
+        """(:class:`collections.Mapping`) A dictionary of the values of primary
         key fields with their names.
 
         """
@@ -343,6 +343,7 @@ class BaseImageQuery(Query):
     """The subtype of :class:`~sqlalchemy.orm.query.Query` specialized
     for :class:`Image`.  It provides more methods and properties over
     :class:`~sqlalchemy.orm.query.Query`.
+
     """
 
     #: (:class:`collections.MutableSet`) The set of instances that their
@@ -484,6 +485,7 @@ class BaseImageSet(object):
        <img src="{{ user.profile|permalink }}"
             width="{{ user.profile.original.width }}"
             height="{{ user.profile.original.height }}">
+
     """
 
     def from_raw_file(self, raw_file, store=current_store, size=None,
@@ -520,15 +522,15 @@ class BaseImageSet(object):
         :type original: :class:`bool`
         :param extra_args: additional arguments to pass to the model's
                            constructor.
-        :type extra_args: :class:`list`
+        :type extra_args: :class:`collections.Sequence`
         :param extra_kwargs: additional keyword arguments to pass to the
                              model's constructor.
-        :type extra_kwargs: :class:`dict`
+        :type extra_kwargs: :class:`collections.Mapping`
         :returns: the created image instance
         :rtype: :class:`Image`
 
         .. versionadded:: 0.9.1
-            The ``extra_args`` and ``extra_kwargs`` options.
+           The ``extra_args`` and ``extra_kwargs`` options.
 
         """
         query = self.query
@@ -561,11 +563,11 @@ class BaseImageSet(object):
             mimetype = 'image/' + mimetype[8:]
 
         if extra_kwargs is None:
-            extra_kwargs = dict()
+            extra_kwargs = {}
         extra_kwargs.update(self.identity_map)
 
         if extra_args is None:
-            extra_args = list()
+            extra_args = ()
 
         image = cls(size=size, mimetype=mimetype, original=original,
                     *extra_args, **extra_kwargs)
@@ -588,15 +590,15 @@ class BaseImageSet(object):
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
         :param extra_args: additional arguments to pass to the model's
                            constructor.
-        :type extra_args: :class:`list`
+        :type extra_args: :class:`collections.Sequence`
         :param extra_kwargs: additional keyword arguments to pass to the
                              model's constructor.
-        :type extra_kwargs: :class:`dict`
+        :type extra_kwargs: :class:`collections.Mapping`
         :returns: the created image instance
         :rtype: :class:`Image`
 
         .. versionadded:: 0.9.1
-            The ``extra_args`` and ``extra_kwargs`` options.
+           The ``extra_args`` and ``extra_kwargs`` options.
 
         """
         data = io.BytesIO(blob)
@@ -616,15 +618,15 @@ class BaseImageSet(object):
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
         :param extra_args: additional arguments to pass to the model's
                            constructor.
-        :type extra_args: :class:`list`
+        :type extra_args: :class:`collections.Sequence`
         :param extra_kwargs: additional keyword arguments to pass to the
                              model's constructor.
-        :type extra_kwargs: :class:`dict`
+        :type extra_kwargs: :class:`collections.Mapping`
         :returns: the created image instance
         :rtype: :class:`Image`
 
         .. versionadded:: 0.9.1
-            The ``extra_args`` and ``extra_kwargs`` options.
+           The ``extra_args`` and ``extra_kwargs`` options.
 
         """
 
@@ -936,6 +938,8 @@ class SingleImageSet(BaseImageQuery, BaseImageSet):
         return self
 
 
+#: Alias of :class:`SingleImageSet`.
+#:
 #: .. deprecated:: Use :class:`SingleImageSet` to distinguish from
 #:                 :class:`MultipleImageSet`.
 ImageSet = SingleImageSet  # backward compatibility
@@ -958,13 +962,18 @@ class ImageSubset(BaseImageSet):
     """Proxy interface as an image set when the parent entity has only one
     image set.
     """
+
     def __init__(self, _query, **identity_map):
         self.query = _query
         cls = _query.column_descriptions[0]['type']
         if set(identity_map.keys()) > set(cls.identity_attributes()):
-            raise TypeError("identity_map got unexpected key. (%s) It must be one"
-                            "of the primary key columns. (%s)" %
-                            (identity_map.keys(), cls.identity_attributes()))
+            raise TypeError(
+                'identity_map got unexpected key {0!r}. it must be one'
+                'of the primary key columns {1!r}.'.format(
+                    tuple(identity_map.keys()),
+                    tuple(cls.identity_attributes())
+                )
+            )
         self.identity_map = identity_map
 
     def count(self):
