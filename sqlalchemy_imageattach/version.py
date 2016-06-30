@@ -9,7 +9,7 @@ __all__ = ('SQLA_COMPAT_VERSION', 'SQLA_COMPAT_VERSION_INFO',
 
 
 #: (:class:`tuple`) The triple of version numbers e.g. ``(1, 2, 3)``.
-VERSION_INFO = (1, 0, 0)
+VERSION_INFO = (1, 0, 1)
 
 #: (:class:`str`) The version string e.g. ``'1.2.3'``.
 VERSION = '{0}.{1}.{2}'.format(*VERSION_INFO)
