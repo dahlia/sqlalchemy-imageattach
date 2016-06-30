@@ -42,6 +42,10 @@ tests_require = [
     'WebOb'
 ]
 
+docs_require = [
+    'Sphinx >= 1.4',
+]
+
 
 setup(
     name='SQLAlchemy-ImageAttach',
@@ -55,7 +59,10 @@ setup(
     packages=find_packages(exclude=['tests', 'tests.stores']),
     install_requires=install_requires,
     tests_require=tests_require,
-    extras_require={'tests': tests_require},
+    extras_require={
+        'tests': tests_require,
+        'docs': docs_require,
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
