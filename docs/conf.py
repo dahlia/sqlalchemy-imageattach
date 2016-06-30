@@ -72,7 +72,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'SQLAlchemy-ImageAttach'
-copyright = u'2013–2016, Hong Minhee'
+copyright = '2013–2016, Hong Minhee'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -126,12 +126,12 @@ if os.path.isdir('bw_sphinxtheme/bw_sphinxtheme'):
     html_theme = 'bw'
     pygments_style = 'pastie'
 else:
-    print '-' * 74
-    print 'Warning: bw_sphinxtheme unavailable. Building with default theme'
-    print 'If you want the bw_sphinxtheme, run this command and build again:'
-    print
-    print ' git submodule update --init'
-    print '-' * 74
+    print('-' * 74)
+    print('Warning: bw_sphinxtheme unavailable. Building with default theme')
+    print('If you want the bw_sphinxtheme, run this command and build again:')
+    print()
+    print(' git submodule update --init')
+    print('-' * 74)
 
     html_theme = 'default'
 
@@ -291,7 +291,7 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/2/', None),
+    'python': ('https://docs.python.org/3/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/rel_1_0/', None),
     'wand': ('http://docs.wand-py.org/en/0.4-maintenance/', None),
     'flask': ('http://flask.pocoo.org/docs/0.11/', None)

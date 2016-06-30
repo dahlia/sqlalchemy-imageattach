@@ -182,7 +182,8 @@ class LocalProxyStore(Store):
     """Proxy of another image storage.
 
     :param get_current_object: a function that returns "current" store
-    :type get_current_object: :class:`collections.Callable`
+    :type get_current_object: :class:`typing.Callable`\ [[],
+                                                         :class:`.store.Store`]
     :param repr_string: an optional string for :func:`repr()`
     :type repr_string: :class:`str`
 

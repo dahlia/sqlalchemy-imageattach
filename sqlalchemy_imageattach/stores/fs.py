@@ -5,14 +5,14 @@ It provides two filesystem-backed image storage implementations:
 
 :class:`FileSystemStore`
    It stores image files into the filesystem of the specified path,
-   but :meth:`~FileSystemStore.locate()` method returns URLs
+   but :meth:`~.store.Store.locate()` method returns URLs
    of the hard-coded base URL.
 
 :class:`HttpExposedFileSystemStore`
    The mostly same to :class:`FileSystemStore` except it provides
    WSGI middleware (:meth:`~HttpExposedFileSystemStore.wsgi_middleware()`)
    which actually serves image files and its
-   :meth:`~HttpExposedFileSystemStore.locate()` method returns URLs
+   :meth:`~.store.Store.locate()` method returns URLs
    based on the actual requested URL.
 
 """
@@ -33,9 +33,9 @@ def guess_extension(mimetype):
     the given ``mimetype`` (e.g. :mimetype:`image/png`).
 
     :param mimetype: mimetype string e.g. ``'image/jpeg'``
-    :type mimetype: :class:`basestring`
+    :type mimetype: :class:`str`
     :returns: filename extension for the mimetype
-    :rtype: :class:`basestring`
+    :rtype: :class:`str`
 
     """
     if mimetype == 'image/jpeg':
@@ -160,14 +160,14 @@ HttpExposedFileSystemStore for more details
         )
 
     :param path: file system path of the directory to store image files
-    :type path: :class:`basestring`
+    :type path: :class:`str`
     :param prefix: the prepended path of the url.
                    ``'__images__'`` by default
-    :type prefix: :class:`basestring`
+    :type prefix: :class:`str`
     :param host_url_getter: optional parameter to manually determine host url.
                             it has to be a callable that takes nothing and
                             returns a host url string
-    :type host_url_getter: :class:`collections.Callable`
+    :type host_url_getter: :class:`~typing.Callable`\ [[], :class:`str`]
 
     .. versionadded:: 1.0.0
        Added ``host_url_getter`` option.
@@ -212,7 +212,8 @@ HttpExposedFileSystemStore for more details
             app = fs_store.wsgi_middleware(app)
 
         :param app: the wsgi app to wrap
-        :type app: :class:`collections.Callable`
+        :type app: :class:`~typing.Callable`\ [[],
+            :class:`~typing.Iterable`\ [:class:`bytes`]]
         :returns: the another wsgi app that wraps ``app``
         :rtype: :class:`StaticServerMiddleware`
 
@@ -237,11 +238,12 @@ class StaticServerMiddleware(object):
 
     :param app: the fallback app when the path is not scoped in
                 ``url_path``
-    :type app: :class:`collections.Callable`
+    :type app: :class:`~typing.Callable`\ [[],
+        :class:`~typing.Iterable`\ [:class:`bytes`]]
     :param url_path: the exposed path to url
-    :type url_path: :class:`basestring`
+    :type url_path: :class:`str`
     :param dir_path: the filesystem directory path to serve
-    :type dir_path: :class:`basestring`
+    :type dir_path: :class:`str`
     :param block_size: the block size in bytes
     :type block_size: :class:`numbers.Integral`
 

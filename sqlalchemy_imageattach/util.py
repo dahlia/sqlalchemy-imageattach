@@ -22,7 +22,7 @@ def get_minimum_indent(docstring, ignore_before=1):
     '    '
 
     :param docstring: the docstring to find its minimum indent
-    :type docstring: :class:`basestring`
+    :type docstring: :class:`str`
     :param ignore_before: ignore lines before this line.
                           usually docstrings which follow :pep:`8`
                           have no indent for the first line,
@@ -30,7 +30,7 @@ def get_minimum_indent(docstring, ignore_before=1):
     :type ignore_before: :class:`numbers.Integral`
     :returns: the minimum indent string which consists of only
               whitespaces (tabs and/or spaces)
-    :rtype: :class:`basestring`
+    :rtype: :class:`str`
 
     """
     indent_re = re.compile(r'^\s*')
@@ -53,7 +53,7 @@ def append_docstring(docstring, *lines):
     :param docstring: a docstring to be appended
     :param \*lines: lines of trailing docstring
     :returns: new docstring which is appended
-    :rtype: :class:`basestring`
+    :rtype: :class:`str`
 
     """
     shallowest = get_minimum_indent(docstring)
@@ -80,11 +80,11 @@ def append_docstring_attributes(docstring, locals):
             )
 
     :param docstring: class docstring to be appended
-    :type docstring: :class:`basestring`
+    :type docstring: :class:`str`
     :param locals: attributes dict
-    :type locals: :class:`collections.Mapping`
+    :type locals: :class:`~typing.Mapping`\ [:class:`str`, :class:`object`]
     :returns: appended docstring
-    :rtype: :class:`basestring`
+    :rtype: :class:`str`
 
     """
     docstring = docstring or ''

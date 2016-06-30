@@ -49,7 +49,7 @@ the same options as :func:`~sqlalchemy.orm.relationship()` takes::
         __tablename__ = 'user'
 
 It's done, you can store the actual image files using
-:meth:`ImageSet.from_file()` or :meth:`ImageSet.from_blob()`
+:meth:`~BaseImageSet.from_file()` or :meth:`~BaseImageSet.from_blob()`
 method::
 
     with store_context(store):
@@ -62,7 +62,7 @@ method::
             session.add(user)
 
 Or you can resize the image to make thumbnails using
-:meth:`ImageSet.generate_thumbnail()` method::
+:meth:`~BaseImageSet.generate_thumbnail()` method::
 
     with store_context(store):
         user.picture.generate_thumbnail(ratio=0.5)
@@ -102,7 +102,7 @@ __all__ = ('VECTOR_TYPES', 'BaseImageSet', 'BaseImageQuery', 'Image',
            'image_attachment')
 
 
-#: (:class:`collections.Set`) The set of vector image types.
+#: (:class:`typing.AbstractSet`\ [:class:`str`]) The set of vector image types.
 VECTOR_TYPES = frozenset(['image/svg+xml', 'application/pdf'])
 
 
@@ -174,7 +174,7 @@ class Image(object):
 
     @declared_attr
     def object_type(cls):
-        """(:class:`basestring`) The identifier string of the image type.
+        """(:class:`str`) The identifier string of the image type.
         It uses :attr:`__tablename__` (which replaces underscores with
         hyphens) by default, but can be overridden.
 
@@ -206,7 +206,7 @@ class Image(object):
         """A list of the names of primary key fields.
 
         :returns: A list of the names of primary key fields
-        :rtype: :class:`collections.Sequence`
+        :rtype: :class:`typing.Sequence`\ [:class:`str`]
 
         .. versionadded:: 1.0.0
 
@@ -217,8 +217,8 @@ class Image(object):
 
     @property
     def identity_map(self):
-        """(:class:`collections.Mapping`) A dictionary of the values of primary
-        key fields with their names.
+        """(:class:`typing.Mapping`\ [:class:`str`, :class:`object`])
+        A dictionary of the values of primary key fields with their names.
 
         .. versionadded:: 1.0.0
 
@@ -235,7 +235,7 @@ class Image(object):
     #: (:class:`numbers.Integral`) The image's height."""
     height = Column('height', Integer, primary_key=True)
 
-    #: (:class:`basestring`) The mimetype of the image
+    #: (:class:`str`) The mimetype of the image
     #: e.g. ``'image/jpeg'``, ``'image/png'``.
     mimetype = Column('mimetype', String(255), nullable=False)
 
@@ -280,7 +280,7 @@ class Image(object):
         """Opens the file-like object which is a context manager
         (that means it can used for :keyword:`with` statement).
 
-        If ``use_seek`` is ``True`` (though ``False`` by default)
+        If ``use_seek`` is :const:`True` (though :const:`False` by default)
         it guarentees the returned file-like object is also seekable
         (provides :meth:`~file.seek()` method).
 
@@ -290,7 +290,7 @@ class Image(object):
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
         :returns: the file-like object of the image, which is a context
                   manager (plus, also seekable only if ``use_seek``
-                  is ``True``)
+                  is :const:`True`)
         :rtype: :class:`file`,
                 :class:`~sqlalchemy_imageattach.file.FileProxy`,
                 file-like object
@@ -318,7 +318,7 @@ class Image(object):
                       by default
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
         :returns: the url of the image
-        :rtype: :class:`basestring`
+        :rtype: :class:`str`
 
         """
         if not isinstance(store, Store):
@@ -363,13 +363,13 @@ class BaseImageQuery(Query):
 
     """
 
-    #: (:class:`collections.MutableSet`) The set of instances that their
+    #: (:class:`collections.abc.MutableSet`) The set of instances that their
     #: image files are stored but the ongoing transaction isn't committed.
     #: When the transaction might fail and rollback, image files in the
     #: set are deleted back in the storage.
     _stored_images = set()
 
-    #: (:class:`collections.MutableSet`) The set of instanced marked
+    #: (:class:`collections.abc.MutableSet`) The set of instanced marked
     #: as deleted.  If the ongoing transaction is successfully committed
     #: the actual files in the storages will be deleted as well.
     #: When the transaction might fail and rollback, image files won't
@@ -448,7 +448,7 @@ class BaseImageQuery(Query):
         """A list of the original images.
 
         :returns: A list of the original images.
-        :rtype: :class:`collections.Image`
+        :rtype: :class:`typing.Sequence`\ [:class:`Image`]
         """
 
         def test(image):
@@ -549,17 +549,18 @@ class BaseImageSet(object):
         :type size: :class:`tuple`
         :param mimetype: an optional mimetype of the image.
                          automatically detected if it's omitted
-        :type mimetype: :class:`basestring`
+        :type mimetype: :class:`str`
         :param original: an optional flag which represents whether
                          it is an original image or not.
-                         defualt is ``True`` (meaning original)
+                         defualt is :const:`True` (meaning original)
         :type original: :class:`bool`
         :param extra_args: additional arguments to pass to the model's
                            constructor.
-        :type extra_args: :class:`collections.Sequence`
+        :type extra_args: :class:`collections.abc.Sequence`
         :param extra_kwargs: additional keyword arguments to pass to the
                              model's constructor.
-        :type extra_kwargs: :class:`collections.Mapping`
+        :type extra_kwargs: :class:`typing.Mapping`\ [:class:`str`,
+                                                      :class:`object`]
         :returns: the created image instance
         :rtype: :class:`Image`
 
@@ -624,10 +625,11 @@ class BaseImageSet(object):
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
         :param extra_args: additional arguments to pass to the model's
                            constructor.
-        :type extra_args: :class:`collections.Sequence`
+        :type extra_args: :class:`collections.abc.Sequence`
         :param extra_kwargs: additional keyword arguments to pass to the
                              model's constructor.
-        :type extra_kwargs: :class:`collections.Mapping`
+        :type extra_kwargs: :class:`typing.Mapping`\ [:class:`str`,
+                                                      :class:`object`]
         :returns: the created image instance
         :rtype: :class:`Image`
 
@@ -652,10 +654,11 @@ class BaseImageSet(object):
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
         :param extra_args: additional arguments to pass to the model's
                            constructor.
-        :type extra_args: :class:`collections.Sequence`
+        :type extra_args: :class:`collections.abc.Sequence`
         :param extra_kwargs: additional keyword arguments to pass to the
                              model's constructor.
-        :type extra_kwargs: :class:`collections.Mapping`
+        :type extra_kwargs: :class:`typing.Mapping`\ [:class:`str`,
+                                                      :class:`object`]
         :returns: the created image instance
         :rtype: :class:`Image`
 
@@ -695,30 +698,25 @@ class BaseImageSet(object):
                        :const:`wand.image.FILTER_TYPES`.  default is
                        ``'undefined'`` which means ImageMagick will try
                        to guess best one to use
-        :type filter: :class:`basestring`, :class:`numbers.Integral`
+        :type filter: :class:`str`, :class:`numbers.Integral`
         :param store: the storage to store the resized image file.
                       :data:`~sqlalchemy_imageattach.context.current_store`
                       by default
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
         :param _preprocess_image: internal-use only option for preprocessing
-                                  original image before resizing.
-                                  it has to be callable which takes
-                                  a :class:`wand.image.Image` object
-                                  and returns a new :class:`wand.image.Image`
-                                  object
-        :type _preprocess_image: :class:`collections.Callable`
+                                  original image before resizing
+        :type _preprocess_image:
+            :class:`typing.Callable`\ [[:class:`wand.image.Image`],
+                                        :class:`wand.image.Image`]
         :param _postprocess_image: internal-use only option for preprocessing
-                                   original image before resizing.
-                                   it has to be callable which takes
-                                   a :class:`wand.image.Image` object
-                                   and returns a new :class:`wand.image.Image`
-                                   object
-        :type _postprocess_image: :class:`collections.Callable`
+                                   original image before resizing
+        :type _postprocess_image:
+            :class:`typing.Callable`\ [[:class:`wand.image.Image`],
+                                        :class:`wand.image.Image`]
         :returns: the resized thumbnail image.  it might be an already
                   existing image if the same size already exists
         :rtype: :class:`Image`
-        :raises exceptions.IOError: when there's no :attr:`original`
-                                    image yet
+        :raise IOError: when there's no :attr:`original` image yet
 
         """
         params = ratio, width, height
@@ -834,7 +832,7 @@ class BaseImageSet(object):
 
     @property
     def original(self):
-        """(:class:`Image`) The original image.  It could be ``None``
+        """(:class:`Image`) The original image.  It could be :const:`None`
         if there are no stored images yet.
 
         """
@@ -844,14 +842,13 @@ class BaseImageSet(object):
 
     def require_original(self):
         """Returns the :attr:`original` image or just raise
-        :exc:`~exceptions.IOError` (instead of returning ``None``).
-        That means it guarantees the return value is never ``None``
+        :exc:`IOError` (instead of returning :const:`None`).
+        That means it guarantees the return value is never :const:`None`
         but always :class:`Image`.
 
         :returns: the :attr:`original` image
         :rtype: :class:`Image`
-        :raises exceptions.IOError: when there's no :attr:`original`
-                                    image yet
+        :raise IOError: when there's no :attr:`original` image yet
 
         """
         image = self.original
@@ -900,12 +897,12 @@ class BaseImageSet(object):
                       by default
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
         :param use_seek: whether the file should seekable.
-                         if ``True`` it maybe buffered in the memory.
-                         default is ``False``
+                         if :const:`True` it maybe buffered in the memory.
+                         default is :const:`False`
         :type use_seek: :class:`bool`
         :returns: the file-like object of the image, which is a context
                   manager (plus, also seekable only if ``use_seek``
-                  is ``True``)
+                  is :const:`True`)
         :rtype: :class:`file`,
                 :class:`~sqlalchemy_imageattach.file.FileProxy`,
                 file-like object
@@ -937,7 +934,7 @@ class BaseImageSet(object):
                       by default
         :type store: :class:`~sqlalchemy_imageattach.store.Store`
         :returns: the url of the :attr:`original` image
-        :rtype: :class:`basestring`
+        :rtype: :class:`str`
 
         """
         return self.require_original().locate(store)
@@ -1023,7 +1020,10 @@ class MultipleImageSet(BaseImageQuery):
 
     @property
     def image_sets(self):
-        """(:class:`collections.Iterable`) The set of attached image sets."""
+        """(:class:`typing.Iterable`\ [:class:`ImageSubset`]) The set of
+        attached image sets.
+
+        """
         images = self._original_images()
         for image in images:
             yield ImageSubset(self, **image.identity_map)

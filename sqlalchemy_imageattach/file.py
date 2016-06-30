@@ -4,13 +4,13 @@
 The file-like types which wraps/proxies an other file objects.
 
 """
-import collections
+import collections.abc
 import os
 
 __all__ = 'FileProxy', 'ReusableFileProxy', 'SeekableFileProxy'
 
 
-class FileProxy(collections.Iterator):
+class FileProxy(collections.abc.Iterator):
     """The complete proxy for ``wrapped`` file-like object.
 
     :param wrapped: the file object to wrap
@@ -29,7 +29,7 @@ class FileProxy(collections.Iterator):
         return self
 
     def __next__(self):
-        """Implementation of :class:`collections.Iterator` protocol."""
+        """Implementation of :class:`~collections.abc.Iterator` protocol."""
         line = self.readline()
         if not line:
             raise StopIteration('hit eof')
@@ -79,7 +79,7 @@ class FileProxy(collections.Iterator):
                          bytes (or more to accommodate a final whole line)
         :type sizehint: :class:`numbers.Integral`
         :returns: a list containing the lines read
-        :rtype: :class:`list`
+        :rtype: :class:`~typing.List`\ [:class:`bytes`]
 
         """
         wrapped = self.wrapped

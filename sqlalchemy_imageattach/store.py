@@ -34,7 +34,7 @@ class Store(object):
         :type file: file-like object, :class:`file`
         :param object_type: the object type of the image to put
                             e.g. ``'comics.cover'``
-        :type object_type: :class:`basestring`
+        :type object_type: :class:`str`
         :param object_id: the object identifier number of the image to put
         :type object_id: :class:`numbers.Integral`
         :param width: the width of the image to put
@@ -43,10 +43,10 @@ class Store(object):
         :type height: :class:`numbers.Integral`
         :param mimetype: the mimetype of the image to put
                          e.g. ``'image/jpeg'``
-        :type mimetype: :class:`basestring`
-        :param reproducible: ``True`` only if it's reproducible by
+        :type mimetype: :class:`str`
+        :param reproducible: :const:`True` only if it's reproducible by
                              computing e.g. resized thumbnails.
-                             ``False`` if it cannot be reproduced
+                             :const:`False` if it cannot be reproduced
                              e.g. original images
         :type reproducible: :class:`bool`
 
@@ -67,7 +67,7 @@ class Store(object):
 
         :param object_type: the object type of the image to put
                             e.g. ``'comics.cover'``
-        :type object_type: :class:`basestring`
+        :type object_type: :class:`str`
         :param object_id: the object identifier number of the image to put
         :type object_id: :class:`numbers.Integral`
         :param width: the width of the image to delete
@@ -76,7 +76,7 @@ class Store(object):
         :type height: :class:`numbers.Integral`
         :param mimetype: the mimetype of the image to delete
                          e.g. ``'image/jpeg'``
-        :type mimetype: :class:`basestring`
+        :type mimetype: :class:`str`
 
         """
         raise NotImplementedError('delete_file() has to be implemented')
@@ -86,7 +86,7 @@ class Store(object):
 
         :param object_type: the object type of the image to find
                             e.g. ``'comics.cover'``
-        :type object_type: :class:`basestring`
+        :type object_type: :class:`str`
         :param object_id: the object identifier number of the image to find
         :type object_id: :class:`numbers.Integral`
         :param width: the width of the image to find
@@ -95,10 +95,10 @@ class Store(object):
         :type height: :class:`numbers.Integral`
         :param mimetype: the mimetype of the image to find
                          e.g. ``'image/jpeg'``
-        :type mimetype: :class:`basestring`
+        :type mimetype: :class:`str`
         :returns: the file of the image
         :rtype: file-like object, :class:`file`
-        :raises exceptions.IOError: when such file doesn't exist
+        :raise IOError: when such file doesn't exist
 
         .. note::
 
@@ -116,7 +116,7 @@ class Store(object):
 
         :param object_type: the object type of the image to find
                             e.g. ``'comics.cover'``
-        :type object_type: :class:`basestring`
+        :type object_type: :class:`str`
         :param object_id: the object identifier number of the image to find
         :type object_id: :class:`numbers.Integral`
         :param width: the width of the image to find
@@ -125,9 +125,9 @@ class Store(object):
         :type height: :class:`numbers.Integral`
         :param mimetype: the mimetype of the image to find
                          e.g. ``'image/jpeg'``
-        :type mimetype: :class:`basestring`
+        :type mimetype: :class:`str`
         :returns: the url locating the image
-        :rtype: :class:`basestring`
+        :rtype: :class:`str`
 
         .. note::
 
@@ -183,19 +183,19 @@ class Store(object):
         Returned file-like object guarantees:
 
         - context manager protocol
-        - :class:`collections.Iterable` protocol
-        - :class:`collections.Iterator` protocol
-        - :meth:`~file.read()` method
-        - :meth:`~file.readline()` method
-        - :meth:`~file.readlines()` method
+        - :class:`collections.abc.Iterable` protocol
+        - :class:`collections.abc.Iterator` protocol
+        - :meth:`~io.RawIOBase.read()` method
+        - :meth:`~io.IOBase.readline()` method
+        - :meth:`~io.IOBase.readlines()` method
 
         To sum up: you definitely can read the file, in :keyword:`with`
         statement and :keyword:`for` loop.
 
-        Plus, if ``use_seek`` option is ``True``:
+        Plus, if ``use_seek`` option is :const:`True`:
 
-        - :meth:`~file.seek()` method
-        - :meth:`~file.tell()` method
+        - :meth:`~io.IOBase.seek()` method
+        - :meth:`~io.IOBase.tell()` method
 
         For example, if you want to make a local copy of
         the image::
@@ -209,15 +209,15 @@ class Store(object):
         :param image: the image to get its file
         :type image: :class:`sqlalchemy_imageattach.entity.Image`
         :param use_seek: whether the file should seekable.
-                         if ``True`` it maybe buffered in the memory.
-                         default is ``False``
+                         if :const:`True` it maybe buffered in the memory.
+                         default is :const:`False`
         :type use_seek: :class:`bool`
         :returns: the file-like object of the image, which is a context
                   manager (plus, also seekable only if ``use_seek``
-                  is ``True``)
+                  is :const:`True`)
         :rtype: :class:`file`, :class:`~sqlalchemy_imageattach.file.FileProxy`,
                 file-like object
-        :raises exceptions.IOError: when such file doesn't exist
+        :raise IOError: when such file doesn't exist
 
         """
         from .entity import Image
@@ -259,7 +259,7 @@ class Store(object):
         :param image: the image to get its url
         :type image: :class:`sqlalchemy_imageattach.entity.Image`
         :returns: the url of the image
-        :rtype: :class:`basestring`
+        :rtype: :class:`str`
 
         """
         from .entity import Image

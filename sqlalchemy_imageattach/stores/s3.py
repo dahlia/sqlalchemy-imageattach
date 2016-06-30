@@ -127,22 +127,22 @@ class S3Store(Store):
     to invalidate cache when the image is updated.
 
     :param bucket: the buckect name
-    :type bucket: :class:`basestring`
+    :type bucket: :class:`str`
     :type access_key: AWS access key for the bucket.
                       it can't be applied if ``name`` isn't string
-    :type access_key: :class:`basestring`
+    :type access_key: :class:`str`
     :type secret_key: AWS secret key for the bucket.
                       it can't be applied if ``name`` isn't string
-    :type secret_key: :class:`basestring`
+    :type secret_key: :class:`str`
     :param max_age: the ``max-age`` seconds of :mailheader:`Cache-Control`.
                     default is :const:`DEFAULT_MAX_AGE`
     :type max_age: :class:`numbers.Integral`
     :param prefix: the optional key prefix to logically separate stores
                    with the same bucket.  not used by default
-    :type prefix: :class:`basestring`
+    :type prefix: :class:`str`
     :param public_base_url: an optional url base for public urls.
                             useful when used with cdn
-    :type public_base_url: :class:`basestring`
+    :type public_base_url: :class:`str`
 
     .. versionchanged:: 0.8.1
        Added ``public_base_url`` parameter.
@@ -153,18 +153,18 @@ class S3Store(Store):
 
     logger = logging.getLogger(__name__ + '.S3Store')
 
-    #: (:class:`basestring`) The S3 bucket name.
+    #: (:class:`str`) The S3 bucket name.
     bucket = None
 
     #: (:class:`numbers.Integral`) The ``max-age`` seconds of
     #: :mailheader:`Cache-Control`.
     max_age = None
 
-    #: (:class:`basestring`) The optional key prefix to logically separate
+    #: (:class:`str`) The optional key prefix to logically separate
     #: stores with the same bucket.
     prefix = None
 
-    #: (:class:`basestring`) The optional url base for public urls.
+    #: (:class:`str`) The optional url base for public urls.
     public_base_url = None
 
     def __init__(self, bucket, access_key=None, secret_key=None,
@@ -266,25 +266,25 @@ class S3SandboxStore(Store):
     the production store in sandbox.
 
     :param underlying: the name of *underlying* bucket for read-only
-    :type underlying: :class:`basestring`
+    :type underlying: :class:`str`
     :param overriding: the name of *overriding* bucket to record
                        overriding modifications
-    :type overriding: :class:`basestring`
+    :type overriding: :class:`str`
     :type access_key: AWS access key for the buckets.
                       it can't be applied if bucket names are not string
-    :type access_key: :class:`basestring`
+    :type access_key: :class:`str`
     :type secret_key: AWS secret key for the bucket.
                       it can't be applied if bucket names are not string
-    :type secret_key: :class:`basestring`
+    :type secret_key: :class:`str`
     :param max_age: the ``max-age`` seconds of :mailheader:`Cache-Control`.
                     default is :const:`DEFAULT_MAX_AGE`
     :type max_age: :class:`numbers.Integral`
     :param overriding_prefix: means the same to :attr:`S3Store.prefix` but
                               it's only applied for ``overriding``
-    :type overriding_prefix: :class:`basestring`
+    :type overriding_prefix: :class:`str`
     :param underlying_prefix: means the same to :attr:`S3Store.prefix` but
                               it's only applied for ``underlying``
-    :type underlying_prefix: :class:`basestring`
+    :type underlying_prefix: :class:`str`
 
     """
 

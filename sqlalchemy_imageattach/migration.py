@@ -139,7 +139,8 @@ class MigrationPlan(object):
         :param callback: an optional callback that takes
                          an :class:`~sqlalchemy_imageattach.entity.Image`
                          instance.  it's called zero or more times
-        :type callback: :class:`~collections.Callable`
+        :type callback: :class:`~typing.Callable`\ [[:class:`~.entity.Image`],
+                                                     :const:`None`]
 
         """
         if callback is None:

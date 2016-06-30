@@ -122,7 +122,7 @@ the following four methods:
    ``width``, ``height``) for the image, and a ``mimetype`` of the image.
    The return type must be file-like.
 
-   It should raise :exc:`~exceptions.IOError` or its subtype
+   It should raise :exc:`IOError` or its subtype
    when there's no requested image in the storage.
 
 :meth:`~sqlalchemy_imageattach.store.Store.get_url()`
