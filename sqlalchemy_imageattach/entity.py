@@ -97,8 +97,9 @@ from .file import ReusableFileProxy
 from .store import Store
 from .util import append_docstring_attributes
 
-__all__ = ('VECTOR_TYPES', 'Image', 'ImageSet', 'ImageSubset',
-           'MultipleImageSet', 'SingleImageSet', 'image_attachment')
+__all__ = ('VECTOR_TYPES', 'BaseImageSet', 'BaseImageQuery', 'Image',
+           'ImageSet', 'ImageSubset', 'MultipleImageSet', 'SingleImageSet',
+           'image_attachment')
 
 
 #: (:class:`collections.Set`) The set of vector image types.

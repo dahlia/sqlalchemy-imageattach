@@ -291,10 +291,10 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/', None),
-    'sqlalchemy': ('http://docs.sqlalchemy.org/en/rel_0_8/', None),
-    'wand': ('http://docs.wand-py.org/en/0.3-maintenance/', None),
-    'flask': ('http://flask.pocoo.org/docs/', None)
+    'python': ('https://docs.python.org/2/', None),
+    'sqlalchemy': ('http://docs.sqlalchemy.org/en/rel_1_0/', None),
+    'wand': ('http://docs.wand-py.org/en/0.4-maintenance/', None),
+    'flask': ('http://flask.pocoo.org/docs/0.11/', None)
 }
 
 

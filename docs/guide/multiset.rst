@@ -16,7 +16,7 @@ different looks each other.  (Think of tweets containing multiple images,
 or Facebook posts containing multiple photos.)  In these case, you don't need
 only an image set, but a set of image sets.  One more dimension should be there.
 
-Fortunately, :func:`~sqlalchemy_imageattach.entity.image_attachement()` provides
+Fortunately, :func:`~sqlalchemy_imageattach.entity.image_attachment()` provides
 ``uselist=True`` option.  It configures the relationship to contain multiple
 image sets.  For example::
 
@@ -38,7 +38,8 @@ image sets.  For example::
 
 In the above example, we should pay attention to two things:
 
-- ``uselist=True`` option of ``image_attachment()``
+- ``uselist=True`` option of
+  :func:`~sqlalchemy_imageattach.entity.image_attachment()`
 - ``PostPhoto.order_index`` column which is a part of primary key columns.
 
 As previously stated, ``uselist=True`` option configures the ``Post.photos``
@@ -55,7 +56,7 @@ Object identifier
 If the image type need to override :attr:`object_id
 <sqlalchemy_imageattach.entity.Image.object_id>` (see also
 :ref:`object-identifier`), the returning object identifier also must be possible
-discriminated in the same way e.g.::
+to be discriminated in the same way e.g.::
 
     @property
     def object_id(self):
