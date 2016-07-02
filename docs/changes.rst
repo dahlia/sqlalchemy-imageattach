@@ -6,6 +6,12 @@ Version 1.0.1
 
 To be released.
 
+- Now :attr:`~sqlalchemy_imageattach.entity.Image.object_id` has a more
+  default implementation for :class:`~uuid.UUID` primary keys.
+  If a primary key is not composite and :class:`~uuid.UUID` type,
+  :attr:`sqlalchemy_imageattach.entity.Image.object_id` for that doesn't have to
+  be implemented.
+
 
 Version 1.0.0
 -------------

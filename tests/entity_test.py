@@ -3,12 +3,14 @@ from __future__ import absolute_import, print_function, with_statement
 import contextlib
 import hashlib
 import os.path
+import uuid
 
 from pytest import yield_fixture, raises
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import Integer, String
+from sqlalchemy_utils.types.uuid import UUIDType
 from wand.image import Image as WandImage
 
 from sqlalchemy_imageattach.context import store_context
@@ -122,6 +124,13 @@ class ObjectIdOverriddenImage(Base, Image):
         return self.id * 2
 
 
+class UuidKeyImage(Base, Image):
+
+    id = Column(UUIDType, primary_key=True)
+
+    __tablename__ = 'uuid_key_image'
+
+
 class StringKeyImage(Base, Image):
 
     id = Column(String(255), primary_key=True)
@@ -138,9 +147,14 @@ class CompositeKeyImage(Base, Image):
 
 
 def test_default_object_id():
-    """If the primary key is integer, object_id is automatically filled."""
+    """If the primary key is integer or UUID, object_id is automatically
+    filled.
+
+    """
     o = SomethingCover(something_id=12345)
     assert o.object_id == o.something_id
+    u = UuidKeyImage(id=uuid.UUID('76fdc405-9120-4ffc-a7a1-3c35409c595f'))
+    assert u.object_id == 158166530401166902469325588563807197535
 
 
 def test_overridden_object_id():

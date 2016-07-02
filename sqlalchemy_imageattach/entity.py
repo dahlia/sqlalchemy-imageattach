@@ -76,6 +76,7 @@ import cgi
 import io
 import numbers
 import shutil
+import uuid
 
 from sqlalchemy import Column
 from sqlalchemy.event import listen
@@ -193,12 +194,21 @@ class Image(object):
         and must be implemented when the primary key is not integer or
         composite key.
 
+        .. versionchanged:: 1.0.1
+           Since 1.0.1, it provides a more default implementation for
+           :class:`~uuid.UUID` primary keys.  If a primary key is not
+           composite and :class:`~uuid.UUID` type, :attr:`object_id
+           <sqlalchemy_imageattach.entity.Image.object_id>` for that doesn't
+           have to be implemented.
+
         """
         pk = self.identity_attributes()
         if len(pk) == 1:
             pk_value = getattr(self, pk[0])
             if isinstance(pk_value, numbers.Integral):
                 return pk_value
+            elif isinstance(pk_value, uuid.UUID):
+                return pk_value.int
         raise NotImplementedError('object_id property has to be implemented')
 
     @classmethod
