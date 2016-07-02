@@ -29,7 +29,7 @@ Attaching from file object
 --------------------------
 
 A way to attach an image to an object is loading it from a file object using
-:class:`~sqlalchemy_imageattach.entity.ImageSet.from_file()` method.
+:class:`~sqlalchemy_imageattach.entity.BaseImageSet.from_file()` method.
 The following example code shows how to attach a profile picture to an user::
 
     from yourapp.config import session, store
@@ -68,7 +68,7 @@ Attaching from byte string
 --------------------------
 
 Of course you can load images from its byte strings.  Use
-:class:`~sqlalchemy_imageattach.entity.ImageSet.from_blob()` method::
+:class:`~sqlalchemy_imageattach.entity.BaseImageSet.from_blob()` method::
 
     from requests import get
 
@@ -88,9 +88,9 @@ Of course you can load images from its byte strings.  Use
 Getting image urls
 ------------------
 
-In web environment, the most case you need just an url of an image, not its
-binary content.  So :class:`~sqlalchemy_imageattach.entity.ImageSet` object
-provide :meth:`~sqlalchemy_imageattach.entity.ImageSet.locate()` method::
+In web server app, for the most part you need just an url of an image, not its
+binary content.  So :class:`~sqlalchemy_imageattach.entity.BaseImageSet`
+provides :meth:`~sqlalchemy_imageattach.entity.BaseImageSet.locate()` method::
 
     def user_profile(request, user_id):
         user = session.query(User).get(int(user_id))
@@ -102,7 +102,7 @@ provide :meth:`~sqlalchemy_imageattach.entity.ImageSet.locate()` method::
 It returns the url of the original image (which is not resized).
 Read about :ref:`thumbnail` if you want a thumbnail url.
 
-:class:`~sqlalchemy_imageattach.entity.ImageSet` also implements de facto
+:class:`~sqlalchemy_imageattach.entity.BaseImageSet` also implements de facto
 standard ``__html__()`` special method, so it can be directly rendered in
 the most of template engines like Jinja2_, Mako_.  It's expanded to
 ``<img>`` tag on templates:
@@ -143,7 +143,7 @@ The above template codes are equivalent to:
 
 .. note::
 
-   Template expansion of :class:`~sqlalchemy_imageattach.entity.ImageSet`
+   Template expansion of :class:`~sqlalchemy_imageattach.entity.BaseImageSet`
    might raise :exc:`~sqlalchemy_imageattach.context.ContextError`.
    You should render the template in the context::
 
@@ -159,8 +159,8 @@ The above template codes are equivalent to:
 Getting image files
 -------------------
 
-:class:`~sqlalchemy_imageattach.entity.ImageSet` provides :meth:`open_file()
-<sqlalchemy_imageattach.entity.ImageSet.open_file>` method.  It returns
+:class:`~sqlalchemy_imageattach.entity.BaseImageSet` provides :meth:`open_file()
+<sqlalchemy_imageattach.entity.BaseImageSet.open_file>` method.  It returns
 a file-like object::
 
     from shutil import copyfileobj
@@ -177,7 +177,7 @@ Getting image binary
 --------------------
 
 There's a shortcut to read byte string from an opened file.
-Use :meth:`~sqlalchemy_imageattach.entity.ImageSet.make_blob()` method.
+Use :meth:`~sqlalchemy_imageattach.entity.BaseImageSet.make_blob()` method.
 The following two ways are equivalent::
 
     # make_blob()
@@ -196,7 +196,7 @@ Thumbnails
 ----------
 
 You can make thumbnails and then store them into the store using
-:meth:`~sqlalchemy_imageattach.entity.ImageSet.generate_thumbnail()` method.
+:meth:`~sqlalchemy_imageattach.entity.BaseImageSet.generate_thumbnail()` method.
 It takes one of three arguments: ``width``, ``height``, or ``ratio``::
 
     with store_context(store):
@@ -211,13 +211,13 @@ It takes one of three arguments: ``width``, ``height``, or ``ratio``::
 
 It returns a made :class:`~sqlalchemy_imageattach.entity.Image` object,
 and it shares the most of the same methods to
-:class:`~sqlalchemy_imageattach.entity.ImageSet` like
+:class:`~sqlalchemy_imageattach.entity.BaseImageSet` like
 :meth:`~sqlalchemy_imageattach.entity.Image.locate()`,
 :meth:`~sqlalchemy_imageattach.entity.Image.open_file()`,
 :meth:`~sqlalchemy_imageattach.entity.Image.make_blob()`.
 
 Once made thumbnails can be found using :meth:`find_thumbnail()
-<sqlalchemy_imageattach.entity.ImageSet.find_thumbnail>`.  It takes one of
+<sqlalchemy_imageattach.entity.BaseImageSet.find_thumbnail>`.  It takes one of
 two arguments: ``width`` or ``height`` and returns a found
 :class:`~sqlalchemy_imageattach.entity.Image` object::
 
