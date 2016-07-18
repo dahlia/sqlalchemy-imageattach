@@ -46,7 +46,7 @@ As previously stated, ``uselist=True`` option configures the ``Post.photos``
 relationship to return a set of image sets, rather than an image set.
 
 The subtle thing is ``PostPhoto.order_index`` column.  If the relationship is
-configured with ``userlist=True``, the image entity must have *extra
+configured with ``uselist=True``, the image entity must have *extra
 discriminating primary key columns* to group each image set.
 
 
