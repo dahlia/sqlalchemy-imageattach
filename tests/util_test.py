@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
-from sqlalchemy_imageattach.util import append_docstring, get_minimum_indent
+from sqlalchemy_imageattach.util import (append_docstring, classproperty,
+                                         get_minimum_indent)
 
 
 def test_minimum_indent():
@@ -52,3 +53,14 @@ def test_append_docstring():
 
            Appended docstring!
     '''.rstrip()
+
+
+def test_classproperty():
+
+    class Foo(object):
+        @classproperty
+        def bar(cls):
+            return 'baz'
+
+    assert Foo.bar == 'baz'
+    assert Foo().bar == 'baz'
