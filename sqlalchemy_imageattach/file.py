@@ -4,13 +4,13 @@
 The file-like types which wraps/proxies an other file objects.
 
 """
-import collections.abc
+from collections import Iterator
 import os
 
 __all__ = 'FileProxy', 'ReusableFileProxy', 'SeekableFileProxy'
 
 
-class FileProxy(collections.abc.Iterator):
+class FileProxy(Iterator):
     """The complete proxy for ``wrapped`` file-like object.
 
     :param wrapped: the file object to wrap
