@@ -172,7 +172,8 @@ HttpExposedFileSystemStore for more details
                  for any origin
     :type cors: :class:`bool`
 
-    .. _Cross-Origin Resource Sharing: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+    .. _Cross-Origin Resource Sharing: https://developer.mozilla.org/en-US/\
+docs/Web/HTTP/Access_control_CORS
 
     .. versionadded:: 1.0.0
        Added ``host_url_getter`` option.
