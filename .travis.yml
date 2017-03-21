@@ -28,7 +28,7 @@ matrix:
 before_install:
 - export PY=`python -c 'import sys;print("pypy" if hasattr(sys,"pypy_version_info") else "%d.%d" % sys.version_info[:2])'`
 install:
-- pip install pytest WebOb pytest-capturelog flake8
+- pip install pytest SQLAlchemy-Utils WebOb pytest-capturelog flake8
 - if [ "$PY" != "3.2" ]; then
   pip install 'pip>=8.1.2' 'setuptools>=23.1.0' pytest-cov coveralls;
   fi
