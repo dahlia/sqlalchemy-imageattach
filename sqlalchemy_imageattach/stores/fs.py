@@ -168,13 +168,20 @@ HttpExposedFileSystemStore for more details
                             it has to be a callable that takes nothing and
                             returns a host url string
     :type host_url_getter: :class:`~typing.Callable`\ [[], :class:`str`]
+    :param cors: whether or not to allow the `Cross-Origin Resource Sharing`_
+                 for any origin
+    :type cors: :class:`bool`
+
+    .. _Cross-Origin Resource Sharing: https://developer.mozilla.org/en-US/\
+docs/Web/HTTP/Access_control_CORS
 
     .. versionadded:: 1.0.0
        Added ``host_url_getter`` option.
 
     """
 
-    def __init__(self, path, prefix='__images__', host_url_getter=None):
+    def __init__(self, path, prefix='__images__', host_url_getter=None,
+                 cors=False):
         if not (callable(host_url_getter) or host_url_getter is None):
             raise TypeError('host_url_getter must be callable')
         super(HttpExposedFileSystemStore, self).__init__(path)
@@ -184,6 +191,7 @@ HttpExposedFileSystemStore for more details
             prefix = prefix[:-1]
         self.prefix = prefix
         self.host_url_getter = host_url_getter
+        self.cors = cors
 
     @property
     def base_url(self):
@@ -204,7 +212,7 @@ HttpExposedFileSystemStore for more details
             )
         )
 
-    def wsgi_middleware(self, app):
+    def wsgi_middleware(self, app, cors=False):
         """WSGI middlewares that wraps the given ``app`` and serves
         actual image files. ::
 
@@ -218,7 +226,8 @@ HttpExposedFileSystemStore for more details
         :rtype: :class:`StaticServerMiddleware`
 
         """
-        _app = StaticServerMiddleware(app, '/' + self.prefix, self.path)
+        _app = StaticServerMiddleware(app, '/' + self.prefix, self.path,
+                                      cors=self.cors)
 
         def app(environ, start_response):
             if not hasattr(self, 'host_url'):
@@ -246,6 +255,9 @@ class StaticServerMiddleware(object):
     :type dir_path: :class:`str`
     :param block_size: the block size in bytes
     :type block_size: :class:`numbers.Integral`
+    :param cors: whether or not to allow the `Cross-Origin Resource Sharing`_
+                 for any origin
+    :type cors: :class:`bool`
 
     .. todo::
 
@@ -256,7 +268,7 @@ class StaticServerMiddleware(object):
 
     """
 
-    def __init__(self, app, url_path, dir_path, block_size=8192):
+    def __init__(self, app, url_path, dir_path, block_size=8192, cors=False):
         if not url_path.startswith('/'):
             url_path = '/' + url_path
         if not url_path.endswith('/'):
@@ -269,6 +281,7 @@ class StaticServerMiddleware(object):
         self.url_path = url_path
         self.dir_path = dir_path
         self.block_size = int(block_size)
+        self.cors_enabled = cors
 
     def file_stream(self, path):
         with open(path, 'rb') as f:
@@ -291,10 +304,13 @@ class StaticServerMiddleware(object):
             return '404 Not Found',
         mimetype, _ = mimetypes.guess_type(file_path)
         mimetype = mimetype or 'application/octet-stream'
-        start_response('200 OK', [
+        headers = [
             ('Content-Type', mimetype),
             ('Content-Length', str(stat.st_size))
-        ])
+        ]
+        if self.cors_enabled:
+            headers.append(('Access-Control-Allow-Origin', '*'))
+        start_response('200 OK', headers)
         try:
             file_wrapper = environ['wsgi.file_wrapper']
         except KeyError:
