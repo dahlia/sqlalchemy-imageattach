@@ -6,7 +6,7 @@ from pytest import mark, raises
 from sqlalchemy_imageattach.store import Store
 
 from .conftest import sample_images_dir
-from .stores.conftest import TestingImage, utcnow
+from .stores.conftest import ExampleImage, utcnow
 
 
 class EmptyStore(Store):
@@ -21,7 +21,7 @@ def miss_put_file(store_cls):
         with raises(NotImplementedError):
             store.put_file(image_file, 'testing', 1234, 405, 640,
                            'image/jpeg', True)
-        image = TestingImage(thing_id=1234, width=405, height=640,
+        image = ExampleImage(thing_id=1234, width=405, height=640,
                              mimetype='image/jpeg', original=True,
                              created_at=utcnow())
         with raises(NotImplementedError):
@@ -33,7 +33,7 @@ def miss_delete_file(store_cls):
     store = store_cls()
     with raises(NotImplementedError):
         store.delete_file('testing', 1234, 405, 640, 'image/jpeg')
-    image = TestingImage(thing_id=1234, width=405, height=640,
+    image = ExampleImage(thing_id=1234, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     with raises(NotImplementedError):
@@ -45,7 +45,7 @@ def miss_get_file(store_cls):
     store = store_cls()
     with raises(NotImplementedError):
         store.get_file('testing', 1234, 405, 640, 'image/jpeg')
-    image = TestingImage(thing_id=1234, width=405, height=640,
+    image = ExampleImage(thing_id=1234, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     with raises(NotImplementedError):
@@ -57,7 +57,7 @@ def miss_get_url(store_cls):
     store = store_cls()
     with raises(NotImplementedError):
         store.get_url('testing', 1234, 405, 640, 'image/jpeg')
-    image = TestingImage(thing_id=1234, width=405, height=640,
+    image = ExampleImage(thing_id=1234, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     with raises(NotImplementedError):
@@ -104,7 +104,7 @@ def test_store():
     store = FakeStore()
     image_path = os.path.join(sample_images_dir, 'iu.jpg')
     with open(image_path, 'rb') as image_file:
-        image = TestingImage(thing_id=1234, width=405, height=640,
+        image = ExampleImage(thing_id=1234, width=405, height=640,
                              mimetype='image/jpeg', original=True,
                              created_at=utcnow())
         store.store(image, image_file)
@@ -123,7 +123,7 @@ def test_store_typeerror():
             store.store('abc', image_file)
         with raises(TypeError):
             store.store(None, image_file)
-    image = TestingImage(thing_id=1234, width=405, height=640,
+    image = ExampleImage(thing_id=1234, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     with raises(TypeError):
@@ -138,7 +138,7 @@ def test_delete():
     store = FakeStore()
     image_path = os.path.join(sample_images_dir, 'iu.jpg')
     with open(image_path, 'rb') as image_file:
-        image = TestingImage(thing_id=1234, width=405, height=640,
+        image = ExampleImage(thing_id=1234, width=405, height=640,
                              mimetype='image/jpeg', original=True,
                              created_at=utcnow())
         store.store(image, image_file)
@@ -160,7 +160,7 @@ def test_delete_typeerror():
 def test_open():
     store = FakeStore()
     image_path = os.path.join(sample_images_dir, 'iu.jpg')
-    image = TestingImage(thing_id=1234, width=405, height=640,
+    image = ExampleImage(thing_id=1234, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     with open(image_path, 'rb') as image_file:
@@ -173,7 +173,7 @@ def test_open():
 def test_open_seek():
     store = FakeStore()
     image_path = os.path.join(sample_images_dir, 'iu.jpg')
-    image = TestingImage(thing_id=1234, width=405, height=640,
+    image = ExampleImage(thing_id=1234, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     with open(image_path, 'rb') as image_file:
@@ -194,7 +194,7 @@ def test_open_typerrror():
         store.open('abc')
     with raises(TypeError):
         store.open(None)
-    image = TestingImage(width=405, height=640, mimetype='image/jpeg',
+    image = ExampleImage(width=405, height=640, mimetype='image/jpeg',
                          original=True, created_at=utcnow())
     with raises(TypeError):
         store.open(image)
@@ -205,7 +205,7 @@ def test_open_typerrror():
 
 def test_locate():
     store = FakeStore()
-    image = TestingImage(thing_id=1234, width=405, height=640,
+    image = ExampleImage(thing_id=1234, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     hash_ = hash(('testing', 1234, 405, 640, 'image/jpeg'))
@@ -227,7 +227,7 @@ def test_locate_qs():
 
     """
     store = FakeStore()
-    image = TestingImage(thing_id=FakeStore.INCLUDE_QUERY_FOR_URL,
+    image = ExampleImage(thing_id=FakeStore.INCLUDE_QUERY_FOR_URL,
                          width=405, height=640, mimetype='image/jpeg',
                          original=True, created_at=utcnow())
     hash_ = hash(('testing', FakeStore.INCLUDE_QUERY_FOR_URL,

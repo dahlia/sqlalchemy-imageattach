@@ -13,7 +13,7 @@ from pytest import fixture, mark, raises, skip
 from sqlalchemy_imageattach.stores import s3
 from sqlalchemy_imageattach.stores.s3 import S3SandboxStore, S3Store
 from ..conftest import sample_images_dir
-from .conftest import TestingImage, utcnow
+from .conftest import ExampleImage, utcnow
 
 
 remove_query = functools.partial(re.compile(r'\?.*$').sub, '')
@@ -86,7 +86,7 @@ def s3_sandbox_store_getter(request):
 def test_s3_store(prefix, public_base_url, s3_store_getter):
     s3 = s3_store_getter(prefix=prefix, public_base_url=public_base_url)
     thing_id = uuid.uuid1().int
-    image = TestingImage(thing_id=thing_id, width=405, height=640,
+    image = ExampleImage(thing_id=thing_id, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     image_path = os.path.join(sample_images_dir, 'iu.jpg')
@@ -132,7 +132,7 @@ def test_s3_sandbox_store(underlying_prefix, overriding_prefix,
         id_offset *= -1
     # Store a fixture image for underlying store
     under_id = id_offset + 1
-    under_image = TestingImage(thing_id=under_id, width=405, height=640,
+    under_image = ExampleImage(thing_id=under_id, width=405, height=640,
                                mimetype='image/jpeg', original=True,
                                created_at=utcnow())
     image_path = os.path.join(sample_images_dir, 'iu.jpg')
@@ -149,7 +149,7 @@ def test_s3_sandbox_store(underlying_prefix, overriding_prefix,
     assert remove_query(expected_url) == remove_query(actual_url)
     # Store an image to sandbox store
     over_id = id_offset + 2
-    image = TestingImage(thing_id=over_id, width=405, height=640,
+    image = ExampleImage(thing_id=over_id, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     image_path = os.path.join(sample_images_dir, 'iu.jpg')

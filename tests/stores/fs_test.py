@@ -11,12 +11,12 @@ from sqlalchemy_imageattach.stores.fs import (FileSystemStore,
                                               StaticServerMiddleware,
                                               guess_extension)
 from ..conftest import sample_images_dir
-from .conftest import TestingImage, utcnow
+from .conftest import ExampleImage, utcnow
 
 
 def test_fs_store(tmpdir):
     fs_store = FileSystemStore(tmpdir.strpath, 'http://mock/img/')
-    image = TestingImage(thing_id=1234, width=405, height=640,
+    image = ExampleImage(thing_id=1234, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     image_path = os.path.join(sample_images_dir, 'iu.jpg')
@@ -41,7 +41,7 @@ remove_query = functools.partial(re.compile(r'\?.*$').sub, '')
 
 def test_http_fs_store(tmpdir, **kwargs):
     http_fs_store = HttpExposedFileSystemStore(tmpdir.strpath, **kwargs)
-    image = TestingImage(thing_id=1234, width=405, height=640,
+    image = ExampleImage(thing_id=1234, width=405, height=640,
                          mimetype='image/jpeg', original=True,
                          created_at=utcnow())
     image_path = os.path.join(sample_images_dir, 'iu.jpg')

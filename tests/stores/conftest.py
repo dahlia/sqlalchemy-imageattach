@@ -24,7 +24,7 @@ def utcnow():
     return datetime.datetime.utcnow().replace(tzinfo=UTC())
 
 
-class TestingImage(Base, Image):
+class ExampleImage(Base, Image):
 
     thing_id = Column(Integer, primary_key=True)
 
