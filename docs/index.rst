@@ -22,7 +22,7 @@ SQLAlchemy transaction aware
    Saved file are removed when the ongoing transaction has been rolled back.
 
 Tested on various environments
-   - Python versions: Python 2.6--2.7, 3.2--3.5, PyPy_
+   - Python versions: Python 2.6--2.7, 3.3--3.5, PyPy_
    - DBMS: PostgreSQL, MySQL, SQLite
    - SQLAlchemy: 0.8 or higher (tested on 0.8 to 1.1; see CI as well)
 

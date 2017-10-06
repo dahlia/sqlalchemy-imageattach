@@ -3,7 +3,6 @@ sudo: false
 python:
 - 2.6
 - 2.7
-- 3.2
 - 3.3
 - 3.4
 - 3.5
@@ -22,8 +21,6 @@ env:
 matrix:
   exclude:
   - python: 2.6
-    env: DB=mysql
-  - python: 3.2
     env: DB=mysql
 before_install:
 - export PY=`python -c 'import sys;print("pypy" if hasattr(sys,"pypy_version_info") else "%d.%d" % sys.version_info[:2])'`
