@@ -74,8 +74,8 @@ provides the default value when the primary key is integer or UUID.
 It has to be explicitly implemented when the primary key is not integer/UUID or
 is composite key.
 
-.. versionchanged:: 1.0.1
-   Since 1.0.1, :attr:`~sqlalchemy_imageattach.entity.Image.object_id` has
+.. versionchanged:: 1.1.0
+   Since 1.1.0, :attr:`~sqlalchemy_imageattach.entity.Image.object_id` has
    a more default implementation for :class:`~uuid.UUID` primary keys.
    If a primary key is not composite and :class:`~uuid.UUID` type,
    :attr:`~sqlalchemy_imageattach.entity.Image.object_id` for that doesn't have
