@@ -105,6 +105,9 @@ def test_from_raw_file(fx_session, fx_sample_image, tmp_store):
     with something.cover.open_file(tmp_store) as f:
         actual = f.read()
     assert actual == expected
+    if mimetype == 'image/svg+xml':
+        # Skip the rest tests for SVG images
+        return
     with something.cover.find_thumbnail(width=10).open_file(tmp_store) as f:
         with WandImage(file=f) as wand:
             assert wand.width == 10
