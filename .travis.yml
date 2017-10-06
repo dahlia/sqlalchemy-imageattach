@@ -1,7 +1,6 @@
 language: python
 sudo: false
 python:
-- 2.6
 - 2.7
 - 3.3
 - 3.4
@@ -18,17 +17,10 @@ env:
   - DB=sqlite
   - DB=postgresql
   - DB=mysql
-matrix:
-  exclude:
-  - python: 2.6
-    env: DB=mysql
 before_install:
 - export PY=`python -c 'import sys;print("pypy" if hasattr(sys,"pypy_version_info") else "%d.%d" % sys.version_info[:2])'`
 install:
-- pip install pytest SQLAlchemy-Utils WebOb pytest-capturelog flake8
-- if [ "$PY" != "3.2" ]; then
-  pip install 'pip>=8.1.2' 'setuptools>=23.1.0' pytest-cov coveralls;
-  fi
+- pip install pytest SQLAlchemy-Utils WebOb pytest-capturelog flake8 'pip>=8.1.2' 'setuptools>=23.1.0' pytest-cov coveralls
 - if [ "$DB" = "sqlite" ]; then
     export IMAGEATTACH_TEST_DATABASE_URL='sqlite://';
   fi
@@ -55,11 +47,7 @@ before_script:
 - if [ "$DB" = "mysql" ]; then mysql -e "CREATE DATABASE si_test;"; fi
 script:
 # SQLAlchemy 1.1
-- if [ "$PY" != "3.2" ]; then
-    py.test --cov sqlalchemy_imageattach --durations=20;
-  else
-    py.test sqlalchemy_imageattach --durations=20;
-  fi
+- py.test --cov sqlalchemy_imageattach --durations=20;
 # SQLAlchemy 1.0
 - pip uninstall --yes SQLAlchemy && pip install "SQLAlchemy>=1.0.0,<1.1.0"
 - py.test

@@ -6,7 +6,7 @@ Version 1.1.0
 
 To be released.
 
-- Dropped Python 3.2 support.
+- Dropped Python 2.6 and 3.2 support.
 - Now :attr:`~sqlalchemy_imageattach.entity.Image.object_id` has a more
   default implementation for :class:`~uuid.UUID` primary keys.
   If a primary key is not composite and :class:`~uuid.UUID` type,
