@@ -33,7 +33,7 @@ class pytest(test):
 
 
 install_requires = [
-    'SQLAlchemy >= 0.8.0',
+    'SQLAlchemy >= 0.9.0',
     'Wand >= 0.3.0'
 ]
 

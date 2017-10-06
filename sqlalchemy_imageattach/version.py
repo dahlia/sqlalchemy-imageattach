@@ -15,13 +15,13 @@ VERSION_INFO = (1, 1, 0)
 VERSION = '{0}.{1}.{2}'.format(*VERSION_INFO)
 
 #: (:class:`tuple`) The triple of minimum compatible SQLAlchemy version
-#: e.g. ``(0, 8, 0)``.
+#: e.g. ``(0, 9, 0)``.
 #:
 #: .. versionadded:: 1.0.0
-SQLA_COMPAT_VERSION_INFO = (0, 8, 0)
+SQLA_COMPAT_VERSION_INFO = (0, 9, 0)
 
 #: (:class:`str`) The minimum compatible SQLAlchemy version string
-#: e.g. ``'0.8.0'``.
+#: e.g. ``'0.9.0'``.
 #:
 #: .. versionadded:: 1.0.0
 SQLA_COMPAT_VERSION = '{0}.{1}.{2}'.format(*SQLA_COMPAT_VERSION_INFO)

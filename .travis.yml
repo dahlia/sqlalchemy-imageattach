@@ -61,9 +61,6 @@ script:
 # SQLAlchemy 0.9
 - pip uninstall --yes SQLAlchemy && pip install "SQLAlchemy>=0.9.0,<1.0.0"
 - py.test
-# SQLAlchemy 0.8
-- pip uninstall --yes SQLAlchemy && pip install "SQLAlchemy>=0.8.0,<0.9.0"
-- py.test
 # Lint
 - flake8
 after_success:

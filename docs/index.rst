@@ -24,7 +24,7 @@ SQLAlchemy transaction aware
 Tested on various environments
    - Python versions: Python 2.7, 3.3--3.5, PyPy_
    - DBMS: PostgreSQL, MySQL, SQLite
-   - SQLAlchemy: 0.8 or higher (tested on 0.8 to 1.1; see CI as well)
+   - SQLAlchemy: 0.9 or higher (tested on 0.9 to 1.1; see CI as well)
 
 .. _SQLAlchemy: http://www.sqlalchemy.org/
 .. _S3: https://aws.amazon.com/s3/
