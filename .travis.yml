@@ -6,6 +6,13 @@ python:
 - 3.4
 - 3.5
 - pypy
+addons:
+  apt:
+    packages:
+    - libmagickwand-dev
+    - libmagickcore5-extra
+    - ghostscript
+    - gsfonts
 env:
   global:
   - secure: "m2miJTnJPlSo2xFppOenQpzrCwxOyUztMlNdQ3GSrkVnE5g/USsFTfD018Si\nniQDBkt2B8+JJZWo42SdP+8rf75y6piwNRxgmMWyON8s9Jsq5g+QFHKaCwtc\nobEYzrrHkCahZ+lUedGL+8ff9zvYm+IcdKpiLQTET84K1ctrRyE="
