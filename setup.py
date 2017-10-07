@@ -39,6 +39,7 @@ install_requires = [
 
 tests_require = [
     'pytest >= 2.6.0',
+    'pytest-rerunfailures',
     'SQLAlchemy-Utils',
     'WebOb'
 ]

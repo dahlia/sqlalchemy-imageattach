@@ -83,6 +83,7 @@ def s3_sandbox_store_getter(request):
                           [None, 'http://example.com', 'https://example.com/'])
     )
 )
+@mark.flaky(reruns=3)
 def test_s3_store(prefix, public_base_url, s3_store_getter):
     s3 = s3_store_getter(prefix=prefix, public_base_url=public_base_url)
     thing_id = uuid.uuid1().int
@@ -118,6 +119,7 @@ def test_s3_store(prefix, public_base_url, s3_store_getter):
     ('under', 'over'),
     ('', '')
 ])
+@mark.flaky(reruns=3)
 @mark.slow
 def test_s3_sandbox_store(underlying_prefix, overriding_prefix,
                           s3_sandbox_store_getter):
