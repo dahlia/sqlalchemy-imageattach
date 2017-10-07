@@ -1,11 +1,4 @@
 language: python
-sudo: false
-python:
-- 2.7
-- 3.3
-- 3.4
-- 3.5
-- pypy
 addons:
   apt:
     packages:
@@ -13,54 +6,34 @@ addons:
     - libmagickcore5-extra
     - ghostscript
     - gsfonts
-env:
-  global:
-  - MYSQL_CONNECTOR_PYTHON_URL='https://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.7.tar.gz'
-  matrix:
-  - DB=sqlite
-  - DB=postgresql
-  - DB=mysql
 before_install:
 - 'export BUCKET_IDX="$(expr "${TRAVIS_JOB_NUMBER#[0-9]*.}" % 6)"'
 - export IMAGEATTACH_TEST_S3_NAME="sqla-ia-test${BUCKET_IDX}"
 - export IMAGEATTACH_TEST_S3_SANDBOX_NAME="sqla-ia-testx${BUCKET_IDX}"
-- export PY=`python -c 'import sys;print("pypy" if hasattr(sys,"pypy_version_info") else "%d.%d" % sys.version_info[:2])'`
 install:
-- pip install pytest SQLAlchemy-Utils WebOb pytest-capturelog flake8 'pip>=8.1.2' 'setuptools>=23.1.0' pytest-cov coveralls
-- if [ "$DB" = "sqlite" ]; then
-    export IMAGEATTACH_TEST_DATABASE_URL='sqlite://';
-  fi
-- if [ "$DB" = "postgresql" ]; then
-    export IMAGEATTACH_TEST_DATABASE_URL='postgresql:///si_test?user=postgres';
-    if [ "$PY" = "pypy" ]; then
-      pip install psycopg2ct;
-    else
-      pip install psycopg2;
-    fi;
-  fi
-- if [ "$DB" = "mysql" ]; then
-    export IMAGEATTACH_TEST_DATABASE_URL='mysql+mysqlconnector://root@localhost/si_test';
-    if [ "$PY" = "pypy" ]; then
-      pip install PyMySQL;
-      export IMAGEATTACH_TEST_DATABASE_URL=${IMAGEATTACH_TEST_DATABASE_URL/mysqlconnector/pymysql};
-    else
-      pip install --find-links="$MYSQL_CONNECTOR_PYTHON_URL" --allow-all-external mysql-connector-python;
-    fi;
-  fi
-- pip install --pre "SQLAlchemy>=1.1.0b1" -e .
+- pip install tox-travis coveralls
 before_script:
-- if [ "$DB" = "postgresql" ]; then createdb -U postgres -E utf8 -T postgres si_test; fi
-- if [ "$DB" = "mysql" ]; then mysql -e "CREATE DATABASE si_test;"; fi
+- createdb -U postgres -E utf8 -T postgres si_test
+- mysql -e "CREATE DATABASE si_test;"
 script:
-# SQLAlchemy 1.1
-- py.test --cov sqlalchemy_imageattach --durations=20;
-# SQLAlchemy 1.0
-- pip uninstall --yes SQLAlchemy && pip install "SQLAlchemy>=1.0.0,<1.1.0"
-- py.test
-# SQLAlchemy 0.9
-- pip uninstall --yes SQLAlchemy && pip install "SQLAlchemy>=0.9.0,<1.0.0"
-- py.test
-# Lint
-- flake8
+# SQLite
+- tox -- --cov sqlalchemy_imageattach --durations=20
+# PostgreSQL
+- tox -- --cov sqlalchemy_imageattach --durations=20 --database-url='postgresql:///si_test?user=postgres'
+# MySQL
+- |
+  if [[ "$TRAVIS_PYTHON_VERSION" = "pypy" ]]; then
+    tox -- --cov sqlalchemy_imageattach --durations=20 --database-url='mysql+pymysql://root@localhost/si_test'
+  else
+    tox -- --cov sqlalchemy_imageattach --durations=20 --database-url='mysql+mysqlconnector://root@localhost/si_test'
+  fi
 after_success:
 - coveralls
+python:
+# CHECK If you're going to change the list of supported Python versions
+# update tox.ini and setup.py's classifiers as well.
+- 2.7
+- 3.3
+- 3.4
+- 3.5
+- pypy

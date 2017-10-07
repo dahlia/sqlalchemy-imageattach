@@ -1,12 +1,6 @@
 import os.path
 
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
-from setuptools.command.test import test
+from setuptools import setup, find_packages
 
 from sqlalchemy_imageattach.version import VERSION
 
@@ -16,32 +10,12 @@ def readme():
         with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as f:
             return f.read()
     except (IOError, OSError):
-        return ''
-
-
-class pytest(test):
-
-    def finalize_options(self):
-        test.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        from pytest import main
-        errno = main(self.test_args)
-        raise SystemExit(errno)
+        pass
 
 
 install_requires = [
     'SQLAlchemy >= 0.9.0',
     'Wand >= 0.3.0'
-]
-
-tests_require = [
-    'pytest >= 2.6.0',
-    'pytest-rerunfailures',
-    'SQLAlchemy-Utils',
-    'WebOb'
 ]
 
 docs_require = [
@@ -60,11 +34,7 @@ setup(
     license='MIT License',
     packages=find_packages(exclude=['tests', 'tests.stores']),
     install_requires=install_requires,
-    tests_require=tests_require,
-    extras_require={
-        'tests': tests_require,
-        'docs': docs_require,
-    },
+    extras_require={'docs': docs_require},
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
@@ -80,6 +50,5 @@ setup(
         'Programming Language :: Python :: Implementation :: Stackless',
         'Topic :: Database :: Front-Ends',
         'Topic :: Multimedia :: Graphics'
-    ],
-    cmdclass={'test': pytest}
+    ]
 )
