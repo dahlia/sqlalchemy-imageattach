@@ -55,7 +55,7 @@ GitHub
 Continuous Integration (Travis CI)
    http://travis-ci.org/dahlia/sqlalchemy-imageattach
 
-   .. image:: https://secure.travis-ci.org/dahlia/sqlalchemy-imageattach.svg?
+   .. image:: https://travis-ci.org/dahlia/sqlalchemy-imageattach.svg?branch=master
       :alt: Build Status
       :target: https://travis-ci.org/dahlia/sqlalchemy-imageattach
 

@@ -103,7 +103,7 @@ Pull requests are also always welcome!
 
 Check out :doc:`changes` as well.
 
-.. image:: https://secure.travis-ci.org/dahlia/sqlalchemy-imageattach.svg
+.. image:: https://travis-ci.org/dahlia/sqlalchemy-imageattach.svg?branch=master
    :alt: Build Status
    :target: https://travis-ci.org/dahlia/sqlalchemy-imageattach
 

@@ -15,16 +15,15 @@ addons:
     - gsfonts
 env:
   global:
-  - secure: "m2miJTnJPlSo2xFppOenQpzrCwxOyUztMlNdQ3GSrkVnE5g/USsFTfD018Si\nniQDBkt2B8+JJZWo42SdP+8rf75y6piwNRxgmMWyON8s9Jsq5g+QFHKaCwtc\nobEYzrrHkCahZ+lUedGL+8ff9zvYm+IcdKpiLQTET84K1ctrRyE="
-  - secure: "qnxIMBzUhRnT6TpEn1CfD6vQltzwppNjdJ2PL9bO12jyETIuwo+ktaJ8r5bc\nKVI8rZW5sdD4sO0qEsz5JJSGh2Ih+Y9YiXg8OzK28noLocXQgv0TItO7sghl\nHPHcwEzfH4PtkS8v+0f82nS74WXAEsNZLi2lhpghH3ODFd8ZYI0="
-  - IMAGEATTACH_TEST_S3_NAME=sqla-imageattach-test
-  - IMAGEATTACH_TEST_S3_SANDBOX_NAME=sqla-imageattach-test2
   - MYSQL_CONNECTOR_PYTHON_URL='https://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.7.tar.gz'
   matrix:
   - DB=sqlite
   - DB=postgresql
   - DB=mysql
 before_install:
+- 'export BUCKET_IDX="$(expr "${TRAVIS_JOB_NUMBER#[0-9]*.}" % 6)"'
+- export IMAGEATTACH_TEST_S3_NAME="sqla-ia-test${BUCKET_IDX}"
+- export IMAGEATTACH_TEST_S3_SANDBOX_NAME="sqla-ia-testx${BUCKET_IDX}"
 - export PY=`python -c 'import sys;print("pypy" if hasattr(sys,"pypy_version_info") else "%d.%d" % sys.version_info[:2])'`
 install:
 - pip install pytest SQLAlchemy-Utils WebOb pytest-capturelog flake8 'pip>=8.1.2' 'setuptools>=23.1.0' pytest-cov coveralls
