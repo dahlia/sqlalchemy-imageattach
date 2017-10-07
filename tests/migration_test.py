@@ -3,11 +3,11 @@ import os.path
 
 from pytest import fixture
 
+from .conftest import Base, sample_images_dir
+from .entity_test import Samething, Something, SomethingCover
 from sqlalchemy_imageattach.context import store_context
 from sqlalchemy_imageattach.migration import migrate, migrate_class
 from sqlalchemy_imageattach.store import Store
-from .conftest import Base, sample_images_dir
-from .entity_test import Samething, Something, SomethingCover
 
 
 class SourceStore(Store):

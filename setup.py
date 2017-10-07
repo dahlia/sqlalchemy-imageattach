@@ -1,6 +1,6 @@
 import os.path
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 from sqlalchemy_imageattach.version import VERSION
 

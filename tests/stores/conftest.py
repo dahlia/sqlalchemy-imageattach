@@ -3,8 +3,8 @@ import datetime
 from sqlalchemy.schema import Column
 from sqlalchemy.types import Integer
 
-from sqlalchemy_imageattach.entity import Image
 from ..conftest import Base
+from sqlalchemy_imageattach.entity import Image
 
 
 class UTC(datetime.tzinfo):

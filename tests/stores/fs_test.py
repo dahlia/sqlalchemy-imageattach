@@ -6,12 +6,12 @@ import re
 from pytest import mark, raises
 from webob import Request
 
+from ..conftest import sample_images_dir
+from .conftest import ExampleImage, utcnow
 from sqlalchemy_imageattach.stores.fs import (FileSystemStore,
                                               HttpExposedFileSystemStore,
                                               StaticServerMiddleware,
                                               guess_extension)
-from ..conftest import sample_images_dir
-from .conftest import ExampleImage, utcnow
 
 
 def test_fs_store(tmpdir):

@@ -10,10 +10,10 @@ import uuid
 
 from pytest import fixture, mark, raises, skip
 
-from sqlalchemy_imageattach.stores import s3
-from sqlalchemy_imageattach.stores.s3 import S3SandboxStore, S3Store
 from ..conftest import sample_images_dir
 from .conftest import ExampleImage, utcnow
+from sqlalchemy_imageattach.stores import s3
+from sqlalchemy_imageattach.stores.s3 import S3SandboxStore, S3Store
 
 
 remove_query = functools.partial(re.compile(r'\?.*$').sub, '')

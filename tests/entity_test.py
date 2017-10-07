@@ -5,7 +5,7 @@ import hashlib
 import os.path
 import uuid
 
-from pytest import yield_fixture, raises
+from pytest import fixture, raises
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import Column, ForeignKey
@@ -13,17 +13,17 @@ from sqlalchemy.types import Integer, String
 from sqlalchemy_utils.types.uuid import UUIDType
 from wand.image import Image as WandImage
 
+from .conftest import Base, sample_images_dir
 from sqlalchemy_imageattach.context import store_context
 from sqlalchemy_imageattach.entity import Image, NoopContext, image_attachment
 from sqlalchemy_imageattach.stores.fs import FileSystemStore
-from .conftest import Base, sample_images_dir
 
 
 class ExpectedException(Exception):
     """Exception to be expected to rise."""
 
 
-@yield_fixture
+@fixture
 def tmp_store(tmpdir):
     yield FileSystemStore(tmpdir.strpath, 'http://localhost/')
     tmpdir.remove()

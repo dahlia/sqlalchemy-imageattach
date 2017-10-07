@@ -3,10 +3,10 @@ import io
 import os.path
 
 from pytest import mark, raises
-from sqlalchemy_imageattach.store import Store
 
 from .conftest import sample_images_dir
 from .stores.conftest import ExampleImage, utcnow
+from sqlalchemy_imageattach.store import Store
 
 
 class EmptyStore(Store):
