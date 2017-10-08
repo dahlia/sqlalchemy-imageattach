@@ -6,12 +6,17 @@ addons:
     - libmagickcore5-extra
     - ghostscript
     - gsfonts
+cache:
+  directories:
+  - $HOME/.cache/pip
+  - $TRAVIS_BUILD_DIR/.tox
 before_install:
 - 'export BUCKET_IDX="$(expr "${TRAVIS_JOB_NUMBER#[0-9]*.}" % 6)"'
 - export IMAGEATTACH_TEST_S3_NAME="sqla-ia-test${BUCKET_IDX}"
 - export IMAGEATTACH_TEST_S3_SANDBOX_NAME="sqla-ia-testx${BUCKET_IDX}"
 install:
 - pip install tox-travis coveralls
+- tox --notest  # for cache
 before_script:
 - createdb -U postgres -E utf8 -T postgres si_test
 - mysql -e "CREATE DATABASE si_test;"
