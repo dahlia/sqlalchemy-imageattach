@@ -1,6 +1,22 @@
 SQLAlchemy-ImageAttach
 ======================
 
+.. image:: https://img.shields.io/pypi/v/SQLAlchemy-ImageAttach.svg
+   :target: https://pypi.org/project/SQLAlchemy-ImageAttach/
+   :alt: PyPI
+
+.. image:: https://readthedocs.org/projects/sqlalchemy-imageattach/badge/?version=stable
+   :target: https://sqlalchemy-imageattach.readthedocs.io/
+   :alt: Read the Docs
+
+.. image:: https://travis-ci.org/dahlia/sqlalchemy-imageattach.svg?branch=master
+   :alt: Build Status
+   :target: https://travis-ci.org/dahlia/sqlalchemy-imageattach
+
+.. image:: https://img.shields.io/coveralls/dahlia/sqlalchemy-imageattach/badge.svg?
+   :alt: Coverage Status
+   :target: https://coveralls.io/r/dahlia/sqlalchemy-imageattach
+
 **SQLAlchemy-ImageAttach** is a SQLAlchemy_ extension for attaching images to
 entity objects.  It provides the following features:
 
@@ -27,44 +43,18 @@ Tested on various environments
    - SQLAlchemy: 0.9 or higher (tested on 0.9 to 1.1; see CI as well)
 
 .. _SQLAlchemy: http://www.sqlalchemy.org/
-.. _S3: http://aws.amazon.com/s3/
-.. _RRS: http://aws.amazon.com/s3/#rss
+.. _S3: https://aws.amazon.com/s3/
+.. _RRS: https://aws.amazon.com/s3/reduced-redundancy/
 .. _PyPy: http://pypy.org/
 
 
-Links
------
+Installation
+------------
 
-Docs
-   https://sqlalchemy-imageattach.readthedocs.io/
+It's available on PyPI_:
 
-   .. image:: https://readthedocs.org/projects/sqlalchemy-imageattach/badge/
-      :target: https://sqlalchemy-imageattach.readthedocs.io/
-      :alt: Documentation Status
+.. code-block:: console
 
-Package Index (Cheeseshop)
-   https://pypi.python.org/pypi/SQLAlchemy-ImageAttach
+   $ pip install SQLAlchemy-ImageAttach
 
-   .. image:: https://badge.fury.io/py/SQLAlchemy-ImageAttach.svg?
-      :target: https://pypi.python.org/pypi/SQLAlchemy-ImageAttach
-      :alt: Latest PyPI version
-
-GitHub
-   https://github.com/dahlia/sqlalchemy-imageattach
-
-Continuous Integration (Travis CI)
-   http://travis-ci.org/dahlia/sqlalchemy-imageattach
-
-   .. image:: https://travis-ci.org/dahlia/sqlalchemy-imageattach.svg?branch=master
-      :alt: Build Status
-      :target: https://travis-ci.org/dahlia/sqlalchemy-imageattach
-
-Code Coverage
-   https://coveralls.io/r/dahlia/sqlalchemy-imageattach
-
-   .. image:: https://img.shields.io/coveralls/dahlia/sqlalchemy-imageattach/badge.svg?
-      :alt: Coverage Status
-      :target: https://coveralls.io/r/dahlia/sqlalchemy-imageattach
-
-Author Website
-   https://hongminhee.org/
+.. _PyPI: https://pypi.org/project/SQLAlchemy-ImageAttach/
