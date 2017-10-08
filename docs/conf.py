@@ -299,7 +299,7 @@ intersphinx_mapping = {
 
 
 extlinks = {
-    'pypi': ('https://pypi.python.org/pypi/%s', ''),
+    'pypi': ('https://pypi.org/project/%s/', ''),
     'issue': ('https://github.com/dahlia/sqlalchemy-imageattach/issues/%s',
               '#'),
     'commit': ('https://github.com/dahlia/sqlalchemy-imageattach/commit/%s',
