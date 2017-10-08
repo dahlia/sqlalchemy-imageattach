@@ -26,7 +26,7 @@ setup(
     long_description=readme(),
     url='https://github.com/dahlia/sqlalchemy-imageattach',
     author='Hong Minhee',
-    author_email='hongminhee' '@' 'member.fsf.org',
+    author_email='hong.minhee' '@' 'gmail.com',
     license='MIT License',
     packages=find_packages(exclude=['tests', 'tests.stores']),
     install_requires=install_requires,
