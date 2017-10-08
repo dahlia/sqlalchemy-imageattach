@@ -18,10 +18,6 @@ install_requires = [
     'Wand >= 0.3.0'
 ]
 
-docs_require = [
-    'Sphinx >= 1.4',
-]
-
 
 setup(
     name='SQLAlchemy-ImageAttach',
@@ -34,7 +30,6 @@ setup(
     license='MIT License',
     packages=find_packages(exclude=['tests', 'tests.stores']),
     install_requires=install_requires,
-    extras_require={'docs': docs_require},
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
