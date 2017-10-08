@@ -824,10 +824,12 @@ class BaseImageSet(object):
                 if len(img.sequence) > 1:
                     img_ctx = img.sequence[0].clone()
                     img_ctx.resize(width, height, filter=filter)
+                    img_ctx.strip()
                 else:
                     img_ctx = NoopContext(img)
                 with img_ctx as single_img:
                     single_img.resize(width, height, filter=filter)
+                    single_img.strip()
                     if _postprocess_image is None:
                         mimetype = img.mimetype
                         single_img.save(file=data)

@@ -15,6 +15,9 @@ To be released.
   If a primary key is not composite and :class:`~uuid.UUID` type,
   :attr:`sqlalchemy_imageattach.entity.Image.object_id` for that doesn't have to
   be implemented.
+- :meth:`BaseImageSet.generate_thumbnail()` became to strip metadata such as
+  all profiles and comments from thumbnail images.  It doesn't affect to
+  original images.
 
 
 Version 1.0.0
