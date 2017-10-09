@@ -4,7 +4,7 @@ SQLAlchemy-ImageAttach Changelog
 Version 1.1.0
 -------------
 
-To be released.
+Released on October 10, 2017.
 
 - Dropped Python 2.6 and 3.2 support.
 - Dropped SQLAlchemy 0.8 support.
