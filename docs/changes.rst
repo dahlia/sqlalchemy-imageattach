@@ -18,6 +18,9 @@ To be released.
 - :meth:`BaseImageSet.generate_thumbnail()` became to strip metadata such as
   all profiles and comments from thumbnail images.  It doesn't affect to
   original images.
+- Added ``max_retry`` parameter to
+  :class:`~sqlalchemy_imageattach.stores.s3.S3Store` and
+  :class:`~sqlalchemy_imageattach.stores.s3.S3SandboxStore` classes.
 
 
 Version 1.0.0
@@ -92,7 +95,7 @@ Released on June 20, 2013.
 - Added manual :func:`~sqlalchemy_imageattach.context.push_store_context()` and
   :func:`~sqlalchemy_imageattach.context.pop_store_context()` API.  It's useful
   when you can't use :keyword:`with` keyword e.g. setup/teardown hooks.
-- :attr:`Image.object_type <sqlalchemy_imageattch.entity.Image.object_type>`
+- :attr:`Image.object_type <sqlalchemy_imageattach.entity.Image.object_type>`
   property now has the default value when the primary key is an integer.
 - Columns of :class:`~sqlalchemy_imageattach.entity.Image` class become
   able to be used as SQL expressions.
