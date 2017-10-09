@@ -11,9 +11,11 @@ cache:
   - $HOME/.cache/pip
   - $TRAVIS_BUILD_DIR/.tox
 before_install:
-- 'export BUCKET_IDX="$(expr "${TRAVIS_JOB_NUMBER#[0-9]*.}" % 6)"'
-- export IMAGEATTACH_TEST_S3_NAME="sqla-ia-test${BUCKET_IDX}"
-- export IMAGEATTACH_TEST_S3_SANDBOX_NAME="sqla-ia-testx${BUCKET_IDX}"
+- 'export BUCKET_IDX="$(expr "${TRAVIS_JOB_NUMBER#[0-9]*.}" % 4)"'
+- export IMAGEATTACH_TEST_S3_NAME="si-test${BUCKET_IDX}"  # AWS2Auth
+- export IMAGEATTACH_TEST_S3_AWS4AUTH_NAME="si-test${BUCKET_IDX}-v4"
+- export IMAGEATTACH_TEST_S3_AWS4AUTH_REGION="us-east-2"
+- export IMAGEATTACH_TEST_S3_SANDBOX_NAME="si-testx${BUCKET_IDX}"
 install:
 - pip install tox-travis coveralls
 - tox --notest  # for cache
@@ -21,16 +23,16 @@ before_script:
 - createdb -U postgres -E utf8 -T postgres si_test
 - mysql -e "CREATE DATABASE si_test;"
 script:
-# SQLite
-- tox -- --cov sqlalchemy_imageattach --durations=20
-# PostgreSQL
-- tox -- --cov sqlalchemy_imageattach --durations=20 --database-url='postgresql:///si_test?user=postgres'
-# MySQL
+# SQLite & AWS4Auth
+- tox -- -vv --cov sqlalchemy_imageattach --durations=20 --s3-name="$IMAGEATTACH_TEST_S3_AWS4AUTH_NAME" --s3-region="$IMAGEATTACH_TEST_S3_AWS4AUTH_REGION"
+# PostgreSQL & AWS2Auth
+- tox -- -vv --cov sqlalchemy_imageattach --durations=20 --database-url='postgresql:///si_test?user=postgres'
+# MySQL & AWS2Auth
 - |
   if [[ "$TRAVIS_PYTHON_VERSION" = "pypy" ]]; then
-    tox -- --cov sqlalchemy_imageattach --durations=20 --database-url='mysql+pymysql://root@localhost/si_test'
+    tox -- -vv --cov sqlalchemy_imageattach --durations=20 --database-url='mysql+pymysql://root@localhost/si_test'
   else
-    tox -- --cov sqlalchemy_imageattach --durations=20 --database-url='mysql+mysqlconnector://root@localhost/si_test'
+    tox -- -vv --cov sqlalchemy_imageattach --durations=20 --database-url='mysql+mysqlconnector://root@localhost/si_test'
   fi
 after_success:
 - coveralls

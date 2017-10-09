@@ -13,7 +13,8 @@ from pytest import fixture, mark, raises, skip
 from ..conftest import sample_images_dir
 from .conftest import ExampleImage, utcnow
 from sqlalchemy_imageattach.stores import s3
-from sqlalchemy_imageattach.stores.s3 import S3SandboxStore, S3Store
+from sqlalchemy_imageattach.stores.s3 import (AuthMechanismError,
+                                              S3SandboxStore, S3Store)
 
 
 remove_query = functools.partial(re.compile(r'\?.*$').sub, '')
@@ -44,9 +45,14 @@ def s3_store_getter(request):
         secret_key = request.config.getoption('--s3-secret-key')
     except ValueError:
         secret_key = None
+    try:
+        region = request.config.getoption('--s3-region')
+    except ValueError:
+        region = None
     return functools.partial(S3Store, name,
                              access_key=access_key,
-                             secret_key=secret_key)
+                             secret_key=secret_key,
+                             region=region)
 
 
 @fixture
@@ -69,11 +75,21 @@ def s3_sandbox_store_getter(request):
         secret_key = request.config.getoption('--s3-secret-key')
     except ValueError:
         secret_key = None
+    try:
+        underlying_region = request.config.getoption('--s3-region')
+    except ValueError:
+        underlying_region = None
+    try:
+        overriding_region = request.config.getoption('--s3-sandbox-region')
+    except ValueError:
+        overriding_region = None
     return functools.partial(S3SandboxStore,
                              underlying=name,
                              overriding=sandbox_name,
                              access_key=access_key,
-                             secret_key=secret_key)
+                             secret_key=secret_key,
+                             underlying_region=underlying_region,
+                             overriding_region=overriding_region)
 
 
 @mark.parametrize(
@@ -110,6 +126,17 @@ def test_s3_store(prefix, public_base_url, s3_store_getter):
         no_prefix = s3_store_getter()
         with raises(IOError):
             no_prefix.open(image)
+    if s3.region not in (None, 'us-east-1', 'us-west-1', 'us-west-2',
+                         'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1',
+                         'eu-west-1', 'sa-east-1'):
+        # Case when the region only supports AWS4Auth
+        # https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+        s3_aws2auth = s3_store_getter(prefix=prefix,
+                                      public_base_url=public_base_url)
+        s3_aws2auth.region = None  # Use AWS2Auth
+        with raises(AuthMechanismError):
+            with s3_aws2auth.open(image):
+                pass
     s3.delete(image)
     with raises(IOError):
         s3.open(image)

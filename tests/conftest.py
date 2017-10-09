@@ -38,6 +38,10 @@ def pytest_addoption(parser):
                      default=env('IMAGEATTACH_TEST_S3_NAME'),
                      help='AWS S3 bucket name for testing purpose '
                           '[default: %default]')
+    parser.addoption('--s3-region', type='string',
+                     default=env('IMAGEATTACH_TEST_S3_REGION'),
+                     help='Region code (e.g. us-east-1) of --s3-name '
+                          '[default: %default]')
     parser.addoption('--s3-access-key', type='string',
                      default=env('IMAGEATTACH_TEST_S3_ACCESS_KEY'),
                      help='AWS credential to access the testing bucket '
@@ -49,6 +53,10 @@ def pytest_addoption(parser):
     parser.addoption('--s3-sandbox-name', type='string',
                      default=env('IMAGEATTACH_TEST_S3_SANDBOX_NAME'),
                      help='AWS S3 secondary bucket name for testing purpose '
+                          '[default: %default]')
+    parser.addoption('--s3-sandbox-region', type='string',
+                     default=env('IMAGEATTACH_TEST_S3_SANDBOX_REGION'),
+                     help='Region code (e.g. us-east-1) of --s3-sandbox-name '
                           '[default: %default]')
     cmd_options_intiailized = True
 

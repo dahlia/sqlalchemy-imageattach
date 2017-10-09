@@ -18,9 +18,35 @@ To be released.
 - :meth:`BaseImageSet.generate_thumbnail()` became to strip metadata such as
   all profiles and comments from thumbnail images.  It doesn't affect to
   original images.
-- Added ``max_retry`` parameter to
-  :class:`~sqlalchemy_imageattach.stores.s3.S3Store` and
+
+- S3 storage backend (:mod:`sqlalchemy_imageattach.stores.s3`) now supports
+  `Signature Version 4`__ (AWS4Auth).  Signature Version 4 is used if
+  the :attr:`~sqlalchemy_imageattach.stores.s3.S3Store.region` of
+  :class:`~sqlalchemy_imageattach.stores.s3.S3Store` is determined.
+  Otherwise `Signature Version 2`__ (which is deprecated since January 30, 2014)
+  is used as it has been.  [:issue:`34`]
+
+  - Added :attr:`~sqlalchemy_imageattach.stores.s3.S3Store.region` parameter
+    to :class:`~sqlalchemy_imageattach.stores.s3.S3Store`.
+  - Added
+    :attr:`~sqlalchemy_imageattach.stores.s3.S3SandboxStore.underlying_region`
+    and
+    :attr:`~sqlalchemy_imageattach.stores.s3.S3SandboxStore.overriding_region`
+    parameters to :class:`~sqlalchemy_imageattach.stores.s3.S3SandboxStore`.
+  - Added :class:`~sqlalchemy_imageattach.stores.s3.S3RequestV4` class.
+  - Renamed :class:`~sqlalchemy_imageattach.stores.s3.S3Request` to
+    :class:`~sqlalchemy_imageattach.stores.s3.S3RequestV2`.
+    The existing :class:`~sqlalchemy_imageattach.stores.s3.S3Request` still
+    remains for backward compatibility, but it's deprecated.
+  - Added :class:`~sqlalchemy_imageattach.stores.s3.AuthMechanismError`
+    exception.
+
+- Added :attr:`~sqlalchemy_imageattach.stores.s3.S3Store.max_retry` parameter
+  to :class:`~sqlalchemy_imageattach.stores.s3.S3Store` and
   :class:`~sqlalchemy_imageattach.stores.s3.S3SandboxStore` classes.
+
+__ https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html
+__ https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html
 
 
 Version 1.0.0
