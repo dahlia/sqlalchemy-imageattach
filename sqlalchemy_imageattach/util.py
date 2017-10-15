@@ -10,7 +10,7 @@ import re
 import textwrap
 
 __all__ = ('append_docstring', 'append_docstring_attributes',
-           'get_minimum_indent')
+           'classproperty', 'get_minimum_indent')
 
 
 def get_minimum_indent(docstring, ignore_before=1):
@@ -102,3 +102,11 @@ def append_docstring_attributes(docstring, locals):
             *lines
         )
     return docstring
+
+
+class classproperty(object):
+    def __init__(self, getter):
+        self.getter = getter
+
+    def __get__(self, instance, owner):
+        return self.getter(owner)

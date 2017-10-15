@@ -76,6 +76,7 @@ import cgi
 import io
 import numbers
 import shutil
+import threading
 import uuid
 
 from sqlalchemy import Column
@@ -96,7 +97,7 @@ from wand.image import Image as WandImage
 from .context import current_store, get_current_store, store_context
 from .file import ReusableFileProxy
 from .store import Store
-from .util import append_docstring_attributes
+from .util import append_docstring_attributes, classproperty
 
 __all__ = ('VECTOR_TYPES', 'BaseImageSet', 'BaseImageQuery', 'Image',
            'ImageSet', 'ImageSubset', 'MultipleImageSet', 'SingleImageSet',
@@ -373,18 +374,32 @@ class BaseImageQuery(Query):
 
     """
 
-    #: (:class:`collections.abc.MutableSet`) The set of instances that their
-    #: image files are stored but the ongoing transaction isn't committed.
-    #: When the transaction might fail and rollback, image files in the
-    #: set are deleted back in the storage.
-    _stored_images = set()
+    _local = threading.local()
 
-    #: (:class:`collections.abc.MutableSet`) The set of instanced marked
-    #: as deleted.  If the ongoing transaction is successfully committed
-    #: the actual files in the storages will be deleted as well.
-    #: When the transaction might fail and rollback, image files won't
-    #: deleted and the set will be empty.
-    _deleted_images = set()
+    @classproperty
+    def _stored_images(cls):
+        """(:class:`collections.abc.MutableSet`) The set of instances that
+        their image files are stored but the ongoing transaction isn't
+        committed. When the transaction might fail and rollback, image files
+        in the set are deleted back in the storage. This set is thread-local.
+
+        """
+        if not getattr(cls._local, '_stored_images', None):
+            cls._local._stored_images = set()
+        return cls._local._stored_images
+
+    @classproperty
+    def _deleted_images(cls):
+        """(:class:`collections.abc.MutableSet`) The set of instanced marked
+        as deleted.  If the ongoing transaction is successfully committed
+        the actual files in the storages will be deleted as well. When the
+        transaction might fail and rollback, image files won't deleted and
+        the set will be empty. This set is thread-local.
+
+        """
+        if not getattr(cls._local, '_deleted_images', None):
+            cls._local._deleted_images = set()
+        return cls._local._deleted_images
 
     @classmethod
     def _mark_image_file_stored(cls, mapper, connection, target):
