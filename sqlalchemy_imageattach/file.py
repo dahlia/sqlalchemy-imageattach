@@ -4,7 +4,7 @@
 The file-like types which wraps/proxies an other file objects.
 
 """
-from collections import Iterator
+from collections.abc import Iterator
 import os
 
 __all__ = 'FileProxy', 'ReusableFileProxy', 'SeekableFileProxy'
